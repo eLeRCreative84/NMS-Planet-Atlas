@@ -159,7 +159,7 @@
   <label>Oddal glob</label>
   <input type="range" id="globeScale" min="0.01" max="1" step="0.01" value="1" oninput="updateGlobeScale()" />
   <label>Skala punktów</label>
-  <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="1" oninput="updatePointScale()" />
+  <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="0.4" oninput="updatePointScale()" />
   <label>Przesuń glob</label>
   <input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
   <button onclick="resetGlobePosition()">Reset pozycji globu</button>
@@ -175,7 +175,7 @@
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
 let currentPlanet = null;
-let pointScale = 1;
+let pointScale = parseFloat(document.getElementById("pointScale").value);
 
 const globe = Globe()(document.getElementById("globeViz"))
   .globeImageUrl(null)
@@ -183,23 +183,23 @@ const globe = Globe()(document.getElementById("globeViz"))
   .pointLng("lng")
   .pointLabel(d => {
     let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
-    if(d.type==="Resource") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+    if(d.type==="Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
     if(d.type==="Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
     return label;
   })
   .pointColor(d=>{
     switch(d.type){
-      case "Resource": return d.extracted?"gray":"gold";
+      case "Zasób": return d.extracted?"gray":"gold";
       case "Obelisk": return d.visited?"green":"orange";
-      case "Base": return "blue";
-      case "Ruins": return "brown";
-      case "LargeStructure": return "purple";
-      case "Other": return "pink";
+      case "Baza": return "blue";
+      case "Ruiny": return "brown";
+      case "Duża struktura": return "purple";
+      case "Inne": return "pink";
       case "Pole": return "red";
       default: return "red";
     }
   })
-  .pointRadius(() => pointScale) // <-- tu ustawiamy skalę punktów
+  .pointRadius(() => pointScale)
   .htmlElementsData([])
   .htmlElement(d=>{
     if(d.type==="Pole"){
@@ -214,19 +214,6 @@ const globe = Globe()(document.getElementById("globeViz"))
   });
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
-
-function getPointColor(d){
-  switch(d.type){
-    case "Zasób": return d.extracted?"gray":"gold";
-    case "Obelisk": return d.visited?"green":"orange";
-    case "Baza": return "blue";
-    case "Ruiny": return "brown";
-    case "Duża struktura": return "purple";
-    case "Inne": return "pink";
-    case "Pole": return "red";
-    default: return "red";
-  }
-}
 
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
@@ -409,42 +396,26 @@ function importAtlas(event){
   reader.readAsText(file);
 }
 
-// Skalowanie globu
 function updateGlobeScale(){
   const scale = parseFloat(document.getElementById("globeScale").value);
   globe.scene().scale.set(scale, scale, scale);
 }
 
-// Skalowanie promienia punktów
-let pointScale = 0.4; // domyślna wartość
-
 function updatePointScale() {
-  pointScale = parseFloat(document.getElementById("pointScaleRange").value);
-  document.getElementById("pointScale").value = pointScale;
+  pointScale = parseFloat(document.getElementById("pointScale").value);
   refreshGlobePoints();
 }
 
-function syncScaleInputs(source) {
-  const numberInput = document.getElementById("pointScale");
-  const rangeInput = document.getElementById("pointScaleRange");
-  if(source==="number") rangeInput.value = numberInput.value;
-  if(source==="range") numberInput.value = rangeInput.value;
-  updatePointScale();
-}
-
-// Przesuwanie globu w lewo/prawo
 function updateGlobeOffset(){
   const offset = parseFloat(document.getElementById("globeOffset").value);
   globe.scene().position.x = offset;
 }
 
-// Reset pozycji globu
 function resetGlobePosition() {
   document.getElementById("globeOffset").value = 0;
   globe.scene().position.x = 0;
 }
 
-// 🔹 helper do odświeżania punktów
 function refreshGlobePoints(){
   if(!currentPlanet) return;
   globe.pointsData(atlas[currentPlanet]);
