@@ -125,8 +125,8 @@ const globe = Globe()(document.getElementById("globeViz"))
   const h = (d.height || 0.4) * pointScale;  // 🔹 uwzględniamy height i pointScale
   obj.scale.set(1, h, 1);
   obj.position.set(0, h / 2, 0); // żeby słupek stał na powierzchni globu
-});
-
+})
+  
   .htmlElementsData([])
   .htmlElement(d => {
     if(d.type==="Pole"){
