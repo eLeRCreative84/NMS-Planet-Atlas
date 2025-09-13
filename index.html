@@ -97,8 +97,8 @@ let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 
 const globe = Globe()(document.getElementById("globeViz"))
-  .globeImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/earth-blue-marble.jpg')
-  .backgroundImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/stars.jpg')
+  .globeImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/earth-blue-marble.jpg') // mapa planety
+  .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png') // 🌌 gwiazdy w tle
   .pointLat("lat")
   .pointLng("lng")
   .pointLabel(d => {
