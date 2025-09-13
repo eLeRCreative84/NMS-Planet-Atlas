@@ -6,35 +6,18 @@
 <script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <style>
-  body {
-    margin: 0;
-    display: flex;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-  }
-  #form {
-    flex: 0 0 25%;
-    min-width: 280px;
-    max-width: 450px;
-    padding: 1rem;
-    background: #0a1e3a; /* ciemny granat */
-    color: white;
-    overflow-y: auto;
-    box-sizing: border-box;
-  }
+  body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; }
+  #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
   #globeViz { flex: 1; background: black; }
   h2 { margin-top: 1rem; margin-bottom: 0.5rem; }
   input, select, textarea, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
   button { cursor: pointer; }
   .texture-input { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-  .texture-input button {
-    flex: 1; padding: 0.5rem; border: none; background: #1976d2; color: white; border-radius: 4px;
-  }
+  .texture-input button { flex: 1; padding: 0.5rem; border: none; background: #1976d2; color: white; border-radius: 4px; }
   .texture-input button:hover { background: #1565c0; }
   ul { padding: 0; list-style: none; }
   li { margin: 0.3rem 0; background: #1a2b4d; padding: 0.3rem; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
-  li div { display: flex; gap: 0.5rem; }
+  li div { display: flex; gap: 0.5rem; align-items: center; }
   li button { padding: 0.2rem 0.5rem; border: none; border-radius: 4px; cursor: pointer; }
   li button.edit { background: #0277bd; color: white; }
   li button.del { background: #c62828; color: white; }
@@ -50,12 +33,12 @@
   <label>Nazwa punktu</label><input type="text" id="name" />
   <label>Typ</label>
   <select id="type">
-    <option>Resource</option>
+    <option>Zasób</option>
     <option>Obelisk</option>
-    <option>Base</option>
-    <option>Ruins</option>
-    <option>LargeStructure</option>
-    <option>Other</option>
+    <option>Baza</option>
+    <option>Ruiny</option>
+    <option>Duża struktura</option>
+    <option>Inne</option>
   </select>
   <label>Notatki</label><textarea id="notes"></textarea>
   <button onclick="addPoint()">Dodaj punkt</button>
@@ -73,16 +56,12 @@
     <button onclick="setPlanetTextureFromInput()">Ustaw</button>
   </div>
 
-  <h2>Skalowanie planety</h2>
-  <label>Skala globu</label>
+  <h2>Skalowanie</h2>
+  <label>Oddal glob</label>
   <input type="range" id="globeScale" min="0.01" max="1" step="0.01" value="1" oninput="updateGlobeScale()" />
-
-  <h2>Oddal (suwak)</h2>
-  <div class="grid-control">
-  <input type="number" id="pointScale" value="1" min="0.01" max="10" step="0.01" oninput="syncScaleInputs('number')"/>
-  <input type="range" id="pointScaleRange" value="1" min="0.01" max="10" step="0.01" oninput="syncScaleInputs('range')"/>
-  </div>
-
+  
+  <label>Skala punktów</label>
+  <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="1" oninput="updatePointScale()" />
 
   <h2>Import/Eksport</h2>
   <button onclick="exportAtlas()">Eksport JSON</button>
@@ -95,6 +74,7 @@
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
 let currentPlanet = null;
+let pointScale = 1;
 
 const globe = Globe()(document.getElementById("globeViz"))
   .globeImageUrl(null)
@@ -102,23 +82,23 @@ const globe = Globe()(document.getElementById("globeViz"))
   .pointLng("lng")
   .pointLabel(d => {
     let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
-    if(d.type==="Resource") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+    if(d.type==="Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
     if(d.type==="Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
     return label;
   })
   .pointColor(d=>{
     switch(d.type){
-      case "Resource": return d.extracted?"gray":"gold";
+      case "Zasób": return d.extracted?"gray":"gold";
       case "Obelisk": return d.visited?"green":"orange";
-      case "Base": return "blue";
-      case "Ruins": return "brown";
-      case "LargeStructure": return "purple";
-      case "Other": return "pink";
+      case "Baza": return "blue";
+      case "Ruiny": return "brown";
+      case "Duża struktura": return "purple";
+      case "Inne": return "pink";
       case "Pole": return "red";
       default: return "red";
     }
   })
-  .pointRadius(0.4)
+  .pointRadius(d=>0.4*pointScale)
   .htmlElementsData([])
   .htmlElement(d=>{
     if(d.type==="Pole"){
@@ -132,7 +112,6 @@ const globe = Globe()(document.getElementById("globeViz"))
     }
   });
 
-// Siatka współrzędnych
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
 function saveAtlas(){
@@ -158,6 +137,7 @@ function refreshPlanetList(){
     btn.style.margin="0.2rem 0";
     btn.onclick=()=>{
       currentPlanet=p;
+      document.getElementById("planet").value=p; // <- automatyczne uzupełnianie pola
       addPoles(p);
       globe.pointsData(atlas[p]);
       globe.htmlElementsData(atlas[p].filter(pt=>pt.type==="Pole"));
@@ -175,12 +155,26 @@ function refreshPointsList(){
   atlas[currentPlanet].forEach((point,index)=>{
     const li=document.createElement("li");
     const info=document.createElement("span");
-    info.innerHTML=`${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}` +
-      (point.type==="Resource"? (point.extracted?" [Wydobyty]":" [Nie wydobyty]") :"") +
-      (point.type==="Obelisk"? (point.visited?" [Odwiedzony]":" [Nie odwiedzony]") :"");
+    info.innerHTML=`${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
     li.appendChild(info);
 
     const btnDiv=document.createElement("div");
+
+    // Checkbox do zmiany stanu
+    if(point.type==="Zasób" || point.type==="Obelisk"){
+      const checkbox=document.createElement("input");
+      checkbox.type="checkbox";
+      checkbox.checked=point.type==="Zasób"?point.extracted:point.visited;
+      checkbox.onchange=()=>{
+        if(point.type==="Zasób") point.extracted=checkbox.checked;
+        if(point.type==="Obelisk") point.visited=checkbox.checked;
+        saveAtlas();
+        globe.pointsData(atlas[currentPlanet]); // natychmiastowa zmiana koloru
+        refreshPointsList();
+      };
+      btnDiv.appendChild(checkbox);
+    }
+
     const editBtn=document.createElement("button");
     editBtn.textContent="Edytuj"; editBtn.className="edit";
     editBtn.onclick=()=>editPoint(index);
@@ -213,7 +207,7 @@ function addPoint(){
   if(!planet || isNaN(lat) || isNaN(lng)){ alert("Uzupełnij planetę i współrzędne!"); return; }
   if(!atlas[planet]) atlas[planet]=[];
   const point={planet,lat,lng,name,type,notes};
-  if(type==="Resource") point.extracted=false;
+  if(type==="Zasób") point.extracted=false;
   if(type==="Obelisk") point.visited=false;
   atlas[planet].push(point);
   saveAtlas();
@@ -285,6 +279,12 @@ function importAtlas(event){
 function updateGlobeScale(){
   const scale=parseFloat(document.getElementById("globeScale").value);
   globe.scene().scale.set(scale,scale,scale);
+}
+
+// Skalowanie punktów
+function updatePointScale(){
+  pointScale=parseFloat(document.getElementById("pointScale").value);
+  if(currentPlanet) globe.pointsData(atlas[currentPlanet]);
 }
 
 refreshPlanetList();
