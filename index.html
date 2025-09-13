@@ -192,14 +192,12 @@ const globe = Globe()(document.getElementById("globeViz"))
   .customLayerData(() => atlas[currentPlanet] || [])
 .customThreeObjectUpdate((obj, d) => {
   const radius = 0.05 * pointScale;
-  const height = 0.4 * pointScale; // stała wysokość razy skala
+  const height = 0.4 * pointScale;
   obj.geometry.dispose();
   obj.geometry = new THREE.CylinderGeometry(radius, radius, height, 8);
-  obj.position.set(0, height/2, 0);
+  obj.position.set(0, height / 2, 0);
 })
-  .customThreeObjectUpdate((obj, d) => {
-    obj.position.set(0, 0.2, 0);
-  })
+
   .htmlElementsData([])
   .htmlElement(d => {
     if(d.type==="Pole") {
