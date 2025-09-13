@@ -190,14 +190,13 @@ const globe = Globe()(document.getElementById("globeViz"))
   })
   .pointColor(getPointColor)
   .customLayerData(() => atlas[currentPlanet] || [])
-  .customThreeObject(d => {
-    if(d.type === "Pole") return null;
-    const geom = new THREE.CylinderGeometry(0.05 * pointScale, 0.05 * pointScale, 0.4, 8);
-    const mat = new THREE.MeshBasicMaterial({ color: getPointColor(d) });
-    const mesh = new THREE.Mesh(geom, mat);
-    mesh.userData = d;
-    return mesh;
-  })
+.customThreeObjectUpdate((obj, d) => {
+  const radius = 0.05 * pointScale;
+  const height = 0.4 * pointScale; // stała wysokość razy skala
+  obj.geometry.dispose();
+  obj.geometry = new THREE.CylinderGeometry(radius, radius, height, 8);
+  obj.position.set(0, height/2, 0);
+})
   .customThreeObjectUpdate((obj, d) => {
     obj.scale.set(1, 1, 1);
     obj.position.set(0, 0.2, 0);
