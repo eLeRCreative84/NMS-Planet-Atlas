@@ -12,7 +12,7 @@
       height: 100vh;
       font-family: Arial, sans-serif;
       overflow: hidden;
-      background: #0d1b2a; /* ciemnogranatowe tło */
+      background: #0d1b2a;
       color: #e0e6ed;
     }
     #form {
@@ -24,6 +24,13 @@
     }
     #globeViz {
       flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      display: block;
+      margin: auto;
     }
     h2 {
       margin-top: 1rem;
@@ -61,13 +68,6 @@
       gap: 0.5rem;
       margin-top: 0.5rem;
     }
-    .texture-input button {
-      flex: 1;
-      padding: 0.5rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
     #texturePreview {
       margin-top: 0.5rem;
       max-width: 100%;
@@ -85,11 +85,44 @@
     .grid-control input[type="range"] {
       flex: 1;
     }
+    ul {
+      padding: 0;
+      list-style: none;
+    }
+    li {
+      margin: 0.3rem 0;
+      background: #24344d;
+      padding: 0.4rem;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .point-info {
+      flex: 1;
+    }
+    .point-actions {
+      display: flex;
+      gap: 0.3rem;
+      justify-content: flex-end;
+    }
+    .point-actions button {
+      width: auto;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+    }
+    .sort-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0.5rem 0;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
   <div id="form">
-    <h2>Dodaj punkt</h2>
+    <h2>Dodaj / Edytuj punkt</h2>
+    <input type="hidden" id="editIndex" value="" />
     <label>Planeta</label>
     <input type="text" id="planet" placeholder="Nazwa planety" />
     <label>Szerokość</label>
@@ -106,7 +139,7 @@
     </select>
     <label>Notatki</label>
     <textarea id="notes"></textarea>
-    <button onclick="addPoint()">Dodaj punkt</button>
+    <button onclick="savePoint()">💾 Zapisz</button>
 
     <h2>Planety</h2>
     <div id="planetList"></div>
@@ -124,6 +157,23 @@
       <input type="number" id="gridScale" value="15" min="1" max="90" step="1" oninput="syncGridInputs('number')" />
       <input type="range" id="gridScaleRange" value="15" min="1" max="90" step="1" oninput="syncGridInputs('range')" />
     </div>
+
+    <h2>Punkty na planecie</h2>
+    <div class="sort-controls">
+      <label for="sortBy">Sortuj:</label>
+      <select id="sortBy" onchange="refreshPointsList()">
+        <option value="name">Nazwa (A-Z)</option>
+        <option value="type">Typ</option>
+        <option value="dateAsc">Data ↑</option>
+        <option value="dateDesc">Data ↓</option>
+      </select>
+    </div>
+    <ul id="pointsList"></ul>
+
+    <h2>Eksport / Import</h2>
+    <button onclick="exportJSON()">📤 Eksportuj JSON</button>
+    <input type="file" id="importFile" accept=".json" hidden onchange="importJSON(event)" />
+    <button onclick="document.getElementById('importFile').click()">📥 Importuj JSON</button>
   </div>
 
   <div id="globeViz"></div>
@@ -158,17 +208,11 @@
           el.style.fontSize = "20px";
           el.style.fontWeight = "bold";
           el.style.textShadow = "0 0 4px black";
-          el.textContent =
-            d.name === "Biegun Północny"
-              ? "N"
-              : d.name === "Biegun Południowy"
-              ? "S"
-              : "";
+          el.textContent = d.name.includes("Północny") ? "N" : "S";
         }
         return el;
       });
 
-    // Siatka współrzędnych
     globe.showGraticules(true).graticuleLineWidth(0.8);
     function updateGrid() {
       const scale = parseInt(document.getElementById("gridScale").value);
@@ -222,18 +266,68 @@
           } else {
             document.getElementById("texturePreview").style.display = "none";
           }
+          refreshPointsList();
         };
         list.appendChild(btn);
       });
     }
 
-    function addPoint() {
+    function refreshPointsList() {
+      const list = document.getElementById("pointsList");
+      list.innerHTML = "";
+      if (!currentPlanet || !atlas[currentPlanet]) return;
+
+      const sortBy = document.getElementById("sortBy").value;
+      let points = [...atlas[currentPlanet]];
+      if (sortBy === "name") {
+        points.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      } else if (sortBy === "type") {
+        points.sort((a, b) => (a.type || "").localeCompare(b.type || ""));
+      } else if (sortBy === "dateAsc") {
+        points.sort((a, b) => (a.created || 0) - (b.created || 0));
+      } else if (sortBy === "dateDesc") {
+        points.sort((a, b) => (b.created || 0) - (a.created || 0));
+      }
+
+      points.forEach((point, index) => {
+        const li = document.createElement("li");
+
+        const info = document.createElement("div");
+        info.className = "point-info";
+        info.textContent = `${point.name || "Bez nazwy"} (${point.type})`;
+
+        const actions = document.createElement("div");
+        actions.className = "point-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edytuj";
+        editBtn.onclick = () => loadPointForEdit(index);
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Usuń";
+        delBtn.style.background = "#c62828";
+        delBtn.onclick = () => {
+          if (confirm("Czy na pewno usunąć ten punkt?")) {
+            deletePoint(index);
+          }
+        };
+
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+        li.appendChild(info);
+        li.appendChild(actions);
+        list.appendChild(li);
+      });
+    }
+
+    function savePoint() {
       const planet = document.getElementById("planet").value.trim();
       const lat = parseFloat(document.getElementById("lat").value);
       const lng = parseFloat(document.getElementById("lng").value);
       const name = document.getElementById("name").value.trim();
       const type = document.getElementById("type").value;
       const notes = document.getElementById("notes").value.trim();
+      const editIndex = document.getElementById("editIndex").value;
 
       if (!planet || isNaN(lat) || isNaN(lng)) {
         alert("Uzupełnij planetę, szerokość i długość!");
@@ -241,29 +335,49 @@
       }
 
       if (!atlas[planet]) atlas[planet] = [];
-      const point = { planet, lat, lng, name, type, notes };
-      if (type === "Resource") point.extracted = false;
-      if (type === "Obelisk") point.visited = false;
-      atlas[planet].push(point);
+
+      if (editIndex !== "") {
+        atlas[planet][editIndex] = {
+          ...atlas[planet][editIndex],
+          planet, lat, lng, name, type, notes
+        };
+        document.getElementById("editIndex").value = "";
+      } else {
+        atlas[planet].push({ planet, lat, lng, name, type, notes, created: Date.now() });
+      }
 
       saveAtlas();
       currentPlanet = planet;
       refreshPlanetList();
 
+      document.getElementById("planet").value = "";
       document.getElementById("lat").value = "";
       document.getElementById("lng").value = "";
       document.getElementById("name").value = "";
       document.getElementById("notes").value = "";
     }
 
-    function setPlanetTexture(planet) {
-      if (planetTextures[planet]) {
-        globe.globeImageUrl(planetTextures[planet]);
-      } else {
-        globe.globeImageUrl(null);
-      }
+    function deletePoint(index) {
+      atlas[currentPlanet].splice(index, 1);
+      saveAtlas();
+      refreshPointsList();
+      globe.pointsData(atlas[currentPlanet]);
     }
 
+    function loadPointForEdit(index) {
+      const point = atlas[currentPlanet][index];
+      document.getElementById("planet").value = point.planet;
+      document.getElementById("lat").value = point.lat;
+      document.getElementById("lng").value = point.lng;
+      document.getElementById("name").value = point.name;
+      document.getElementById("type").value = point.type;
+      document.getElementById("notes").value = point.notes;
+      document.getElementById("editIndex").value = index;
+    }
+
+    function setPlanetTexture(planet) {
+      globe.globeImageUrl(planetTextures[planet] || null);
+    }
     function setPlanetTextureFromInput() {
       const input = document.getElementById("planetTextureInput");
       if (!input.files[0] || !currentPlanet) return;
@@ -276,6 +390,36 @@
         saveAtlas();
       };
       reader.readAsDataURL(input.files[0]);
+    }
+
+    function exportJSON() {
+      const data = { atlas, planetTextures };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "atlas.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          atlas = data.atlas || {};
+          planetTextures = data.planetTextures || {};
+          saveAtlas();
+          refreshPlanetList();
+          refreshPointsList();
+        } catch {
+          alert("Błędny plik JSON");
+        }
+      };
+      reader.readAsText(file);
     }
 
     refreshPlanetList();
