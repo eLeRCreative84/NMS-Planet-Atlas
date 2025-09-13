@@ -71,8 +71,8 @@
   <label>Skala punktów</label>
   <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="1" oninput="updatePointScale()" />
 
-  <label>Obrót globu</label>
-  <input type="range" id="globeRotation" min="-180" max="180" step="1" value="0" oninput="updateGlobeRotation()" />
+  <label>Przesuń glob</label>
+<input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
 
   <h2>Import/Eksport</h2>
   <button onclick="exportAtlas()">Eksport JSON</button>
@@ -306,10 +306,10 @@ function updatePointScale(){
   if(currentPlanet) globe.pointsData(atlas[currentPlanet]);
 }
 
-// Obrót globu
-function updateGlobeRotation(){
-  const rot=parseFloat(document.getElementById("globeRotation").value);
-  globe.scene().rotation.y = THREE.MathUtils.degToRad(rot);
+// Przesuwanie globu w lewo/prawo
+function updateGlobeOffset(){
+  const offset = parseFloat(document.getElementById("globeOffset").value);
+  globe.scene().position.x = offset;
 }
 
 refreshPlanetList();
