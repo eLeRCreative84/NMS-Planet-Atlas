@@ -102,11 +102,29 @@ const globe = Globe()(document.getElementById("globeViz"))
   .pointLat("lat")
   .pointLng("lng")
   .pointLabel(d => {
-    let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
-    if(d.type==="Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
-    if(d.type==="Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
-    return label;
-  })
+  if (!currentPlanet || !atlas[currentPlanet]) return "";
+
+  // wszystkie punkty w tym miejscu
+  const sameLocation = atlas[currentPlanet].filter(
+    p => p.lat === d.lat && p.lng === d.lng
+  );
+
+  // jeśli jest więcej niż jeden punkt w tym miejscu → lista
+  if (sameLocation.length > 1) {
+    return sameLocation.map(p => {
+      let label = `${p.name || "Bez nazwy"} (${p.type})`;
+      if (p.type === "Zasób") label += p.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+      if (p.type === "Obelisk") label += p.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+      return label;
+    }).join("<br>");
+  }
+
+  // w przeciwnym razie zachowaj pojedynczy opis
+  let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
+  if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+  if (d.type === "Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+  return label;
+})
   .pointColor(d=>{
     switch(d.type){
       case "Zasób": return d.extracted?"gray":"gold";
