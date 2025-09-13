@@ -74,6 +74,8 @@
   <label>Przesuń glob</label>
 <input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
 
+  <button onclick="resetGlobePosition()">Reset pozycji globu</button>
+
   <h2>Import/Eksport</h2>
   <button onclick="exportAtlas()">Eksport JSON</button>
   <input type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
@@ -110,7 +112,7 @@ const globe = Globe()(document.getElementById("globeViz"))
       default: return "red";
     }
   })
-  .pointRadius(d=>0.4*pointScale)
+  .pointRadius(d => (d.height || 0.4) * pointScale)
   .htmlElementsData([])
   .htmlElement(d=>{
     if(d.type==="Pole"){
@@ -160,39 +162,64 @@ function refreshPlanetList(){
   });
 }
 
-function refreshPointsList(){
-  const list=document.getElementById("pointsList");
-  list.innerHTML="";
-  if(!currentPlanet || !atlas[currentPlanet]) return;
+points.forEach((point,index)=>{
+  const li=document.createElement("li");
+  const info=document.createElement("span");
+  info.innerHTML=`${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
+  li.appendChild(info);
 
-  let points=[...atlas[currentPlanet]];
-  const sort=document.getElementById("sortPoints").value;
-  if(sort==="nameAsc") points.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
-  if(sort==="nameDesc") points.sort((a,b)=>(b.name||"").localeCompare(a.name||""));
-  if(sort==="type") points.sort((a,b)=>(a.type||"").localeCompare(b.type||""));
-  if(sort==="newest") points.sort((a,b)=> (b.timestamp||0)-(a.timestamp||0));
-  if(sort==="oldest") points.sort((a,b)=> (a.timestamp||0)-(b.timestamp||0));
+  const btnDiv=document.createElement("div");
+  if(point.type==="Zasób" || point.type==="Obelisk"){
+    const checkbox=document.createElement("input");
+    checkbox.type="checkbox";
+    checkbox.checked=point.type==="Zasób"?point.extracted:point.visited;
+    checkbox.onchange=()=>{
+      if(point.type==="Zasób") point.extracted=checkbox.checked;
+      if(point.type==="Obelisk") point.visited=checkbox.checked;
+      saveAtlas();
+      globe.pointsData(atlas[currentPlanet]);
+      refreshPointsList();
+    };
+    btnDiv.appendChild(checkbox);
+  }
 
-  points.forEach((point,index)=>{
-    const li=document.createElement("li");
-    const info=document.createElement("span");
-    info.innerHTML=`${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
-    li.appendChild(info);
+  const editBtn=document.createElement("button");
+  editBtn.textContent="Edytuj"; editBtn.className="edit";
+  editBtn.onclick=()=>editPoint(index);
+  btnDiv.appendChild(editBtn);
 
-    const btnDiv=document.createElement("div");
-    if(point.type==="Zasób" || point.type==="Obelisk"){
-      const checkbox=document.createElement("input");
-      checkbox.type="checkbox";
-      checkbox.checked=point.type==="Zasób"?point.extracted:point.visited;
-      checkbox.onchange=()=>{
-        if(point.type==="Zasób") point.extracted=checkbox.checked;
-        if(point.type==="Obelisk") point.visited=checkbox.checked;
-        saveAtlas();
-        globe.pointsData(atlas[currentPlanet]);
-        refreshPointsList();
-      };
-      btnDiv.appendChild(checkbox);
+  const delBtn=document.createElement("button");
+  delBtn.textContent="Usuń"; delBtn.className="del";
+  delBtn.onclick=()=>{
+    if(confirm("Czy na pewno usunąć punkt?")){
+      atlas[currentPlanet].splice(index,1);
+      saveAtlas();
+      refreshPointsList();
+      globe.pointsData(atlas[currentPlanet]);
     }
+  };
+  btnDiv.appendChild(delBtn);
+
+  li.appendChild(btnDiv);
+
+  // 🔽 tutaj dodajesz suwak wysokości 🔽
+  const heightSlider = document.createElement("input");
+  heightSlider.type = "range";
+  heightSlider.min = 0.1;
+  heightSlider.max = 5;
+  heightSlider.step = 0.1;
+  heightSlider.value = point.height || 0.4;
+  heightSlider.oninput = () => {
+    point.height = parseFloat(heightSlider.value);
+    saveAtlas();
+    globe.pointsData(atlas[currentPlanet]); // odśwież glob
+  };
+  li.appendChild(heightSlider);
+  // 🔼 do tego miejsca 🔼
+
+  list.appendChild(li);
+});
+
 
     const editBtn=document.createElement("button");
     editBtn.textContent="Edytuj"; editBtn.className="edit";
@@ -312,6 +339,17 @@ function updateGlobeOffset(){
   globe.scene().position.x = offset;
 }
 
+  // reset suwkow
+function resetGlobePosition() {
+  document.getElementById("globeOffset").value = 0;
+  globe.scene().position.x = 0;
+
+  // jeśli dodasz też oś Y/Z, to możesz je tu wyzerować
+  // document.getElementById("globeOffsetY").value = 0;
+  // globe.scene().position.y = 0;
+}
+
+  
 refreshPlanetList();
 </script>
 </body>
