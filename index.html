@@ -97,8 +97,8 @@ let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 
 const globe = Globe()(document.getElementById("globeViz"))
-  .globeImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/earth-blue-marble.jpg') // mapa planety
-  .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png') // 🌌 gwiazdy w tle
+  .globeImageUrl(null) // brak domyślnej mapy, czarna kula
+  .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png') // gwiazdy
   .pointLat("lat")
   .pointLng("lng")
   .pointLabel(d => {
@@ -330,6 +330,9 @@ function updateGlobeOffset(){
 function resetGlobePosition(){
   document.getElementById("globeOffset").value = 0;
   globe.scene().position.x = 0;
+
+  document.getElementById("globeScale").value = 1;
+  globe.scene().scale.set(1,1,1); // reset skali globu
 }
 
 function refreshGlobePoints(){
