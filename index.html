@@ -2,159 +2,114 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <title>Mini Atlas Planet</title>
+  <title>Atlas Planetarny</title>
+  <script src="https://unpkg.com/three"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
   <style>
     body {
       margin: 0;
-      font-family: sans-serif;
       display: flex;
-      flex-direction: row;
       height: 100vh;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      background: #0d1b2a; /* ciemnogranatowe tło */
+      color: #e0e6ed;
     }
-
-    /* Panel boczny */
     #form {
-      flex: 0 0 25%;
-      min-width: 280px;
-      max-width: 450px;
+      flex: 0 0 600px;
       padding: 1rem;
-      background: #f5f5f5;
+      background: #1b263b;
       overflow-y: auto;
       box-sizing: border-box;
     }
-
     #globeViz {
       flex: 1;
     }
-
+    h2 {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: #f0f4f8;
+    }
     label {
-      display: block;
+      font-weight: bold;
       margin-top: 0.5rem;
+      display: block;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      margin: 0.3rem 0;
+      padding: 0.4rem;
+      box-sizing: border-box;
+      border: none;
+      border-radius: 4px;
+    }
+    input, select, textarea {
+      background: #24344d;
+      color: #f0f4f8;
+    }
+    button {
+      background: #1976d2;
+      color: white;
+      cursor: pointer;
       font-weight: bold;
     }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 0.3rem;
-      margin-top: 0.2rem;
+    button:hover {
+      background: #1565c0;
     }
-
-    button {
-      margin-top: 0.5rem;
-      padding: 0.5rem;
-      width: 100%;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-    }
-
-    ul {
-      padding: 0;
-      list-style: none;
-    }
-
-    li {
-      margin: 0.3rem 0;
-      background: #e0e0e0;
-      padding: 0.3rem;
-      border-radius: 5px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    li div {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    li button {
-      width: auto;
-      margin-left: 0.5rem;
-      padding: 0.2rem 0.5rem;
-      cursor: pointer;
-    }
-
-    /* Sekcja wyboru tekstury */
     .texture-input {
       display: flex;
       gap: 0.5rem;
       margin-top: 0.5rem;
     }
-
     .texture-input button {
       flex: 1;
       padding: 0.5rem;
       border: none;
-      background: #1976d2;
-      color: white;
       border-radius: 4px;
       cursor: pointer;
     }
-
-    .texture-input button:hover {
-      background: #1565c0;
+    #texturePreview {
+      margin-top: 0.5rem;
+      max-width: 100%;
+      border-radius: 6px;
+      display: none;
     }
-
-    /* Responsywność na małych ekranach */
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-      #form {
-        flex: none;
-        width: 100%;
-        max-width: none;
-        min-width: unset;
-        height: auto;
-      }
-      #globeViz {
-        flex: 1;
-        height: 70vh;
-      }
+    .grid-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grid-control input[type="number"] {
+      flex: 0 0 70px;
+    }
+    .grid-control input[type="range"] {
+      flex: 1;
     }
   </style>
-  <script src="https://unpkg.com/three"></script>
-  <script src="https://unpkg.com/globe.gl"></script>
 </head>
 <body>
   <div id="form">
     <h2>Dodaj punkt</h2>
     <label>Planeta</label>
-    <input type="text" id="planet" placeholder="np. Eissentam Prime" />
-
-    <label>Szerokość (lat)</label>
-    <input type="number" id="lat" step="0.1" min="-90" max="90" />
-
-    <label>Długość (lng)</label>
-    <input type="number" id="lng" step="0.1" min="-180" max="180" />
-
+    <input type="text" id="planet" placeholder="Nazwa planety" />
+    <label>Szerokość</label>
+    <input type="number" id="lat" step="0.0001" />
+    <label>Długość</label>
+    <input type="number" id="lng" step="0.0001" />
     <label>Nazwa punktu</label>
     <input type="text" id="name" />
-
     <label>Typ</label>
     <select id="type">
-      <option value="Base">Baza</option>
-      <option value="Ruins">Ruiny</option>
-      <option value="Resource">Zasób</option>
-      <option value="Obelisk">Obelisk</option>
-      <option value="LargeStructure">Duża Struktura</option>
-      <option value="Other">Inne</option>
+      <option>Resource</option>
+      <option>Obelisk</option>
+      <option>Other</option>
     </select>
-
     <label>Notatki</label>
     <textarea id="notes"></textarea>
-
     <button onclick="addPoint()">Dodaj punkt</button>
 
-    <h2>Wybierz planetę</h2>
-    <select id="planetSelect" onchange="switchPlanet()">
-      <option value="">-- wybierz --</option>
-    </select>
-    <button onclick="deletePlanet()" style="background:#c62828; color:white;">Usuń planetę</button>
+    <h2>Planety</h2>
+    <div id="planetList"></div>
 
     <h2>Tekstura planety</h2>
     <div class="texture-input">
@@ -162,298 +117,168 @@
       <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
       <button onclick="setPlanetTextureFromInput()">Ustaw</button>
     </div>
+    <img id="texturePreview" />
 
-    <h2>Punkty na planecie</h2>
-    <ul id="pointsList"></ul>
-
-    <h2>Atlas</h2>
-    <button onclick="exportAtlas()">Eksportuj atlas (JSON)</button>
-    <input type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
+    <h2>Siatka współrzędnych</h2>
+    <div class="grid-control">
+      <input type="number" id="gridScale" value="15" min="1" max="90" step="1" oninput="syncGridInputs('number')" />
+      <input type="range" id="gridScaleRange" value="15" min="1" max="90" step="1" oninput="syncGridInputs('range')" />
+    </div>
   </div>
 
   <div id="globeViz"></div>
 
   <script>
-    const planetTextures = {};
+    let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
+    let currentPlanet = null;
+    let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
 
-    const globe = Globe()(document.getElementById('globeViz'))
+    const globe = Globe()(document.getElementById("globeViz"))
       .globeImageUrl(null)
-      .pointLat('lat')
-      .pointLng('lng')
-      .pointLabel(
-        p =>
-          `${p.name} (${p.type})<br>${p.notes}${
-            p.type === 'Resource'
-              ? '<br>Wydobyty: ' + (p.extracted ? 'Tak' : 'Nie')
-              : ''
-          }${
-            p.type === 'Obelisk'
-              ? '<br>Odwiedzony: ' + (p.visited ? 'Tak' : 'Nie')
-              : ''
-          }`
+      .pointLat("lat")
+      .pointLng("lng")
+      .pointLabel((d) =>
+        `<b>${d.name || ""}</b><br>Typ: ${d.type}<br>Lat: ${d.lat.toFixed(2)}°, Lng: ${d.lng.toFixed(2)}°<br>${d.notes || ""}`
       )
-      .pointColor(p => {
-        switch (p.type) {
-          case 'Resource':
-            return p.extracted ? 'gray' : 'gold';
-          case 'Obelisk':
-            return p.visited ? 'green' : 'orange';
-          case 'Base':
-            return 'blue';
-          case 'Ruins':
-            return 'brown';
-          case 'LargeStructure':
-            return 'purple';
-          case 'Other':
-            return 'pink';
-          case 'Pole':
-            return 'red';
-          default:
-            return 'red';
-        }
-      })
-      .pointAltitude(0.02)
-      .pointRadius(0.3)
-      /* Dodaj litery N i S */
+      .pointColor((d) =>
+        d.type === "Resource"
+          ? "yellow"
+          : d.type === "Obelisk"
+          ? "cyan"
+          : d.type === "Pole"
+          ? "white"
+          : "red"
+      )
+      .pointRadius(0.8)
       .htmlElementsData([])
-      .htmlElement(d => {
-        const el = document.createElement('div');
-        if (d.type === 'Pole') {
-          el.style.color = 'white';
-          el.style.fontSize = '20px';
-          el.style.fontWeight = 'bold';
-          el.style.textShadow = '0 0 4px black';
+      .htmlElement((d) => {
+        const el = document.createElement("div");
+        if (d.type === "Pole") {
+          el.style.color = "white";
+          el.style.fontSize = "20px";
+          el.style.fontWeight = "bold";
+          el.style.textShadow = "0 0 4px black";
           el.textContent =
-            d.name === 'Biegun Północny'
-              ? 'N'
-              : d.name === 'Biegun Południowy'
-              ? 'S'
-              : '';
+            d.name === "Biegun Północny"
+              ? "N"
+              : d.name === "Biegun Południowy"
+              ? "S"
+              : "";
         }
         return el;
       });
 
-    let atlas = {};
-    let currentPlanet = null;
+    // Siatka współrzędnych
+    globe.showGraticules(true).graticuleLineWidth(0.8);
+    function updateGrid() {
+      const scale = parseInt(document.getElementById("gridScale").value);
+      if (isNaN(scale) || scale < 1) return;
+      globe.graticuleStep([scale, scale]);
+    }
+    function syncGridInputs(source) {
+      const num = document.getElementById("gridScale");
+      const range = document.getElementById("gridScaleRange");
+      if (source === "number") {
+        range.value = num.value;
+      } else {
+        num.value = range.value;
+      }
+      updateGrid();
+    }
+    updateGrid();
 
     function saveAtlas() {
-      localStorage.setItem('nmsAtlas', JSON.stringify(atlas));
-      localStorage.setItem('planetTextures', JSON.stringify(planetTextures));
-    }
-
-    function loadAtlas() {
-      const data = localStorage.getItem('nmsAtlas');
-      if (data) atlas = JSON.parse(data);
-      const textures = localStorage.getItem('planetTextures');
-      if (textures) Object.assign(planetTextures, JSON.parse(textures));
-      refreshPlanetList();
-    }
-
-    function refreshPlanetList() {
-      const select = document.getElementById('planetSelect');
-      select.innerHTML = '<option value="">-- wybierz --</option>';
-      Object.keys(atlas).forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p;
-        opt.textContent = p;
-        select.appendChild(opt);
-      });
-      if (currentPlanet && atlas[currentPlanet]) {
-        addPoles(currentPlanet);
-        const points = atlas[currentPlanet];
-        globe.pointsData(points);
-        globe.htmlElementsData(points.filter(p => p.type === 'Pole'));
-        setPlanetTexture(currentPlanet);
-        refreshPointsList();
-      } else {
-        globe.pointsData([]);
-        globe.htmlElementsData([]);
-        globe.globeImageUrl(null);
-        document.getElementById('pointsList').innerHTML = '';
-      }
+      localStorage.setItem("atlas", JSON.stringify(atlas));
+      localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
     }
 
     function addPoles(planet) {
       if (!atlas[planet]) atlas[planet] = [];
-      if (!atlas[planet].some(p => p.name === 'Biegun Północny'))
-        atlas[planet].push({
-          lat: 90,
-          lng: 0,
-          name: 'Biegun Północny',
-          type: 'Pole',
-          notes: '',
-          extracted: false,
-        });
-      if (!atlas[planet].some(p => p.name === 'Biegun Południowy'))
-        atlas[planet].push({
-          lat: -90,
-          lng: 0,
-          name: 'Biegun Południowy',
-          type: 'Pole',
-          notes: '',
-          extracted: false,
-        });
+      if (!atlas[planet].some((p) => p.type === "Pole")) {
+        atlas[planet].push(
+          { lat: 90, lng: 0, name: "Biegun Północny", type: "Pole" },
+          { lat: -90, lng: 0, name: "Biegun Południowy", type: "Pole" }
+        );
+      }
+    }
+
+    function refreshPlanetList() {
+      const list = document.getElementById("planetList");
+      list.innerHTML = "";
+      Object.keys(atlas).forEach((p) => {
+        const btn = document.createElement("button");
+        btn.textContent = p;
+        btn.style.width = "100%";
+        btn.style.margin = "0.2rem 0";
+        btn.onclick = () => {
+          currentPlanet = p;
+          addPoles(p);
+          globe.pointsData(atlas[p]);
+          globe.htmlElementsData(atlas[p].filter((pt) => pt.type === "Pole"));
+          setPlanetTexture(p);
+          if (planetTextures[p]) {
+            document.getElementById("texturePreview").src = planetTextures[p];
+            document.getElementById("texturePreview").style.display = "block";
+          } else {
+            document.getElementById("texturePreview").style.display = "none";
+          }
+        };
+        list.appendChild(btn);
+      });
+    }
+
+    function addPoint() {
+      const planet = document.getElementById("planet").value.trim();
+      const lat = parseFloat(document.getElementById("lat").value);
+      const lng = parseFloat(document.getElementById("lng").value);
+      const name = document.getElementById("name").value.trim();
+      const type = document.getElementById("type").value;
+      const notes = document.getElementById("notes").value.trim();
+
+      if (!planet || isNaN(lat) || isNaN(lng)) {
+        alert("Uzupełnij planetę, szerokość i długość!");
+        return;
+      }
+
+      if (!atlas[planet]) atlas[planet] = [];
+      const point = { planet, lat, lng, name, type, notes };
+      if (type === "Resource") point.extracted = false;
+      if (type === "Obelisk") point.visited = false;
+      atlas[planet].push(point);
+
+      saveAtlas();
+      currentPlanet = planet;
+      refreshPlanetList();
+
+      document.getElementById("lat").value = "";
+      document.getElementById("lng").value = "";
+      document.getElementById("name").value = "";
+      document.getElementById("notes").value = "";
     }
 
     function setPlanetTexture(planet) {
-      globe.globeImageUrl(planetTextures[planet] || null);
+      if (planetTextures[planet]) {
+        globe.globeImageUrl(planetTextures[planet]);
+      } else {
+        globe.globeImageUrl(null);
+      }
     }
 
     function setPlanetTextureFromInput() {
-      const input = document.getElementById('planetTextureInput');
+      const input = document.getElementById("planetTextureInput");
       if (!input.files[0] || !currentPlanet) return;
       const reader = new FileReader();
-      reader.onload = e => {
+      reader.onload = (e) => {
         planetTextures[currentPlanet] = e.target.result;
         setPlanetTexture(currentPlanet);
+        document.getElementById("texturePreview").src = e.target.result;
+        document.getElementById("texturePreview").style.display = "block";
         saveAtlas();
       };
       reader.readAsDataURL(input.files[0]);
     }
 
-    function refreshPointsList() {
-      const list = document.getElementById('pointsList');
-      list.innerHTML = '';
-      if (!currentPlanet || !atlas[currentPlanet]) return;
-      atlas[currentPlanet].forEach((point, index) => {
-        const li = document.createElement('li');
-        const div = document.createElement('div');
-        const span = document.createElement('span');
-        let label = `${point.name || 'Bez nazwy'} (${point.type})`;
-        if (point.type === 'Resource')
-          label += point.extracted ? ' [Wydobyty]' : ' [Nie wydobyty]';
-        if (point.type === 'Obelisk')
-          label += point.visited ? ' [Odwiedzony]' : ' [Nie odwiedzony]';
-        span.textContent = label;
-        div.appendChild(span);
-
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'Edytuj';
-        editBtn.style.background = '#0277bd';
-        editBtn.style.color = 'white';
-        editBtn.onclick = () => editPoint(index);
-        div.appendChild(editBtn);
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = 'Usuń';
-        delBtn.style.background = '#c62828';
-        delBtn.style.color = 'white';
-        delBtn.onclick = () => deletePoint(index);
-        div.appendChild(delBtn);
-
-        if (point.type === 'Resource') {
-          const toggleBtn = document.createElement('button');
-          toggleBtn.textContent = point.extracted ? 'Przywróć' : 'Wyeksplatuj';
-          toggleBtn.onclick = () => toggleExtracted(index);
-          div.appendChild(toggleBtn);
-        }
-        if (point.type === 'Obelisk') {
-          const toggleBtn = document.createElement('button');
-          toggleBtn.textContent = point.visited ? 'Przywróć' : 'Odwiedź';
-          toggleBtn.onclick = () => toggleVisited(index);
-          div.appendChild(toggleBtn);
-        }
-
-        li.appendChild(div);
-        list.appendChild(li);
-      });
-    }
-
-    function addPoint() {
-      const planet = document.getElementById('planet').value.trim();
-      const lat = parseFloat(document.getElementById('lat').value);
-      const lng = parseFloat(document.getElementById('lng').value);
-      const name = document.getElementById('name').value.trim();
-      const type = document.getElementById('type').value;
-      const notes = document.getElementById('notes').value.trim();
-      if (!planet || isNaN(lat) || isNaN(lng)) {
-        alert('Uzupełnij planetę, szerokość i długość!');
-        return;
-      }
-      if (!atlas[planet]) atlas[planet] = [];
-      const point = { planet, lat, lng, name, type, notes };
-      if (type === 'Resource') point.extracted = false;
-      if (type === 'Obelisk') point.visited = false;
-      atlas[planet].push(point);
-      saveAtlas();
-      currentPlanet = planet;
-      refreshPlanetList();
-    }
-
-    function switchPlanet() {
-      const sel = document.getElementById('planetSelect');
-      currentPlanet = sel.value;
-      refreshPlanetList();
-    }
-
-    function deletePlanet() {
-      if (!currentPlanet) return;
-      if (confirm('Na pewno usunąć planetę ' + currentPlanet + '?')) {
-        delete atlas[currentPlanet];
-        delete planetTextures[currentPlanet];
-        currentPlanet = null;
-        saveAtlas();
-        refreshPlanetList();
-      }
-    }
-
-    function editPoint(index) {
-      const p = atlas[currentPlanet][index];
-      document.getElementById('planet').value = currentPlanet;
-      document.getElementById('lat').value = p.lat;
-      document.getElementById('lng').value = p.lng;
-      document.getElementById('name').value = p.name;
-      document.getElementById('type').value = p.type;
-      document.getElementById('notes').value = p.notes;
-      deletePoint(index);
-    }
-
-    function deletePoint(index) {
-      atlas[currentPlanet].splice(index, 1);
-      saveAtlas();
-      refreshPlanetList();
-    }
-
-    function toggleExtracted(index) {
-      atlas[currentPlanet][index].extracted =
-        !atlas[currentPlanet][index].extracted;
-      saveAtlas();
-      refreshPlanetList();
-    }
-
-    function toggleVisited(index) {
-      atlas[currentPlanet][index].visited =
-        !atlas[currentPlanet][index].visited;
-      saveAtlas();
-      refreshPlanetList();
-    }
-
-    function exportAtlas() {
-      const data = JSON.stringify({ atlas, planetTextures }, null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'atlas.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importAtlas(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        const data = JSON.parse(e.target.result);
-        atlas = data.atlas || {};
-        Object.assign(planetTextures, data.planetTextures || {});
-        saveAtlas();
-        refreshPlanetList();
-      };
-      reader.readAsText(file);
-    }
-
-    loadAtlas();
+    refreshPlanetList();
   </script>
 </body>
 </html>
