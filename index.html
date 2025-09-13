@@ -121,10 +121,12 @@ const globe = Globe()(document.getElementById("globeViz"))
     mesh.userData = d;
     return mesh;
   })
-  .customThreeObjectUpdate((obj, d) => {
-    obj.scale.set(1, d.height || 1, 1);
-    obj.position.set(0, (d.height || 1)/2, 0);
-  })
+.customThreeObjectUpdate((obj, d) => {
+  const h = (d.height || 0.4) * pointScale;  // 🔹 uwzględniamy height i pointScale
+  obj.scale.set(1, h, 1);
+  obj.position.set(0, h / 2, 0); // żeby słupek stał na powierzchni globu
+});
+
   .htmlElementsData([])
   .htmlElement(d => {
     if(d.type==="Pole"){
@@ -257,11 +259,12 @@ function refreshPointsList(){
     heightSlider.value = point.height || 0.4;
     heightSlider.style.width = "100%";
     heightSlider.style.marginTop = "0.5rem"; // odstęp od przycisków
-    heightSlider.oninput = () => {
-      point.height = parseFloat(heightSlider.value);
-      saveAtlas();
-      globe.pointsData(atlas[currentPlanet]);
-    };
+heightSlider.oninput = () => {
+  point.height = parseFloat(heightSlider.value);
+  saveAtlas();
+  if(currentPlanet) globe.pointsData(atlas[currentPlanet]); // 🔹 odświeża wszystkie słupki
+};
+
     li.appendChild(heightSlider);
     // 🔼
 
@@ -355,9 +358,12 @@ function updateGlobeScale(){
 
 // Skalowanie punktów
 function updatePointScale(){
-  pointScale=parseFloat(document.getElementById("pointScale").value);
-  if(currentPlanet) globe.pointsData(atlas[currentPlanet]);
+  pointScale = parseFloat(document.getElementById("pointScale").value);
+  if(currentPlanet) {
+    globe.pointsData(atlas[currentPlanet]); // 🔹 powoduje ponowne wywołanie customThreeObjectUpdate
+  }
 }
+
 
 // Przesuwanie globu w lewo/prawo
 function updateGlobeOffset(){
