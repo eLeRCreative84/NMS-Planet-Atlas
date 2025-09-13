@@ -208,11 +208,11 @@ function refreshPointsList(){
       // Kamera na punkt
       globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 2000);
 
-      // Tymczasowe podświetlenie punktu na czerwono
+      // Tymczasowe podświetlenie punktu na pomaranczowo
       const originalType = point.type;
       point.__highlight = true;
       globe.pointColor(d=>{
-        if(d.__highlight) return "red";
+        if(d.__highlight) return "orange";
         switch(d.type){
           case "Zasób": return d.extracted?"gray":"gold";
           case "Obelisk": return d.visited?"green":"orange";
