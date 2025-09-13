@@ -162,64 +162,39 @@ function refreshPlanetList(){
   });
 }
 
-points.forEach((point,index)=>{
-  const li=document.createElement("li");
-  const info=document.createElement("span");
-  info.innerHTML=`${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
-  li.appendChild(info);
+function refreshPointsList(){
+  const list=document.getElementById("pointsList");
+  list.innerHTML="";
+  if(!currentPlanet || !atlas[currentPlanet]) return;
 
-  const btnDiv=document.createElement("div");
-  if(point.type==="Zasób" || point.type==="Obelisk"){
-    const checkbox=document.createElement("input");
-    checkbox.type="checkbox";
-    checkbox.checked=point.type==="Zasób"?point.extracted:point.visited;
-    checkbox.onchange=()=>{
-      if(point.type==="Zasób") point.extracted=checkbox.checked;
-      if(point.type==="Obelisk") point.visited=checkbox.checked;
-      saveAtlas();
-      globe.pointsData(atlas[currentPlanet]);
-      refreshPointsList();
-    };
-    btnDiv.appendChild(checkbox);
-  }
+  let points=[...atlas[currentPlanet]];
+  const sort=document.getElementById("sortPoints").value;
+  if(sort==="nameAsc") points.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  if(sort==="nameDesc") points.sort((a,b)=>(b.name||"").localeCompare(a.name||""));
+  if(sort==="type") points.sort((a,b)=>(a.type||"").localeCompare(b.type||""));
+  if(sort==="newest") points.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+  if(sort==="oldest") points.sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
 
-  const editBtn=document.createElement("button");
-  editBtn.textContent="Edytuj"; editBtn.className="edit";
-  editBtn.onclick=()=>editPoint(index);
-  btnDiv.appendChild(editBtn);
+  points.forEach((point,index)=>{
+    const li=document.createElement("li");
+    const info=document.createElement("span");
+    info.innerHTML=`${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
+    li.appendChild(info);
 
-  const delBtn=document.createElement("button");
-  delBtn.textContent="Usuń"; delBtn.className="del";
-  delBtn.onclick=()=>{
-    if(confirm("Czy na pewno usunąć punkt?")){
-      atlas[currentPlanet].splice(index,1);
-      saveAtlas();
-      refreshPointsList();
-      globe.pointsData(atlas[currentPlanet]);
+    const btnDiv=document.createElement("div");
+    if(point.type==="Zasób" || point.type==="Obelisk"){
+      const checkbox=document.createElement("input");
+      checkbox.type="checkbox";
+      checkbox.checked=point.type==="Zasób"?point.extracted:point.visited;
+      checkbox.onchange=()=>{
+        if(point.type==="Zasób") point.extracted=checkbox.checked;
+        if(point.type==="Obelisk") point.visited=checkbox.checked;
+        saveAtlas();
+        globe.pointsData(atlas[currentPlanet]);
+        refreshPointsList();
+      };
+      btnDiv.appendChild(checkbox);
     }
-  };
-  btnDiv.appendChild(delBtn);
-
-  li.appendChild(btnDiv);
-
-  // 🔽 tutaj dodajesz suwak wysokości 🔽
-  const heightSlider = document.createElement("input");
-  heightSlider.type = "range";
-  heightSlider.min = 0.1;
-  heightSlider.max = 5;
-  heightSlider.step = 0.1;
-  heightSlider.value = point.height || 0.4;
-  heightSlider.oninput = () => {
-    point.height = parseFloat(heightSlider.value);
-    saveAtlas();
-    globe.pointsData(atlas[currentPlanet]); // odśwież glob
-  };
-  li.appendChild(heightSlider);
-  // 🔼 do tego miejsca 🔼
-
-  list.appendChild(li);
-});
-
 
     const editBtn=document.createElement("button");
     editBtn.textContent="Edytuj"; editBtn.className="edit";
@@ -239,9 +214,26 @@ points.forEach((point,index)=>{
     btnDiv.appendChild(delBtn);
 
     li.appendChild(btnDiv);
+
+    // 🔽 suwak wysokości 🔽
+    const heightSlider = document.createElement("input");
+    heightSlider.type = "range";
+    heightSlider.min = 0.1;
+    heightSlider.max = 5;
+    heightSlider.step = 0.1;
+    heightSlider.value = point.height || 0.4;
+    heightSlider.oninput = () => {
+      point.height = parseFloat(heightSlider.value);
+      saveAtlas();
+      globe.pointsData(atlas[currentPlanet]);
+    };
+    li.appendChild(heightSlider);
+    // 🔼
+
     list.appendChild(li);
   });
 }
+
 
 function addPoint(){
   const planet = document.getElementById("planet").value.trim();
