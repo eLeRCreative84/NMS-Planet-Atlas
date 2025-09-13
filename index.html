@@ -112,7 +112,20 @@ const globe = Globe()(document.getElementById("globeViz"))
       default: return "red";
     }
   })
-  .pointRadius(d => (d.height || 0.4) * pointScale)
+  .customLayerData(() => atlas[currentPlanet] || [])
+.customThreeObject(d => {
+  if(d.type === "Pole") return null; // bieguny zostają w htmlElements
+  const geom = new THREE.CylinderGeometry(0.05, 0.05, 1, 8); // wąski słupek
+  const mat = new THREE.MeshBasicMaterial({ color: getPointColor(d) });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.userData = d;
+  return mesh;
+})
+.customThreeObjectUpdate((obj, d) => {
+  obj.scale.set(1, d.height || 1, 1); // wysokość = height
+  obj.position.set(0, (d.height || 1) / 2, 0); // żeby stał na powierzchni
+});
+
   .htmlElementsData([])
   .htmlElement(d=>{
     if(d.type==="Pole"){
@@ -172,16 +185,24 @@ function refreshPointsList(){
   if(sort==="nameAsc") points.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   if(sort==="nameDesc") points.sort((a,b)=>(b.name||"").localeCompare(a.name||""));
   if(sort==="type") points.sort((a,b)=>(a.type||"").localeCompare(b.type||""));
-  if(sort==="newest") points.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
-  if(sort==="oldest") points.sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
+  if(sort==="newest") points.sort((a,b)=> (b.timestamp||0)-(a.timestamp||0));
+  if(sort==="oldest") points.sort((a,b)=> (a.timestamp||0)-(b.timestamp||0));
 
   points.forEach((point,index)=>{
     const li=document.createElement("li");
+    li.style.display = "flex";
+    li.style.flexDirection = "column";   // 🔹 ustawia elementy w kolumnie
+    li.style.alignItems = "flex-start";  // 🔹 wyrównuje do lewej
+
+    // opis punktu
     const info=document.createElement("span");
     info.innerHTML=`${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
     li.appendChild(info);
 
+    // przyciski i checkbox
     const btnDiv=document.createElement("div");
+    btnDiv.style.display="flex";
+    btnDiv.style.gap="0.5rem";
     if(point.type==="Zasób" || point.type==="Obelisk"){
       const checkbox=document.createElement("input");
       checkbox.type="checkbox";
@@ -215,13 +236,15 @@ function refreshPointsList(){
 
     li.appendChild(btnDiv);
 
-    // 🔽 suwak wysokości 🔽
+    // 🔽 suwak wysokości zawsze pod spodem 🔽
     const heightSlider = document.createElement("input");
     heightSlider.type = "range";
     heightSlider.min = 0.1;
     heightSlider.max = 5;
     heightSlider.step = 0.1;
     heightSlider.value = point.height || 0.4;
+    heightSlider.style.width = "100%";
+    heightSlider.style.marginTop = "0.5rem"; // odstęp od przycisków
     heightSlider.oninput = () => {
       point.height = parseFloat(heightSlider.value);
       saveAtlas();
@@ -233,7 +256,6 @@ function refreshPointsList(){
     list.appendChild(li);
   });
 }
-
 
 function addPoint(){
   const planet = document.getElementById("planet").value.trim();
