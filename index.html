@@ -12,6 +12,7 @@
     height: 100vh;
     font-family: Arial, sans-serif;
     overflow: hidden;
+    font-size: 14px; /* zmniejszona czcionka */
   }
 
   #form {
@@ -108,17 +109,37 @@
     margin-top: 0.5rem;
     font-weight: bold;
   }
+
+  .xy-inputs {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .xy-inputs input {
+    width: 50%;
+  }
 </style>
 </head>
 <body>
 <div id="form">
   <h2>Dodaj punkt</h2>
+  <label>Skala punktów</label>
+  <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="0.4" oninput="updatePointScale()" />
+
   <label>Planeta</label>
   <input type="text" id="planet" placeholder="Nazwa planety" />
-  <label>X</label>
-  <input type="number" id="lat" step="0.0001" />
-  <label>Y</label>
-  <input type="number" id="lng" step="0.0001" />
+  
+  <div class="xy-inputs">
+    <div>
+      <label>X</label>
+      <input type="number" id="lat" step="0.0001" />
+    </div>
+    <div>
+      <label>Y</label>
+      <input type="number" id="lng" step="0.0001" />
+    </div>
+  </div>
+
   <label>Nazwa punktu</label>
   <input type="text" id="name" />
   <label>Typ</label>
@@ -158,8 +179,6 @@
   <h2>Skalowanie</h2>
   <label>Oddal glob</label>
   <input type="range" id="globeScale" min="0.01" max="1" step="0.01" value="1" oninput="updateGlobeScale()" />
-  <label>Skala punktów</label>
-  <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="0.4" oninput="updatePointScale()" />
   <label>Przesuń glob</label>
   <input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
   <button onclick="resetGlobePosition()">Reset pozycji globu</button>
@@ -174,11 +193,13 @@
 <script>
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
+let planetNotes = JSON.parse(localStorage.getItem("planetNotes") || "{}");
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 
 const globe = Globe()(document.getElementById("globeViz"))
   .globeImageUrl(null)
+  .backgroundImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/stars.jpg') // tło gwiazd
   .pointLat("lat")
   .pointLng("lng")
   .pointLabel(d => {
@@ -215,9 +236,12 @@ const globe = Globe()(document.getElementById("globeViz"))
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
+// ---------------------- FUNKCJE ----------------------
+
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
   localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
+  localStorage.setItem("planetNotes", JSON.stringify(planetNotes));
 }
 
 function addPoles(planet){
@@ -232,10 +256,14 @@ function refreshPlanetList(){
   const list = document.getElementById("planetList");
   list.innerHTML = "";
   Object.keys(atlas).forEach(p => {
+    const container = document.createElement("div");
+    container.style.display = "flex";
+    container.style.gap = "0.5rem";
+    container.style.marginBottom = "0.2rem";
+
     const btn = document.createElement("button");
     btn.textContent = p;
-    btn.style.width = "100%";
-    btn.style.margin = "0.2rem 0";
+    btn.style.flex = "1";
     btn.onclick = () => {
       currentPlanet = p;
       document.getElementById("planet").value = p;
@@ -245,7 +273,22 @@ function refreshPlanetList(){
       setPlanetTexture(p);
       refreshPointsList();
     };
-    list.appendChild(btn);
+    container.appendChild(btn);
+
+    const noteBtn = document.createElement("button");
+    noteBtn.textContent = "Notatka";
+    noteBtn.style.flex = "0 0 auto";
+    noteBtn.onclick = () => {
+      let note = planetNotes[p] || "";
+      const newNote = prompt(`Notatka dla planety ${p}:`, note);
+      if(newNote !== null){
+        planetNotes[p] = newNote;
+        saveAtlas();
+      }
+    };
+    container.appendChild(noteBtn);
+
+    list.appendChild(container);
   });
 }
 
@@ -370,7 +413,7 @@ function setPlanetTextureFromInput(){
 }
 
 function exportAtlas(){
-  const blob = new Blob([JSON.stringify({atlas,planetTextures},null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetNotes},null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -388,6 +431,7 @@ function importAtlas(event){
       const data = JSON.parse(e.target.result);
       if(data.atlas) atlas = data.atlas;
       if(data.planetTextures) planetTextures = data.planetTextures;
+      if(data.planetNotes) planetNotes = data.planetNotes;
       saveAtlas();
       refreshPlanetList();
       alert("Import zakończony!");
@@ -396,31 +440,37 @@ function importAtlas(event){
   reader.readAsText(file);
 }
 
+// Skalowanie globu
 function updateGlobeScale(){
   const scale = parseFloat(document.getElementById("globeScale").value);
   globe.scene().scale.set(scale, scale, scale);
 }
 
+// Skalowanie punktów
 function updatePointScale() {
   pointScale = parseFloat(document.getElementById("pointScale").value);
   refreshGlobePoints();
 }
 
+// Przesuwanie globu w lewo/prawo
 function updateGlobeOffset(){
   const offset = parseFloat(document.getElementById("globeOffset").value);
   globe.scene().position.x = offset;
 }
 
+// Reset pozycji globu i suwaka oddalenia
 function resetGlobePosition() {
   document.getElementById("globeOffset").value = 0;
   globe.scene().position.x = 0;
 }
 
+// Odświeżanie punktów
 function refreshGlobePoints(){
   if(!currentPlanet) return;
   globe.pointsData(atlas[currentPlanet]);
 }
 
+// Inicjalizacja
 refreshPlanetList();
 </script>
 </body>
