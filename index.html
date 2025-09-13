@@ -179,42 +179,36 @@ let pointScale = 1;
 
 const globe = Globe()(document.getElementById("globeViz"))
   .globeImageUrl(null)
-  .backgroundImageUrl("//unpkg.com/three-globe/example/img/night-sky.png")
   .pointLat("lat")
   .pointLng("lng")
   .pointLabel(d => {
     let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
-    if(d.type==="Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+    if(d.type==="Resource") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
     if(d.type==="Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
     return label;
   })
-  .pointColor(getPointColor)
-  .customLayerData(() => atlas[currentPlanet] || [])
-
-.customThreeObject(d => {
-  const geom = new THREE.CylinderGeometry(d._customRadius, d._customRadius, d._customHeight, 8);
-  const mat = new THREE.MeshBasicMaterial({ color: getPointColor(d) });
-  const mesh = new THREE.Mesh(geom, mat);
-  mesh.position.set(0, d._customHeight / 2, 0);
-  return mesh;
-})
-.customThreeObjectUpdate((obj, d) => {
-  obj.geometry.dispose();
-  obj.geometry = new THREE.CylinderGeometry(d._customRadius, d._customRadius, d._customHeight, 8);
-  obj.position.set(0, d._customHeight / 2, 0);
-  obj.material.color.set(getPointColor(d));
-})
-
-
+  .pointColor(d=>{
+    switch(d.type){
+      case "Resource": return d.extracted?"gray":"gold";
+      case "Obelisk": return d.visited?"green":"orange";
+      case "Base": return "blue";
+      case "Ruins": return "brown";
+      case "LargeStructure": return "purple";
+      case "Other": return "pink";
+      case "Pole": return "red";
+      default: return "red";
+    }
+  })
+  .pointRadius(() => pointScale) // <-- tu ustawiamy skalę punktów
   .htmlElementsData([])
-  .htmlElement(d => {
-    if(d.type==="Pole") {
-      const el = document.createElement("div");
-      el.style.color = "white";
-      el.style.fontSize = "20px";
-      el.style.fontWeight = "bold";
-      el.style.textShadow = "0 0 4px black";
-      el.textContent = d.name === "Biegun Północny" ? "N" : "S";
+  .htmlElement(d=>{
+    if(d.type==="Pole"){
+      const el=document.createElement("div");
+      el.style.color="white";
+      el.style.fontSize="20px";
+      el.style.fontWeight="bold";
+      el.style.textShadow="0 0 4px black";
+      el.textContent=d.name==="Biegun Północny"?"N":"S";
       return el;
     }
   });
@@ -422,9 +416,20 @@ function updateGlobeScale(){
 }
 
 // Skalowanie promienia punktów
-function updatePointScale(){
-  pointScale = parseFloat(document.getElementById("pointScale").value);
+let pointScale = 0.4; // domyślna wartość
+
+function updatePointScale() {
+  pointScale = parseFloat(document.getElementById("pointScaleRange").value);
+  document.getElementById("pointScale").value = pointScale;
   refreshGlobePoints();
+}
+
+function syncScaleInputs(source) {
+  const numberInput = document.getElementById("pointScale");
+  const rangeInput = document.getElementById("pointScaleRange");
+  if(source==="number") rangeInput.value = numberInput.value;
+  if(source==="range") numberInput.value = rangeInput.value;
+  updatePointScale();
 }
 
 // Przesuwanie globu w lewo/prawo
@@ -442,17 +447,7 @@ function resetGlobePosition() {
 // 🔹 helper do odświeżania punktów
 function refreshGlobePoints(){
   if(!currentPlanet) return;
-
-  // Tworzymy nowe punkty z aktualnym pointScale
-  globe.pointsData(atlas[currentPlanet].map(d => {
-    const radius = 0.05 * pointScale;
-    const height = 0.4 * pointScale;
-    return {
-      ...d,
-      _customRadius: radius,
-      _customHeight: height
-    };
-  }));
+  globe.pointsData(atlas[currentPlanet]);
 }
 
 refreshPlanetList();
