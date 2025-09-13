@@ -6,138 +6,35 @@
 <script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <style>
-  body {
-    margin: 0;
-    display: flex;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-    font-size: 14px; /* zmniejszona czcionka */
-  }
-
-  #form {
-    flex: 0 0 25%;
-    min-width: 280px;
-    max-width: 450px;
-    padding: 1rem;
-    background: #0a1e3a;
-    color: white;
-    overflow-y: auto;
-    box-sizing: border-box;
-  }
-
-  #globeViz {
-    flex: 1;
-    background: black;
-  }
-
-  h2 {
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
-  }
-
-  input, select, textarea, button {
-    width: 100%;
-    margin: 0.3rem 0;
-    padding: 0.4rem;
-    box-sizing: border-box;
-  }
-
-  button {
-    cursor: pointer;
-  }
-
-  .texture-input {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-
-  .texture-input button {
-    flex: 1;
-    padding: 0.5rem;
-    border: none;
-    background: #1976d2;
-    color: white;
-    border-radius: 4px;
-  }
-
-  .texture-input button:hover {
-    background: #1565c0;
-  }
-
-  ul {
-    padding: 0;
-    list-style: none;
-  }
-
-  li {
-    margin: 0.3rem 0;
-    background: #1a2b4d;
-    padding: 0.3rem;
-    border-radius: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  li div {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  li button {
-    padding: 0.2rem 0.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  li button.edit {
-    background: #0277bd;
-    color: white;
-  }
-
-  li button.del {
-    background: #c62828;
-    color: white;
-  }
-
-  label {
-    display: block;
-    margin-top: 0.5rem;
-    font-weight: bold;
-  }
-
-  .xy-inputs {
-    display: flex;
-    gap: 0.3rem;
-  }
-
-  .xy-inputs input {
-    width: 50%;
-  }
+  body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
+  #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
+  #globeViz { flex: 1; background: black; }
+  h2 { margin-top: 1rem; margin-bottom: 0.5rem; }
+  input, select, textarea, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
+  button { cursor: pointer; }
+  .texture-input { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .texture-input button { flex: 1; padding: 0.5rem; border: none; background: #1976d2; color: white; border-radius: 4px; }
+  .texture-input button:hover { background: #1565c0; }
+  ul { padding: 0; list-style: none; }
+  li { margin: 0.3rem 0; background: #1a2b4d; padding: 0.3rem; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+  li div { display: flex; gap: 0.5rem; align-items: center; }
+  li button { padding: 0.2rem 0.5rem; border: none; border-radius: 4px; cursor: pointer; }
+  li button.edit { background: #0277bd; color: white; }
+  li button.del { background: #c62828; color: white; }
+  label { display: block; margin-top: 0.5rem; font-weight: bold; }
+  .xy-inputs { display: flex; gap: 0.3rem; }
+  .xy-inputs input { width: 50%; }
 </style>
 </head>
 <body>
 <div id="form">
   <h2>Dodaj punkt</h2>
-  
   <label>Planeta</label>
   <input type="text" id="planet" placeholder="Nazwa planety" />
-  
   <div class="xy-inputs">
-    <div>
-      <label>X</label>
-      <input type="number" id="lat" step="0.0001" />
-    </div>
-    <div>
-      <label>Y</label>
-      <input type="number" id="lng" step="0.0001" />
-    </div>
+    <div><label>X</label><input type="number" id="lat" step="0.0001" /></div>
+    <div><label>Y</label><input type="number" id="lng" step="0.0001" /></div>
   </div>
-
   <label>Nazwa punktu</label>
   <input type="text" id="name" />
   <label>Typ</label>
@@ -153,7 +50,6 @@
   <textarea id="notes"></textarea>
   <label>Notatka planety</label>
   <textarea id="planetNote"></textarea>
-
   <button onclick="addPoint()">Dodaj punkt</button>
 
   <h2>Planety</h2>
@@ -180,13 +76,10 @@
   <h2>Skalowanie i pozycja globu</h2>
   <label>Skala punktów</label>
   <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="0.4" oninput="updatePointScale()" />
-  
   <label>Oddal glob</label>
   <input type="range" id="globeScale" min="0.01" max="1" step="0.01" value="1" oninput="updateGlobeScale()" />
-  
   <label>Przesuń glob</label>
   <input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
-  
   <button onclick="resetGlobePosition()">Reset pozycji globu</button>
 
   <h2>Import/Eksport</h2>
@@ -204,7 +97,7 @@ let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 
 const globe = Globe()(document.getElementById("globeViz"))
-  .globeImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/earth-blue-marble.jpg') 
+  .globeImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/earth-blue-marble.jpg')
   .backgroundImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/stars.jpg')
   .pointLat("lat")
   .pointLng("lng")
@@ -242,8 +135,6 @@ const globe = Globe()(document.getElementById("globeViz"))
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
-// ---------------------- FUNKCJE ----------------------
-
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
   localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
@@ -262,39 +153,21 @@ function refreshPlanetList(){
   const list = document.getElementById("planetList");
   list.innerHTML = "";
   Object.keys(atlas).forEach(p => {
-    const container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.gap = "0.5rem";
-    container.style.marginBottom = "0.2rem";
-
     const btn = document.createElement("button");
     btn.textContent = p;
-    btn.style.flex = "1";
+    btn.style.width = "100%";
+    btn.style.margin = "0.2rem 0";
     btn.onclick = () => {
       currentPlanet = p;
       document.getElementById("planet").value = p;
+      document.getElementById("planetNote").value = planetNotes[p] || "";
       addPoles(p);
       refreshGlobePoints();
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
       setPlanetTexture(p);
       refreshPointsList();
     };
-    container.appendChild(btn);
-
-    const noteBtn = document.createElement("button");
-    noteBtn.textContent = "Notatka";
-    noteBtn.style.flex = "0 0 auto";
-    noteBtn.onclick = () => {
-      let note = planetNotes[p] || "";
-      const newNote = prompt(`Notatka dla planety ${p}:`, note);
-      if(newNote !== null){
-        planetNotes[p] = newNote;
-        saveAtlas();
-      }
-    };
-    container.appendChild(noteBtn);
-
-    list.appendChild(container);
+    list.appendChild(btn);
   });
 }
 
@@ -302,7 +175,6 @@ function refreshPointsList(){
   const list = document.getElementById("pointsList");
   list.innerHTML = "";
   if(!currentPlanet || !atlas[currentPlanet]) return;
-
   let points = [...atlas[currentPlanet]];
   const sort = document.getElementById("sortPoints").value;
   if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
@@ -310,26 +182,22 @@ function refreshPointsList(){
   if(sort==="type") points.sort((a,b)=> (a.type||"").localeCompare(b.type||""));
   if(sort==="newest") points.sort((a,b)=> (b.timestamp||0)-(a.timestamp||0));
   if(sort==="oldest") points.sort((a,b)=> (a.timestamp||0)-(b.timestamp||0));
-
-  points.forEach((point,index) => {
+  points.forEach((point,index)=>{
     const li = document.createElement("li");
     li.style.display = "flex";
     li.style.flexDirection = "column";
     li.style.alignItems = "flex-start";
-
     const info = document.createElement("span");
     info.innerHTML = `${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
     li.appendChild(info);
-
     const btnDiv = document.createElement("div");
     btnDiv.style.display = "flex";
     btnDiv.style.gap = "0.5rem";
-
     if(point.type==="Zasób" || point.type==="Obelisk"){
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.checked = point.type==="Zasób"?point.extracted:point.visited;
-      checkbox.onchange = () => {
+      checkbox.onchange = ()=>{
         if(point.type==="Zasób") point.extracted = checkbox.checked;
         if(point.type==="Obelisk") point.visited = checkbox.checked;
         saveAtlas();
@@ -338,17 +206,15 @@ function refreshPointsList(){
       };
       btnDiv.appendChild(checkbox);
     }
-
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edytuj";
     editBtn.className = "edit";
-    editBtn.onclick = () => editPoint(index);
+    editBtn.onclick = ()=>editPoint(index);
     btnDiv.appendChild(editBtn);
-
     const delBtn = document.createElement("button");
     delBtn.textContent = "Usuń";
     delBtn.className = "del";
-    delBtn.onclick = () => {
+    delBtn.onclick = ()=>{
       if(confirm("Czy na pewno usunąć punkt?")){
         atlas[currentPlanet].splice(index,1);
         saveAtlas();
@@ -357,7 +223,6 @@ function refreshPointsList(){
       }
     };
     btnDiv.appendChild(delBtn);
-
     li.appendChild(btnDiv);
     list.appendChild(li);
   });
@@ -370,6 +235,7 @@ function addPoint(){
   const name = document.getElementById("name").value.trim();
   const type = document.getElementById("type").value;
   const notes = document.getElementById("notes").value.trim();
+  planetNotes[planet] = document.getElementById("planetNote").value.trim();
   if(!planet || isNaN(lat) || isNaN(lng)){
     alert("Uzupełnij planetę i współrzędne!");
     return;
@@ -403,7 +269,7 @@ function editPoint(index){
 
 function setPlanetTexture(planet){
   if(planetTextures[planet]) globe.globeImageUrl(planetTextures[planet]);
-  else globe.globeImageUrl(null);
+  else globe.globeImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/earth-blue-marble.jpg');
 }
 
 function setPlanetTextureFromInput(){
@@ -446,37 +312,31 @@ function importAtlas(event){
   reader.readAsText(file);
 }
 
-// Skalowanie globu
 function updateGlobeScale(){
   const scale = parseFloat(document.getElementById("globeScale").value);
   globe.scene().scale.set(scale, scale, scale);
 }
 
-// Skalowanie punktów
-function updatePointScale() {
+function updatePointScale(){
   pointScale = parseFloat(document.getElementById("pointScale").value);
   refreshGlobePoints();
 }
 
-// Przesuwanie globu w lewo/prawo
 function updateGlobeOffset(){
   const offset = parseFloat(document.getElementById("globeOffset").value);
   globe.scene().position.x = offset;
 }
 
-// Reset pozycji globu i suwaka oddalenia
-function resetGlobePosition() {
+function resetGlobePosition(){
   document.getElementById("globeOffset").value = 0;
   globe.scene().position.x = 0;
 }
 
-// Odświeżanie punktów
 function refreshGlobePoints(){
   if(!currentPlanet) return;
   globe.pointsData(atlas[currentPlanet]);
 }
 
-// Inicjalizacja
 refreshPlanetList();
 </script>
 </body>
