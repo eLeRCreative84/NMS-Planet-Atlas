@@ -262,8 +262,13 @@ function refreshPointsList(){
 heightSlider.oninput = () => {
   point.height = parseFloat(heightSlider.value);
   saveAtlas();
-  if(currentPlanet) globe.pointsData(atlas[currentPlanet]); // 🔹 odświeża wszystkie słupki
+  refreshGlobePoints();
 };
+
+function updatePointScale(){
+  pointScale = parseFloat(document.getElementById("pointScale").value);
+  refreshGlobePoints();
+}
 
     li.appendChild(heightSlider);
     // 🔼
@@ -381,6 +386,12 @@ function resetGlobePosition() {
   // globe.scene().position.y = 0;
 }
 
+  // Musimy wymusić, aby Globe.js faktycznie przeliczył wszystkie obiekty 3D. Najprostszy sposób:
+  function refreshGlobePoints() {
+  if(!currentPlanet) return;
+  globe.pointsData([]); // reset
+  globe.pointsData(atlas[currentPlanet]); // ponownie ustaw punkty
+}
   
 refreshPlanetList();
 </script>
