@@ -192,23 +192,19 @@ const globe = Globe()(document.getElementById("globeViz"))
   .customLayerData(() => atlas[currentPlanet] || [])
 
 .customThreeObject(d => {
-  const radius = 0.05 * pointScale;
-  const height = 0.4 * pointScale;
-  const geom = new THREE.CylinderGeometry(radius, radius, height, 8);
+  const geom = new THREE.CylinderGeometry(d._customRadius, d._customRadius, d._customHeight, 8);
   const mat = new THREE.MeshBasicMaterial({ color: getPointColor(d) });
   const mesh = new THREE.Mesh(geom, mat);
-  mesh.position.set(0, height / 2, 0);
+  mesh.position.set(0, d._customHeight / 2, 0);
   return mesh;
 })
 .customThreeObjectUpdate((obj, d) => {
-  // Update rozmiar przy zmianie pointScale
-  const radius = 0.05 * pointScale;
-  const height = 0.4 * pointScale;
   obj.geometry.dispose();
-  obj.geometry = new THREE.CylinderGeometry(radius, radius, height, 8);
-  obj.position.set(0, height / 2, 0);
+  obj.geometry = new THREE.CylinderGeometry(d._customRadius, d._customRadius, d._customHeight, 8);
+  obj.position.set(0, d._customHeight / 2, 0);
   obj.material.color.set(getPointColor(d));
 })
+
 
   .htmlElementsData([])
   .htmlElement(d => {
@@ -446,8 +442,17 @@ function resetGlobePosition() {
 // 🔹 helper do odświeżania punktów
 function refreshGlobePoints(){
   if(!currentPlanet) return;
-  globe.pointsData([]);
-  globe.pointsData(atlas[currentPlanet]);
+
+  // Tworzymy nowe punkty z aktualnym pointScale
+  globe.pointsData(atlas[currentPlanet].map(d => {
+    const radius = 0.05 * pointScale;
+    const height = 0.4 * pointScale;
+    return {
+      ...d,
+      _customRadius: radius,
+      _customHeight: height
+    };
+  }));
 }
 
 refreshPlanetList();
