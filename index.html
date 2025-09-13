@@ -91,7 +91,7 @@ let pointScale = 1;
 
 const globe = Globe()(document.getElementById("globeViz"))
   .globeImageUrl(null)
-  .backgroundImageUrl("//unpkg.com/three-globe/example/img/night-sky.png") // 🌌 gwiazdy w tle
+  .backgroundImageUrl("//unpkg.com/three-globe/example/img/night-sky.png")
   .pointLat("lat")
   .pointLng("lng")
   .pointLabel(d => {
@@ -113,21 +113,20 @@ const globe = Globe()(document.getElementById("globeViz"))
     }
   })
   .customLayerData(() => atlas[currentPlanet] || [])
-.customThreeObject(d => {
-  if(d.type === "Pole") return null; // bieguny zostają w htmlElements
-  const geom = new THREE.CylinderGeometry(0.05, 0.05, 1, 8); // wąski słupek
-  const mat = new THREE.MeshBasicMaterial({ color: getPointColor(d) });
-  const mesh = new THREE.Mesh(geom, mat);
-  mesh.userData = d;
-  return mesh;
-})
-.customThreeObjectUpdate((obj, d) => {
-  obj.scale.set(1, d.height || 1, 1); // wysokość = height
-  obj.position.set(0, (d.height || 1) / 2, 0); // żeby stał na powierzchni
-});
-
+  .customThreeObject(d => {
+    if(d.type === "Pole") return null;
+    const geom = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
+    const mat = new THREE.MeshBasicMaterial({ color: getPointColor(d) });
+    const mesh = new THREE.Mesh(geom, mat);
+    mesh.userData = d;
+    return mesh;
+  })
+  .customThreeObjectUpdate((obj, d) => {
+    obj.scale.set(1, d.height || 1, 1);
+    obj.position.set(0, (d.height || 1)/2, 0);
+  })
   .htmlElementsData([])
-  .htmlElement(d=>{
+  .htmlElement(d => {
     if(d.type==="Pole"){
       const el=document.createElement("div");
       el.style.color="white";
@@ -141,6 +140,19 @@ const globe = Globe()(document.getElementById("globeViz"))
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
+function getPointColor(d){
+  switch(d.type){
+    case "Zasób": return d.extracted?"gray":"gold";
+    case "Obelisk": return d.visited?"green":"orange";
+    case "Baza": return "blue";
+    case "Ruiny": return "brown";
+    case "Duża struktura": return "purple";
+    case "Inne": return "pink";
+    case "Pole": return "red";
+    default: return "red";
+  }
+}
+  
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
   localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
