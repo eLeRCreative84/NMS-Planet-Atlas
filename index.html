@@ -535,22 +535,39 @@ function refreshGlobePoints(){
 
   // Filtrowanie punktów
 function applyPointFilter() {
-  if(!currentPlanet || !atlas[currentPlanet]) return;
-  const checkedTypes = Array.from(document.querySelectorAll('#filterPoints input:checked')).map(cb => cb.value);
+  if (!currentPlanet || !atlas[currentPlanet]) return;
 
-  // pełna lista z atlasu (punktów NIE usuwamy)
-  const allPoints = atlas[currentPlanet];
+  // Typy zaznaczone w filtrze
+  const checkedTypes = Array.from(document.querySelectorAll('#filterPoints input:checked'))
+                            .map(cb => cb.value);
 
-  // na globie: zawsze bieguny + tylko zaznaczone typy
-  const filteredForGlobe = allPoints.filter(p => p.type === "Pole" || checkedTypes.includes(p.type));
-  globe.pointsData(filteredForGlobe);
+  // ------------------- Glob -------------------
+  globe.pointColor(d => {
+    if (d.type === "Pole") return "red"; // bieguny zawsze widoczne
+    if (!checkedTypes.includes(d.type)) return "rgba(0,0,0,0)"; // ukryj punkt wizualnie
+    switch (d.type) {
+      case "Zasób": return d.extracted ? "gray" : "gold";
+      case "Obelisk": return d.visited ? "green" : "orange";
+      case "Baza": return "blue";
+      case "Ruiny": return "brown";
+      case "Duża struktura": return "purple";
+      case "Inne": return "pink";
+      default: return "red";
+    }
+  });
 
-  // w HUD: bez biegunów, tylko zaznaczone typy
-  const filteredForList = allPoints.filter(p => p.type !== "Pole" && checkedTypes.includes(p.type));
+  // Zaktualizuj glob z pełnym zestawem punktów (żadne nie giną)
+  globe.pointsData(atlas[currentPlanet]);
+
+  // ------------------- Lista HUD -------------------
   const list = document.getElementById("pointsList");
   list.innerHTML = "";
 
-  filteredForList.forEach((point, index) => {
+  atlas[currentPlanet].forEach((point, index) => {
+    // pomijamy bieguny w liście
+    if (point.type === "Pole") return;
+    if (!checkedTypes.includes(point.type)) return;
+
     const li = document.createElement("li");
     li.style.display = "flex";
     li.style.flexDirection = "column";
@@ -564,61 +581,49 @@ function applyPointFilter() {
     btnDiv.style.display = "flex";
     btnDiv.style.gap = "0.5rem";
 
+    // przycisk pokaż
     const showBtn = document.createElement("button");
     showBtn.textContent = "Pokaż";
-    showBtn.className = "show";
     showBtn.style.background = "#388e3c";
     showBtn.style.color = "white";
     showBtn.onclick = () => {
       globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1000);
       point.__highlight = true;
-      globe.pointColor(d=>{
-        if(d.__highlight) return "orange";
-        switch(d.type){
-          case "Zasób": return d.extracted?"gray":"gold";
-          case "Obelisk": return d.visited?"green":"orange";
-          case "Baza": return "blue";
-          case "Ruiny": return "brown";
-          case "Duża struktura": return "purple";
-          case "Inne": return "pink";
-          case "Pole": return "red";
-          default: return "red";
-        }
-      });
-      globe.pointsData(filteredForGlobe);
-      setTimeout(()=>{
+      globe.pointsData(atlas[currentPlanet]);
+      setTimeout(() => {
         delete point.__highlight;
-        globe.pointsData(filteredForGlobe);
-      },2000);
+        globe.pointsData(atlas[currentPlanet]);
+      }, 2000);
     };
     btnDiv.appendChild(showBtn);
 
-    if(point.type==="Zasób" || point.type==="Obelisk"){
+    // checkbox dla Zasób/Obelisk
+    if (point.type === "Zasób" || point.type === "Obelisk") {
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.checked = point.type==="Zasób"?point.extracted:point.visited;
-      checkbox.onchange = ()=>{
-        if(point.type==="Zasób") point.extracted = checkbox.checked;
-        if(point.type==="Obelisk") point.visited = checkbox.checked;
+      checkbox.checked = point.type === "Zasób" ? point.extracted : point.visited;
+      checkbox.onchange = () => {
+        if (point.type === "Zasób") point.extracted = checkbox.checked;
+        if (point.type === "Obelisk") point.visited = checkbox.checked;
         saveAtlas();
-        applyPointFilter(); // odśwież po zmianie
+        applyPointFilter();
       };
       btnDiv.appendChild(checkbox);
     }
 
+    // przyciski Edytuj / Usuń
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edytuj";
     editBtn.className = "edit";
-    editBtn.onclick = ()=>editPoint(atlas[currentPlanet].indexOf(point));
+    editBtn.onclick = () => editPoint(index);
     btnDiv.appendChild(editBtn);
 
     const delBtn = document.createElement("button");
     delBtn.textContent = "Usuń";
     delBtn.className = "del";
-    delBtn.onclick = ()=>{
-      if(confirm("Czy na pewno usunąć punkt?")){
-        const idx = atlas[currentPlanet].indexOf(point);
-        atlas[currentPlanet].splice(idx,1);
+    delBtn.onclick = () => {
+      if (confirm("Czy na pewno usunąć punkt?")) {
+        atlas[currentPlanet].splice(index, 1);
         saveAtlas();
         applyPointFilter();
       }
@@ -629,6 +634,7 @@ function applyPointFilter() {
     list.appendChild(li);
   });
 }
+
   
 // start
 refreshPlanetList();
