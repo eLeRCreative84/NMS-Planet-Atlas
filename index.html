@@ -33,6 +33,24 @@
   #tabs button.active { background: #1976d2; }
   .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
   .tab-content.active { display: block; }
+ 
+#filterPoints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+#filterPoints label {
+  display: flex;
+  align-items: center;
+  background: #1a2b4d;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#filterPoints input {
+  margin-right: 0.3rem;
+}
+  
 </style>
 </head>
 <body>
@@ -341,14 +359,17 @@ function refreshPointsList(types = null){
   list.innerHTML = "";
   if(!currentPlanet || !atlas[currentPlanet]) return;
 
-  let points = [...atlas[currentPlanet]];
+  // usuwamy bieguny z listy HUD
+  let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
+
   const sort = document.getElementById("sortPoints").value;
   if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
   if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
   if(sort==="type") points.sort((a,b)=> (a.type||"").localeCompare(b.type||""));
   if(sort==="newest") points.sort((a,b)=> (b.timestamp||0)-(a.timestamp||0));
   if(sort==="oldest") points.sort((a,b)=> (a.timestamp||0)-(b.timestamp||0));
-  // filtr punktów
+
+  // filtr listy punktów HUD
   if(types) points = points.filter(p => types.includes(p.type));
  
   points.forEach((point,index)=>{
@@ -598,10 +619,16 @@ function refreshGlobePoints(){
 function applyPointFilter() {
   if(!currentPlanet || !atlas[currentPlanet]) return;
   const checkedTypes = Array.from(document.querySelectorAll('#filterPoints input:checked')).map(cb => cb.value);
-  const filteredPoints = atlas[currentPlanet].filter(p => checkedTypes.includes(p.type));
-  globe.pointsData(filteredPoints);
-}
 
+  // filtrujemy punkty (ale bieguny zostają zawsze)
+  const filteredPoints = atlas[currentPlanet].filter(p => p.type === "Pole" || checkedTypes.includes(p.type));
+
+  // na globie zawsze bieguny + przefiltrowane punkty
+  globe.pointsData(filteredPoints);
+
+  // odświeżamy listę HUD bez biegunów
+  refreshPointsList(checkedTypes);
+}
   
 // start
 refreshPlanetList();
