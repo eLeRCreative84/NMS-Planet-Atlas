@@ -8,7 +8,10 @@
 <style>
   body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
   #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
-  #globeViz { flex: 1; background: black; }
+  #globeViz { flex: 1; background: black; position: relative; }
+  /* upewniamy się że canvas zajmuje cały obszar kontenera */
+  #globeViz canvas { width: 100% !important; height: 100% !important; display: block; background: transparent; }
+
   h2 { margin-top: 1rem; margin-bottom: 0.5rem; }
   input, select, textarea, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
   button { cursor: pointer; }
@@ -24,13 +27,12 @@
   label { display: block; margin-top: 0.5rem; font-weight: bold; }
   .xy-inputs { display: flex; gap: 0.3rem; }
   .xy-inputs input { width: 50%; }
-  
-  #tabs { display: flex; background: #102b56; }
+
+  #tabs { display: flex; background: #102b56; margin-bottom: 0.5rem; }
   #tabs button { flex: 1; padding: 0.5rem; border: none; background: #102b56; color: white; cursor: pointer; font-weight: bold; }
   #tabs button.active { background: #1976d2; }
-  .tab-content { display: none; padding: 1rem; overflow-y: auto; }
+  .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
   .tab-content.active { display: block; }
-  
 </style>
 </head>
 <body>
@@ -64,6 +66,11 @@
     </select>
     <label>Notatki</label>
     <textarea id="notes"></textarea>
+
+    <!-- UWAGA: element wymagany przez skrypt (by uniknąć błędów JS) -->
+    <label>Notatka planety</label>
+    <textarea id="planetNote"></textarea>
+
     <button onclick="addPoint()">Dodaj punkt</button>
 
     <h2>Tekstura planety</h2>
@@ -128,42 +135,47 @@
   </div>
 </div>
 
+<div id="globeViz"></div>
+
 <script>
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
 let planetNotes = JSON.parse(localStorage.getItem("planetNotes") || "{}");
+let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}"); // dla detali planety, jeśli używasz
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 
+// Inicjalizacja globu — używamy https aby tło zawsze się załadowało
 const globe = Globe()(document.getElementById("globeViz"))
-  .globeImageUrl(null) // brak domyślnej mapy, czarna kula
-  .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png') // gwiazdy
+  .globeImageUrl(null) // brak domyślnej mapy (pusta/ciemna kula)
+  .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png') // 🌌 gwiazdy w tle
   .pointLat("lat")
   .pointLng("lng")
   .pointLabel(d => {
-  if (!currentPlanet || !atlas[currentPlanet]) return "";
-
-  // wszystkie punkty w tym miejscu
-  const sameLocation = atlas[currentPlanet].filter(
-    p => p.lat === d.lat && p.lng === d.lng
-  );
-
-  // jeśli jest więcej niż jeden punkt w tym miejscu → lista
-  if (sameLocation.length > 1) {
-    return sameLocation.map(p => {
-      let label = `${p.name || "Bez nazwy"} (${p.type})`;
-      if (p.type === "Zasób") label += p.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
-      if (p.type === "Obelisk") label += p.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+    // zabezpieczenie: gdy nie ma currentPlanet, zwracamy opis punktu pojedynczo
+    if (!currentPlanet || !atlas[currentPlanet]) {
+      let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
+      if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+      if (d.type === "Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
       return label;
-    }).join("<br>");
-  }
+    }
 
-  // w przeciwnym razie zachowaj pojedynczy opis
-  let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
-  if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
-  if (d.type === "Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
-  return label;
-})
+    // grupowanie punktów w tym samym miejscu dla aktualnej planety
+    const sameLocation = atlas[currentPlanet].filter(p => p.lat === d.lat && p.lng === d.lng);
+    if (sameLocation.length > 1) {
+      return sameLocation.map(p => {
+        let label = `${p.name || "Bez nazwy"} (${p.type})`;
+        if (p.type === "Zasób") label += p.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+        if (p.type === "Obelisk") label += p.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+        return label;
+      }).join("<br>");
+    }
+
+    let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
+    if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+    if (d.type === "Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+    return label;
+  })
   .pointColor(d=>{
     switch(d.type){
       case "Zasób": return d.extracted?"gray":"gold";
@@ -192,18 +204,24 @@ const globe = Globe()(document.getElementById("globeViz"))
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
-
+// ---------------------- TABY ----------------------
 function openTab(tabId) {
   document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
   document.querySelectorAll("#tabs button").forEach(el => el.classList.remove("active"));
-  document.getElementById(tabId).classList.add("active");
-  document.querySelector(`#tabs button[onclick*="${tabId}"]`).classList.add("active");
+  const tab = document.getElementById(tabId);
+  if(tab) tab.classList.add("active");
+  // oznacz odpowiedni przycisk jako active (przybliżone dopasowanie)
+  document.querySelectorAll("#tabs button").forEach(btn=>{
+    if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
+  });
 }
-  
+
+// ---------------------- FUNKCJE ZAPIS/Odśwież ----------------------
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
   localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
   localStorage.setItem("planetNotes", JSON.stringify(planetNotes));
+  localStorage.setItem("planetDetails", JSON.stringify(planetDetails));
 }
 
 function addPoles(planet){
@@ -225,7 +243,8 @@ function refreshPlanetList(){
     btn.onclick = () => {
       currentPlanet = p;
       document.getElementById("planet").value = p;
-      document.getElementById("planetNote").value = planetNotes[p] || "";
+      // jeśli mamy planetNote w storage, ustawiamy pole (pole istnieje)
+      if (document.getElementById("planetNote")) document.getElementById("planetNote").value = planetNotes[p] || "";
       addPoles(p);
       refreshGlobePoints();
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
@@ -270,11 +289,9 @@ function refreshPointsList(){
     showBtn.style.background = "#388e3c";
     showBtn.style.color = "white";
     showBtn.onclick = () => {
-      // Kamera na punkt
-      globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 2000);
+      globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1000);
 
-      // Tymczasowe podświetlenie punktu na pomaranczowo
-      const originalType = point.type;
+      // podświetlenie punktu
       point.__highlight = true;
       globe.pointColor(d=>{
         if(d.__highlight) return "orange";
@@ -297,7 +314,6 @@ function refreshPointsList(){
     };
     btnDiv.appendChild(showBtn);
 
-    // ✅ Checkbox (dla Zasób/Obelisk)
     if(point.type==="Zasób" || point.type==="Obelisk"){
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
@@ -312,14 +328,12 @@ function refreshPointsList(){
       btnDiv.appendChild(checkbox);
     }
 
-    // ✏️ Edytuj
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edytuj";
     editBtn.className = "edit";
     editBtn.onclick = ()=>editPoint(index);
     btnDiv.appendChild(editBtn);
 
-    // ❌ Usuń
     const delBtn = document.createElement("button");
     delBtn.textContent = "Usuń";
     delBtn.className = "del";
@@ -338,7 +352,6 @@ function refreshPointsList(){
   });
 }
 
-
 function addPoint(){
   const planet = document.getElementById("planet").value.trim();
   const lat = parseFloat(document.getElementById("lat").value);
@@ -346,7 +359,8 @@ function addPoint(){
   const name = document.getElementById("name").value.trim();
   const type = document.getElementById("type").value;
   const notes = document.getElementById("notes").value.trim();
-  planetNotes[planet] = document.getElementById("planetNote").value.trim();
+  // zapis notatki planety do planetNotes (pole istnieje w DOM)
+  planetNotes[planet] = document.getElementById("planetNote") ? document.getElementById("planetNote").value.trim() : (planetNotes[planet] || "");
   if(!planet || isNaN(lat) || isNaN(lng)){
     alert("Uzupełnij planetę i współrzędne!");
     return;
@@ -380,7 +394,7 @@ function editPoint(index){
 
 function setPlanetTexture(planet){
   if(planetTextures[planet]) globe.globeImageUrl(planetTextures[planet]);
-  else globe.globeImageUrl('https://raw.githubusercontent.com/ChaituVR/ThreeJS-Globe/main/images/earth-blue-marble.jpg');
+  else globe.globeImageUrl(null);
 }
 
 function setPlanetTextureFromInput(){
@@ -396,7 +410,7 @@ function setPlanetTextureFromInput(){
 }
 
 function exportAtlas(){
-  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetNotes},null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetNotes,planetDetails},null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -415,6 +429,7 @@ function importAtlas(event){
       if(data.atlas) atlas = data.atlas;
       if(data.planetTextures) planetTextures = data.planetTextures;
       if(data.planetNotes) planetNotes = data.planetNotes;
+      if(data.planetDetails) planetDetails = data.planetDetails;
       saveAtlas();
       refreshPlanetList();
       alert("Import zakończony!");
@@ -423,16 +438,19 @@ function importAtlas(event){
   reader.readAsText(file);
 }
 
+// Skalowanie globu
 function updateGlobeScale(){
   const scale = parseFloat(document.getElementById("globeScale").value);
   globe.scene().scale.set(scale, scale, scale);
 }
 
+// Skalowanie punktów
 function updatePointScale(){
   pointScale = parseFloat(document.getElementById("pointScale").value);
   refreshGlobePoints();
 }
 
+// Przesuwanie globu w lewo/prawo
 function updateGlobeOffset(){
   const offset = parseFloat(document.getElementById("globeOffset").value);
   globe.scene().position.x = offset;
@@ -441,16 +459,59 @@ function updateGlobeOffset(){
 function resetGlobePosition(){
   document.getElementById("globeOffset").value = 0;
   globe.scene().position.x = 0;
-
+  // reset suwaka oddalenia globu
   document.getElementById("globeScale").value = 1;
-  globe.scene().scale.set(1,1,1); // reset skali globu
+  globe.scene().scale.set(1,1,1);
 }
 
+// Detale planety (założyłeś te funkcje wcześniej — zostawiamy je działające)
+function loadPlanetDetails(){
+  if(!currentPlanet) return;
+  const details=planetDetails[currentPlanet]||{};
+  document.getElementById("detailGalaxy").value=details.galaxy||"";
+  document.getElementById("detailRegion").value=details.region||"";
+  document.getElementById("detailSystem").value=details.system||"";
+  document.getElementById("detailBiome").value=details.biome||"";
+  document.getElementById("detailWeather").value=details.weather||"";
+  document.getElementById("detailSentinels").value=details.sentinels||"";
+  document.getElementById("detailFlora").value=details.flora||"";
+  document.getElementById("detailFauna").value=details.fauna||"";
+  document.getElementById("detailClaimed").value=details.claimed||"";
+  document.getElementById("detailDiscovered").value=details.discovered||"";
+  document.getElementById("detailMode").value=details.mode||"";
+  document.getElementById("detailUpdated").value=details.updated||"";
+  document.getElementById("detailCoords").value=details.coords||"";
+  document.getElementById("detailNotes").value=details.notes||"";
+}
+function savePlanetDetails(){
+  if(!currentPlanet) return;
+  planetDetails[currentPlanet]={
+    galaxy:document.getElementById("detailGalaxy").value,
+    region:document.getElementById("detailRegion").value,
+    system:document.getElementById("detailSystem").value,
+    biome:document.getElementById("detailBiome").value,
+    weather:document.getElementById("detailWeather").value,
+    sentinels:document.getElementById("detailSentinels").value,
+    flora:document.getElementById("detailFlora").value,
+    fauna:document.getElementById("detailFauna").value,
+    claimed:document.getElementById("detailClaimed").value,
+    discovered:document.getElementById("detailDiscovered").value,
+    mode:document.getElementById("detailMode").value,
+    updated:document.getElementById("detailUpdated").value,
+    coords:document.getElementById("detailCoords").value,
+    notes:document.getElementById("detailNotes").value
+  };
+  saveAtlas();
+  alert("Opis zapisany!");
+}
+
+// Odświeżenie punktów na globie
 function refreshGlobePoints(){
   if(!currentPlanet) return;
   globe.pointsData(atlas[currentPlanet]);
 }
 
+// start
 refreshPlanetList();
 </script>
 </body>
