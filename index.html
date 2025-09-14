@@ -354,107 +354,23 @@ function refreshPlanetList(){
   });
 }
 
-function refreshPointsList(types = null){
-  const list = document.getElementById("pointsList");
-  list.innerHTML = "";
-  if(!currentPlanet || !atlas[currentPlanet]) return;
+function refreshPointsList() {
+  if (!currentPlanet || !atlas[currentPlanet]) return;
 
-  // usuwamy bieguny z listy HUD
+  // przygotuj listę (bez biegunów)
   let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
 
   const sort = document.getElementById("sortPoints").value;
-  if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
-  if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
-  if(sort==="type") points.sort((a,b)=> (a.type||"").localeCompare(b.type||""));
-  if(sort==="newest") points.sort((a,b)=> (b.timestamp||0)-(a.timestamp||0));
-  if(sort==="oldest") points.sort((a,b)=> (a.timestamp||0)-(b.timestamp||0));
+  if (sort === "nameAsc") points.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  if (sort === "nameDesc") points.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+  if (sort === "type") points.sort((a, b) => (a.type || "").localeCompare(b.type || ""));
+  if (sort === "newest") points.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  if (sort === "oldest") points.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-  // filtr listy punktów HUD
-  if(types) points = points.filter(p => types.includes(p.type));
- 
-  points.forEach((point,index)=>{
-    const li = document.createElement("li");
-    li.style.display = "flex";
-    li.style.flexDirection = "column";
-    li.style.alignItems = "flex-start";
-
-    const info = document.createElement("span");
-    info.innerHTML = `${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
-    li.appendChild(info);
-
-    const btnDiv = document.createElement("div");
-    btnDiv.style.display = "flex";
-    btnDiv.style.gap = "0.5rem";
-
-    // 🔍 Nowy przycisk "Pokaż"
-    const showBtn = document.createElement("button");
-    showBtn.textContent = "Pokaż";
-    showBtn.className = "show";
-    showBtn.style.background = "#388e3c";
-    showBtn.style.color = "white";
-    showBtn.onclick = () => {
-      globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1000);
-
-      // podświetlenie punktu
-      point.__highlight = true;
-      globe.pointColor(d=>{
-        if(d.__highlight) return "orange";
-        switch(d.type){
-          case "Zasób": return d.extracted?"gray":"gold";
-          case "Obelisk": return d.visited?"green":"orange";
-          case "Baza": return "blue";
-          case "Ruiny": return "brown";
-          case "Duża struktura": return "purple";
-          case "Inne": return "pink";
-          case "Pole": return "red";
-          default: return "red";
-        }
-      });
-      globe.pointsData(atlas[currentPlanet]);
-      setTimeout(()=>{
-        delete point.__highlight;
-        globe.pointsData(atlas[currentPlanet]);
-      },2000);
-    };
-    btnDiv.appendChild(showBtn);
-
-    if(point.type==="Zasób" || point.type==="Obelisk"){
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = point.type==="Zasób"?point.extracted:point.visited;
-      checkbox.onchange = ()=>{
-        if(point.type==="Zasób") point.extracted = checkbox.checked;
-        if(point.type==="Obelisk") point.visited = checkbox.checked;
-        saveAtlas();
-        refreshGlobePoints();
-        refreshPointsList();
-      };
-      btnDiv.appendChild(checkbox);
-    }
-
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edytuj";
-    editBtn.className = "edit";
-    editBtn.onclick = ()=>editPoint(index);
-    btnDiv.appendChild(editBtn);
-
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Usuń";
-    delBtn.className = "del";
-    delBtn.onclick = ()=>{
-      if(confirm("Czy na pewno usunąć punkt?")){
-        atlas[currentPlanet].splice(index,1);
-        saveAtlas();
-        refreshPointsList();
-        refreshGlobePoints();
-      }
-    };
-    btnDiv.appendChild(delBtn);
-
-    li.appendChild(btnDiv);
-    list.appendChild(li);
-  });
+  // wywołaj filtr, żeby zbudować listę i zaktualizować glob
+  applyPointFilter();
 }
+
 
 function addPoint(){
   const planet = document.getElementById("planet").value.trim();
