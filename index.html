@@ -565,79 +565,51 @@ function applyPointFilter() {
   list.innerHTML = "";
 
   visiblePoints.forEach(point => {
-    if (point.type === "Pole") return; // pomijamy bieguny w liście
+  if (point.type === "Pole") return;
 
-    const li = document.createElement("li");
-    li.style.display = "flex";
-    li.style.flexDirection = "column";
-    li.style.alignItems = "flex-start";
+  const li = document.createElement("li");
+  const idx = atlas[currentPlanet].indexOf(point); // prawidłowy indeks w atlas
+  li.dataset.index = idx; // przypisujemy indeks do li
 
-    const info = document.createElement("span");
-    info.innerHTML = `${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
-    li.appendChild(info);
+  // ...info i buttony...
 
-    const btnDiv = document.createElement("div");
-    btnDiv.style.display = "flex";
-    btnDiv.style.gap = "0.5rem";
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edytuj";
+  editBtn.className = "edit";
+  editBtn.onclick = () => editPoint(parseInt(li.dataset.index));
+  btnDiv.appendChild(editBtn);
 
-    // przycisk pokaż
-    const showBtn = document.createElement("button");
-    showBtn.textContent = "Pokaż";
-    showBtn.style.background = "#388e3c";
-    showBtn.style.color = "white";
-    showBtn.onclick = () => {
-      globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1000);
-      point.__highlight = true;
-      globe.pointsData(visiblePoints);
-      setTimeout(() => {
-        delete point.__highlight;
-        globe.pointsData(visiblePoints);
-      }, 2000);
-    };
-    btnDiv.appendChild(showBtn);
-
-    // checkbox dla Zasób/Obelisk
-    if (point.type === "Zasób" || point.type === "Obelisk") {
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = point.type === "Zasób" ? point.extracted : point.visited;
-      checkbox.onchange = () => {
-  // zawsze zapisujemy w atlas[currentPlanet], nie w liście widocznej
-  const index = atlas[currentPlanet].indexOf(point);
-  if(index === -1) return;
-
-  if (point.type === "Zasób") atlas[currentPlanet][index].extracted = checkbox.checked;
-  if (point.type === "Obelisk") atlas[currentPlanet][index].visited = checkbox.checked;
-
-  saveAtlas();
-  applyPointFilter(); // odśwież listę i glob
-};
-      btnDiv.appendChild(checkbox);
+  const delBtn = document.createElement("button");
+  delBtn.textContent = "Usuń";
+  delBtn.className = "del";
+  delBtn.onclick = () => {
+    if(confirm("Czy na pewno usunąć punkt?")) {
+      atlas[currentPlanet].splice(parseInt(li.dataset.index), 1);
+      saveAtlas();
+      applyPointFilter();
     }
+  };
+  btnDiv.appendChild(delBtn);
 
-    // przyciski Edytuj / Usuń
-    const idx = atlas[currentPlanet].indexOf(point); // prawidłowy indeks względem atlas[currentPlanet]
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edytuj";
-    editBtn.className = "edit";
-    editBtn.onclick = () => editPoint(idx);
-    btnDiv.appendChild(editBtn);
-
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Usuń";
-    delBtn.className = "del";
-    delBtn.onclick = () => {
-      if (confirm("Czy na pewno usunąć punkt?")) {
-        atlas[currentPlanet].splice(idx, 1);
-        saveAtlas();
-        applyPointFilter();
-      }
+  // checkbox Zasób/Obelisk
+  if(point.type === "Zasób" || point.type === "Obelisk"){
+    const checkbox = document.createElement("input");
+    checkbox.type="checkbox";
+    checkbox.checked = point.type==="Zasób"? point.extracted : point.visited;
+    checkbox.onchange = () => {
+      const i = parseInt(li.dataset.index);
+      if(i===-1) return;
+      if(point.type==="Zasób") atlas[currentPlanet][i].extracted = checkbox.checked;
+      if(point.type==="Obelisk") atlas[currentPlanet][i].visited = checkbox.checked;
+      saveAtlas();
+      applyPointFilter();
     };
-    btnDiv.appendChild(delBtn);
+    btnDiv.appendChild(checkbox);
+  }
 
-    li.appendChild(btnDiv);
-    list.appendChild(li);
-  });
+  li.appendChild(btnDiv);
+  list.appendChild(li);
+});
 }
 
 
