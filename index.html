@@ -401,7 +401,7 @@ function refreshPointsList(){
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edytuj";
     editBtn.className = "edit";
-    editBtn.onclick = ()=>editPoint(index);
+    editBtn.onclick = ()=>editPoint(point.timestamp);  // Musimy jednoznacznie wskazać który punkt w atlasie edytujemy. Najprościej przekazywać nie indeks, tylko unikalny identyfikator (timestamp, który już dodajemy do każdego punktu).
     btnDiv.appendChild(editBtn);
 
     const delBtn = document.createElement("button");
@@ -422,6 +422,12 @@ function refreshPointsList(){
   });
 }
 
+// Kliknięcie Edytuj nie usuwa punktu od razu.
+//Punkt jest tymczasowo przygotowany do edycji (ładuje się do formularza).
+//Dopiero kliknięcie Nadpisz punkt faktycznie zmienia dane.
+//Jak klikniesz „Punkty” bez zapisania → lista zostaje nietknięta.
+//Przycisk zmienia podpis w zależności od trybu.
+  
 function addPoint(){
   const planet = document.getElementById("planet").value.trim();
   const lat = parseFloat(document.getElementById("lat").value);
@@ -462,8 +468,14 @@ function addPoint(){
   refreshPointsList();
 }
 
-function editPoint(index){
+// Musimy jednoznacznie wskazać który punkt w atlasie edytujemy. Najprościej przekazywać nie indeks, tylko unikalny identyfikator (timestamp, który już dodajemy do każdego punktu).
+  
+function editPoint(timestamp){   
   if(!currentPlanet || !atlas[currentPlanet]) return;
+  
+  const index = atlas[currentPlanet].findIndex(p => p.timestamp === timestamp);
+  if(index === -1) return;
+
   const p = atlas[currentPlanet][index];
   document.getElementById("planet").value = currentPlanet;
   document.getElementById("lat").value = p.lat;
@@ -472,10 +484,10 @@ function editPoint(index){
   document.getElementById("type").value = p.type;
   document.getElementById("notes").value = p.notes;
 
-  editIndex = index; // zapamiętaj który punkt edytujemy
+  editIndex = index; // zapamiętaj indeks prawidłowego punktu w atlasie
   document.querySelector("button[onclick='addPoint()']").textContent = "Nadpisz punkt";
 
-  // przełączenie na zakładkę START
+  // 🔥 przełączenie na zakładkę START
   openTab('start');
 }
 
