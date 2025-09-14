@@ -131,15 +131,7 @@
   <label><input type="checkbox" value="Duża struktura" checked onchange="applyPointFilter()"> Duża struktura</label>
   <label><input type="checkbox" value="Inne" checked onchange="applyPointFilter()"> Inne</label>
 </div>
-    <!-- Sortuj -->
-    <label>Sortuj:</label>
-    <select id="sortPoints" onchange="refreshPointsList()">
-      <option value="nameAsc">Nazwa A–Z</option>
-      <option value="nameDesc">Nazwa Z–A</option>
-      <option value="type">Typ</option>
-      <option value="newest">Najnowsze</option>
-      <option value="oldest">Najstarsze</option>
-    </select>
+
     <ul id="pointsList"></ul>
   </div>
 
@@ -354,25 +346,6 @@ function refreshPlanetList(){
   });
 }
 
-function refreshPointsList() {
-  if (!currentPlanet || !atlas[currentPlanet]) return;
- 
-  // posortuj atlas[currentPlanet] (z wyłączeniem biegunów)
-  const sort = document.getElementById("sortPoints").value;
-
-  atlas[currentPlanet].sort((a, b) => {
-    if (a.type === "Pole" || b.type === "Pole") return 0;
-    if (sort === "nameAsc") return (a.name || "").localeCompare(b.name || "");
-    if (sort === "nameDesc") return (b.name || "").localeCompare(a.name || "");
-    if (sort === "type") return (a.type || "").localeCompare(b.type || "");
-    if (sort === "newest") return (b.timestamp || 0) - (a.timestamp || 0);
-    if (sort === "oldest") return (a.timestamp || 0) - (b.timestamp || 0);
-    return 0;
-  });
-  // po sortowaniu przebuduj listę i glob
-  applyPointFilter();
-}
-
 function addPoint(){
   const planet = document.getElementById("planet").value.trim();
   const lat = parseFloat(document.getElementById("lat").value);
@@ -394,7 +367,7 @@ function addPoint(){
   saveAtlas();
   currentPlanet = planet;
   refreshPlanetList();   // odświeża listę planet w zakładce Planety
-  refreshPointsList();   // odświeża listę punktów w zakładce Punkty (i filtr działa poprawnie)
+  applyPointFilter()   // odświeża listę punktów w zakładce Punkty (i filtr działa poprawnie)
   refreshGlobePoints();  // aktualizuje punkty na globie
 }
 
@@ -409,7 +382,7 @@ function editPoint(index){
   document.getElementById("notes").value = p.notes;
   atlas[currentPlanet].splice(index,1);
   saveAtlas();
-  refreshPointsList();
+  applyPointFilter()
   refreshGlobePoints();
 }
 
@@ -536,17 +509,18 @@ function refreshGlobePoints(){
 function applyPointFilter() {
   if (!currentPlanet || !atlas[currentPlanet]) return;
 
+  // Typy zaznaczone w filtrze
   const checkedTypes = Array.from(document.querySelectorAll('#filterPoints input:checked'))
                             .map(cb => cb.value);
 
-  // Filtrujemy punkty
+  // Filtrujemy punkty (bieguny zawsze widoczne na globie)
   const visiblePoints = atlas[currentPlanet].filter(p => p.type === "Pole" || checkedTypes.includes(p.type));
 
-  // Glob
+  // ------------------- Glob -------------------
   globe.pointsData(visiblePoints);
   globe.pointColor(d => {
     if (d.type === "Pole") return "red"; // bieguny zawsze widoczne
-    if (!checkedTypes.includes(d.type)) return "rgba(0,0,0,0)"; // ukryj punkt
+    if (!checkedTypes.includes(d.type)) return "rgba(0,0,0,0)"; // ukryj punkt wizualnie
     switch (d.type) {
       case "Zasób": return d.extracted ? "gray" : "gold";
       case "Obelisk": return d.visited ? "green" : "orange";
@@ -558,7 +532,7 @@ function applyPointFilter() {
     }
   });
 
-  // Lista HUD
+  // ------------------- Lista HUD -------------------
   const list = document.getElementById("pointsList");
   list.innerHTML = "";
 
@@ -566,22 +540,24 @@ function applyPointFilter() {
     if (point.type === "Pole") return; // pomijamy bieguny w liście
 
     const li = document.createElement("li");
+
+    // Pobieramy **prawdziwy indeks punktu w atlas[currentPlanet]**
     const idx = atlas[currentPlanet].indexOf(point);
     li.dataset.index = idx;
 
-    const infoDiv = document.createElement("div");
-    infoDiv.innerHTML = `${point.name} (${point.type}) X:${point.lat}, Y:${point.lng}`;
+    // Tekst nazwy
+    const span = document.createElement("span");
+    span.textContent = `${point.name || "Bez nazwy"} (${point.type})`;
+    li.appendChild(span);
 
-    const btnDiv = document.createElement("div");
-
-    // Edytuj
+    // Przycisk Edytuj
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edytuj";
     editBtn.className = "edit";
     editBtn.onclick = () => editPoint(idx);
-    btnDiv.appendChild(editBtn);
+    li.appendChild(editBtn);
 
-    // Usuń
+    // Przycisk Usuń
     const delBtn = document.createElement("button");
     delBtn.textContent = "Usuń";
     delBtn.className = "del";
@@ -589,33 +565,28 @@ function applyPointFilter() {
       if (confirm("Czy na pewno usunąć punkt?")) {
         atlas[currentPlanet].splice(idx, 1);
         saveAtlas();
-        applyPointFilter();
+        applyPointFilter(); // odśwież listę i glob
       }
     };
-    btnDiv.appendChild(delBtn);
+    li.appendChild(delBtn);
 
-    // Checkbox Zasób / Obelisk
+    // Checkbox Zasób/Obelisk
     if (point.type === "Zasób" || point.type === "Obelisk") {
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.checked = point.type === "Zasób" ? point.extracted : point.visited;
       checkbox.onchange = () => {
-        const i = parseInt(li.dataset.index);
-        if (i === -1) return;
-        if (point.type === "Zasób") atlas[currentPlanet][i].extracted = checkbox.checked;
-        if (point.type === "Obelisk") atlas[currentPlanet][i].visited = checkbox.checked;
+        if (point.type === "Zasób") atlas[currentPlanet][idx].extracted = checkbox.checked;
+        if (point.type === "Obelisk") atlas[currentPlanet][idx].visited = checkbox.checked;
         saveAtlas();
         applyPointFilter();
       };
-      btnDiv.appendChild(checkbox);
+      li.appendChild(checkbox);
     }
 
-    li.appendChild(infoDiv);
-    li.appendChild(btnDiv);
     list.appendChild(li);
   });
 }
-
 
 
 
