@@ -6,120 +6,128 @@
 <script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <style>
-  body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
-  #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
-  #globeViz { flex: 1; background: black; }
-  h2 { margin-top: 1rem; margin-bottom: 0.5rem; }
-  input, select, textarea, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
-  button { cursor: pointer; }
-  .texture-input { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-  .texture-input button { flex: 1; padding: 0.5rem; border: none; background: #1976d2; color: white; border-radius: 4px; }
-  .texture-input button:hover { background: #1565c0; }
-  ul { padding: 0; list-style: none; }
-  li { margin: 0.3rem 0; background: #1a2b4d; padding: 0.3rem; border-radius: 5px; display: flex; flex-direction: column; }
-  li div { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.2rem; }
-  li button { padding: 0.2rem 0.5rem; border: none; border-radius: 4px; cursor: pointer; }
-  li button.edit { background: #0277bd; color: white; }
-  li button.del { background: #c62828; color: white; }
-  label { display: block; margin-top: 0.5rem; font-weight: bold; }
-  .xy-inputs { display: flex; gap: 0.3rem; }
-  .xy-inputs input { width: 100%; }
-  /* zakładki */
-  .tabs { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
-  .tabs button {
+  body {
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+  #form {
+    flex: 0 0 28%;
+    min-width: 280px;
+    max-width: 450px;
+    padding: 0;
+    background: #0a1e3a;
+    color: white;
+    display: flex;
+    flex-direction: column;
+  }
+  #tabs {
+    display: flex;
+    background: #102b56;
+  }
+  #tabs button {
     flex: 1;
     padding: 0.5rem;
     border: none;
-    background: #1976d2;
+    background: #102b56;
     color: white;
     cursor: pointer;
-    border-radius: 4px 4px 0 0;
+    font-weight: bold;
   }
-  .tabs button.active { background: #0d47a1; }
-  .tab-content { display: none; }
+  #tabs button.active { background: #1976d2; }
+  .tab-content { flex: 1; overflow-y: auto; padding: 1rem; display: none; }
   .tab-content.active { display: block; }
+  #globeViz { flex: 1; background: black; }
+  h2 { margin-top: 1rem; margin-bottom: 0.5rem; }
+  input, select, textarea, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
+  textarea { min-height: 60px; }
+  button { cursor: pointer; }
+  ul { padding: 0; list-style: none; }
+  li { margin: 0.3rem 0; background: #1a2b4d; padding: 0.3rem; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+  li div { display: flex; gap: 0.5rem; }
+  li button { padding: 0.2rem 0.5rem; border: none; border-radius: 4px; cursor: pointer; }
+  li button.edit { background: #0277bd; color: white; }
+  li button.del { background: #c62828; color: white; }
+  li button.view { background: #43a047; color: white; }
+  label { display: block; margin-top: 0.5rem; font-weight: bold; }
 </style>
 </head>
 <body>
 <div id="form">
-  <div class="tabs">
-    <button class="active" onclick="openTab('planets')">Planety</button>
-    <button onclick="openTab('points')">Punkty</button>
-    <button onclick="openTab('texture')">Tekstura</button>
-    <button onclick="openTab('globe')">Glob</button>
-    <button onclick="openTab('import')">Import/Eksport</button>
+  <div id="tabs">
+    <button class="active" onclick="openTab('start')">Start</button>
+    <button onclick="openTab('planety')">Planety</button>
+    <button onclick="openTab('punkty')">Punkty</button>
+    <button onclick="openTab('opis')">Opis planety</button>
   </div>
 
-  <!-- Zakładka Planety -->
-  <div id="tab-planets" class="tab-content active">
+  <div id="start" class="tab-content active">
     <h2>Dodaj punkt</h2>
-    <label>Planeta</label>
-    <input type="text" id="planet" placeholder="Nazwa planety" />
-    <div class="xy-inputs">
-      <div><label>X</label><input type="number" id="lat" step="0.0001" /></div>
-      <div><label>Y</label><input type="number" id="lng" step="0.0001" /></div>
-    </div>
-    <label>Nazwa punktu</label>
-    <input type="text" id="name" />
+    <label>Planeta</label><input type="text" id="planet" placeholder="Nazwa planety" />
+    <label>X</label><input type="number" id="lat" step="0.0001" />
+    <label>Y</label><input type="number" id="lng" step="0.0001" />
+    <label>Nazwa punktu</label><input type="text" id="name" />
     <label>Typ</label>
     <select id="type">
-      <option>Zasób</option>
+      <option>Resource</option>
       <option>Obelisk</option>
-      <option>Baza</option>
-      <option>Ruiny</option>
-      <option>Duża struktura</option>
-      <option>Inne</option>
+      <option>Base</option>
+      <option>Ruins</option>
+      <option>LargeStructure</option>
+      <option>Other</option>
     </select>
-    <label>Notatki</label>
-    <textarea id="notes"></textarea>
-    <label>Notatka planety</label>
-    <textarea id="planetNote"></textarea>
+    <label>Notatki punktu</label><textarea id="notes"></textarea>
     <button onclick="addPoint()">Dodaj punkt</button>
-    <h2>Planety</h2>
-    <div id="planetList"></div>
-  </div>
 
-  <!-- Zakładka Punkty -->
-  <div id="tab-points" class="tab-content">
-    <h2>Punkty na planecie</h2>
-    <label>Sortuj:</label>
-    <select id="sortPoints" onchange="refreshPointsList()">
-      <option value="nameAsc">Nazwa A–Z</option>
-      <option value="nameDesc">Nazwa Z–A</option>
-      <option value="type">Typ</option>
-      <option value="newest">Najnowsze</option>
-      <option value="oldest">Najstarsze</option>
-    </select>
-    <ul id="pointsList"></ul>
-  </div>
-
-  <!-- Zakładka Tekstura -->
-  <div id="tab-texture" class="tab-content">
     <h2>Tekstura planety</h2>
-    <div class="texture-input">
+    <div>
       <input type="file" id="planetTextureInput" accept="image/*" hidden />
       <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
       <button onclick="setPlanetTextureFromInput()">Ustaw</button>
     </div>
-  </div>
 
-  <!-- Zakładka Glob -->
-  <div id="tab-globe" class="tab-content">
-    <h2>Skalowanie i pozycja globu</h2>
-    <label>Skala punktów</label>
-    <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="0.4" oninput="updatePointScale()" />
-    <label>Oddal glob</label>
+    <h2>Skalowanie planety</h2>
+    <label>Skala globu</label>
     <input type="range" id="globeScale" min="0.01" max="1" step="0.01" value="1" oninput="updateGlobeScale()" />
-    <label>Przesuń glob</label>
-    <input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
-    <button onclick="resetGlobePosition()">Reset pozycji globu</button>
-  </div>
 
-  <!-- Zakładka Import/Eksport -->
-  <div id="tab-import" class="tab-content">
+    <h2>Oddal (suwak)</h2>
+    <input type="number" id="pointScale" value="1" min="0.01" max="10" step="0.01" oninput="syncScaleInputs('number')" />
+    <input type="range" id="pointScaleRange" value="1" min="0.01" max="10" step="0.01" oninput="syncScaleInputs('range')" />
+
     <h2>Import/Eksport</h2>
     <button onclick="exportAtlas()">Eksport JSON</button>
     <input type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
+  </div>
+
+  <div id="planety" class="tab-content">
+    <h2>Planety</h2>
+    <div id="planetList"></div>
+  </div>
+
+  <div id="punkty" class="tab-content">
+    <h2>Punkty na planecie</h2>
+    <ul id="pointsList"></ul>
+  </div>
+
+  <div id="opis" class="tab-content">
+    <h2>Opis planety</h2>
+    <label>Galaktyka</label><input type="text" id="detailGalaxy" />
+    <label>Region</label><input type="text" id="detailRegion" />
+    <label>Układ gwiazdowy</label><input type="text" id="detailSystem" />
+    <label>Biom</label><input type="text" id="detailBiome" />
+    <label>Pogoda</label><input type="text" id="detailWeather" />
+    <label>Strażnicy</label><input type="text" id="detailSentinels" />
+    <label>Flora</label><input type="text" id="detailFlora" />
+    <label>Fauna</label><input type="text" id="detailFauna" />
+    <label>Roszczenie przez</label><input type="text" id="detailClaimed" />
+    <label>Odkryty przez</label><input type="text" id="detailDiscovered" />
+    <label>Tryb gry</label><input type="text" id="detailMode" />
+    <label>Zaktualizowano</label><input type="text" id="detailUpdated" />
+    <label>Koordynaty</label><input type="text" id="detailCoords" />
+    <label>Notatki planety</label><textarea id="detailNotes"></textarea>
+    <button onclick="savePlanetDetails()">Zapisz opis planety</button>
   </div>
 </div>
 
@@ -138,6 +146,7 @@ function openTab(tabName){
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
 let planetNotes = JSON.parse(localStorage.getItem("planetNotes") || "{}");
+let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}");
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 
@@ -201,6 +210,7 @@ globe.showGraticules(true).graticuleLineWidth(0.5);
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
   localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
+  localStorage.setItem("planetDetails", JSON.stringify(planetDetails));
   localStorage.setItem("planetNotes", JSON.stringify(planetNotes));
 }
 
@@ -229,6 +239,7 @@ function refreshPlanetList(){
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
       setPlanetTexture(p);
       refreshPointsList();
+      loadPlanetDetails();
     };
     list.appendChild(btn);
   });
@@ -394,7 +405,7 @@ function setPlanetTextureFromInput(){
 }
 
 function exportAtlas(){
-  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetNotes},null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetNotes,planetDetails},null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -413,6 +424,7 @@ function importAtlas(event){
       if(data.atlas) atlas = data.atlas;
       if(data.planetTextures) planetTextures = data.planetTextures;
       if(data.planetNotes) planetNotes = data.planetNotes;
+      if(data.planetDetails) planetDetails=data.planetDetails;
       saveAtlas();
       refreshPlanetList();
       alert("Import zakończony!");
@@ -449,6 +461,47 @@ function refreshGlobePoints(){
   globe.pointsData(atlas[currentPlanet]);
 }
 
+// Szczegóły planety
+function loadPlanetDetails(){
+  if(!currentPlanet) return;
+  const details=planetDetails[currentPlanet]||{};
+  document.getElementById("detailGalaxy").value=details.galaxy||"";
+  document.getElementById("detailRegion").value=details.region||"";
+  document.getElementById("detailSystem").value=details.system||"";
+  document.getElementById("detailBiome").value=details.biome||"";
+  document.getElementById("detailWeather").value=details.weather||"";
+  document.getElementById("detailSentinels").value=details.sentinels||"";
+  document.getElementById("detailFlora").value=details.flora||"";
+  document.getElementById("detailFauna").value=details.fauna||"";
+  document.getElementById("detailClaimed").value=details.claimed||"";
+  document.getElementById("detailDiscovered").value=details.discovered||"";
+  document.getElementById("detailMode").value=details.mode||"";
+  document.getElementById("detailUpdated").value=details.updated||"";
+  document.getElementById("detailCoords").value=details.coords||"";
+  document.getElementById("detailNotes").value=details.notes||"";
+}
+function savePlanetDetails(){
+  if(!currentPlanet) return;
+  planetDetails[currentPlanet]={
+    galaxy:document.getElementById("detailGalaxy").value,
+    region:document.getElementById("detailRegion").value,
+    system:document.getElementById("detailSystem").value,
+    biome:document.getElementById("detailBiome").value,
+    weather:document.getElementById("detailWeather").value,
+    sentinels:document.getElementById("detailSentinels").value,
+    flora:document.getElementById("detailFlora").value,
+    fauna:document.getElementById("detailFauna").value,
+    claimed:document.getElementById("detailClaimed").value,
+    discovered:document.getElementById("detailDiscovered").value,
+    mode:document.getElementById("detailMode").value,
+    updated:document.getElementById("detailUpdated").value,
+    coords:document.getElementById("detailCoords").value,
+    notes:document.getElementById("detailNotes").value
+  };
+  saveAtlas();
+  alert("Opis zapisany!");
+}
+  
 refreshPlanetList();
 </script>
 </body>
