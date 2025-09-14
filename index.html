@@ -685,6 +685,30 @@ function refreshGlobePoints(){
 
 // start
 refreshPlanetList();
+
+// --- Obsługa zmiany planety w formularzu START ---
+document.getElementById("planet").addEventListener("input", () => {
+  const planet = document.getElementById("planet").value.trim();
+  if (!planet) return;
+
+  // ustaw aktualną planetę
+  currentPlanet = planet;
+
+  // jeśli planeta nie istnieje w atlasie -> tworzymy ją
+  if (!atlas[planet]) {
+    atlas[planet] = [];
+    addPoles(planet);
+    saveAtlas();
+  }
+
+  // odśwież dane widoku
+  addPoles(planet);
+  applyPlanetTexture(planet);
+  refreshPlanetList();
+  refreshPointsList();
+  refreshGlobePoints();
+});
+  
 </script>
 </body>
 </html>
