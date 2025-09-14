@@ -334,11 +334,12 @@ function refreshPlanetList(){
     // 🔴 mały przycisk usuń
     const delBtn = document.createElement("button");
     delBtn.textContent = "✖";
-    delBtn.style.background = "#900";
+    delBtn.style.background = "transparent";
     delBtn.style.color = "#fff";
     delBtn.style.border = "none";
-    delBtn.style.padding = "0 6px";
+    delBtn.style.fontWeight = "bold";
     delBtn.style.cursor = "pointer";
+    delBtn.style.marginLeft = "auto"; // przesuwa na prawy róg
     delBtn.title = `Usuń planetę ${p}`;
     delBtn.onclick = (e) => {
       e.stopPropagation(); // żeby nie kliknął przypadkiem przycisku planety
@@ -535,12 +536,19 @@ function setPlanetTexture(planet){
 
 function setPlanetTextureFromInput(){
   const input = document.getElementById("planetTextureInput");
-  if(!input.files[0] || !currentPlanet) return;
+  if(!input.files[0]) return;
+
+  // pobieramy nazwę planety z pola input, jeśli currentPlanet nie ustawione
+  const planet = currentPlanet || document.getElementById("planet").value.trim();
+  if(!planet) { alert("Wybierz planetę lub wpisz jej nazwę!"); return; }
+
   const reader = new FileReader();
   reader.onload = e => {
-    planetTextures[currentPlanet] = e.target.result;
-    setPlanetTexture(currentPlanet);
+    planetTextures[planet] = e.target.result;
+    currentPlanet = planet; // upewniamy się, że glob wie, na której planecie jesteśmy
+    setPlanetTexture(planet);
     saveAtlas();
+    refreshGlobePoints();
   };
   reader.readAsDataURL(input.files[0]);
 }
