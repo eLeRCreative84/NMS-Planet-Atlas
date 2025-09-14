@@ -16,80 +16,125 @@
   .texture-input button { flex: 1; padding: 0.5rem; border: none; background: #1976d2; color: white; border-radius: 4px; }
   .texture-input button:hover { background: #1565c0; }
   ul { padding: 0; list-style: none; }
-  li { margin: 0.3rem 0; background: #1a2b4d; padding: 0.3rem; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
-  li div { display: flex; gap: 0.5rem; align-items: center; }
+  li { margin: 0.3rem 0; background: #1a2b4d; padding: 0.3rem; border-radius: 5px; display: flex; flex-direction: column; }
+  li div { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.2rem; }
   li button { padding: 0.2rem 0.5rem; border: none; border-radius: 4px; cursor: pointer; }
   li button.edit { background: #0277bd; color: white; }
   li button.del { background: #c62828; color: white; }
   label { display: block; margin-top: 0.5rem; font-weight: bold; }
   .xy-inputs { display: flex; gap: 0.3rem; }
-  .xy-inputs input { width: 50%; }
+  .xy-inputs input { width: 100%; }
+  /* zakładki */
+  .tabs { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .tabs button {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    background: #1976d2;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+  }
+  .tabs button.active { background: #0d47a1; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 </style>
 </head>
 <body>
 <div id="form">
-  <h2>Dodaj punkt</h2>
-  <label>Planeta</label>
-  <input type="text" id="planet" placeholder="Nazwa planety" />
-  <div class="xy-inputs">
-    <div><label>X</label><input type="number" id="lat" step="0.0001" /></div>
-    <div><label>Y</label><input type="number" id="lng" step="0.0001" /></div>
-  </div>
-  <label>Nazwa punktu</label>
-  <input type="text" id="name" />
-  <label>Typ</label>
-  <select id="type">
-    <option>Zasób</option>
-    <option>Obelisk</option>
-    <option>Baza</option>
-    <option>Ruiny</option>
-    <option>Duża struktura</option>
-    <option>Inne</option>
-  </select>
-  <label>Notatki</label>
-  <textarea id="notes"></textarea>
-  <label>Notatka planety</label>
-  <textarea id="planetNote"></textarea>
-  <button onclick="addPoint()">Dodaj punkt</button>
-
-  <h2>Planety</h2>
-  <div id="planetList"></div>
-
-  <h2>Punkty na planecie</h2>
-  <label>Sortuj:</label>
-  <select id="sortPoints" onchange="refreshPointsList()">
-    <option value="nameAsc">Nazwa A–Z</option>
-    <option value="nameDesc">Nazwa Z–A</option>
-    <option value="type">Typ</option>
-    <option value="newest">Najnowsze</option>
-    <option value="oldest">Najstarsze</option>
-  </select>
-  <ul id="pointsList"></ul>
-
-  <h2>Tekstura planety</h2>
-  <div class="texture-input">
-    <input type="file" id="planetTextureInput" accept="image/*" hidden />
-    <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
-    <button onclick="setPlanetTextureFromInput()">Ustaw</button>
+  <div class="tabs">
+    <button class="active" onclick="openTab('planets')">Planety</button>
+    <button onclick="openTab('points')">Punkty</button>
+    <button onclick="openTab('texture')">Tekstura</button>
+    <button onclick="openTab('globe')">Glob</button>
+    <button onclick="openTab('import')">Import/Eksport</button>
   </div>
 
-  <h2>Skalowanie i pozycja globu</h2>
-  <label>Skala punktów</label>
-  <input type="range" id="pointScale" min="0.01" max="2" step="0.01" value="0.4" oninput="updatePointScale()" />
-  <label>Oddal glob</label>
-  <input type="range" id="globeScale" min="0.01" max="1" step="0.01" value="1" oninput="updateGlobeScale()" />
-  <label>Przesuń glob</label>
-  <input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
-  <button onclick="resetGlobePosition()">Reset pozycji globu</button>
+  <!-- Zakładka Planety -->
+  <div id="tab-planets" class="tab-content active">
+    <h2>Dodaj punkt</h2>
+    <label>Planeta</label>
+    <input type="text" id="planet" placeholder="Nazwa planety" />
+    <div class="xy-inputs">
+      <div><label>X</label><input type="number" id="lat" step="0.0001" /></div>
+      <div><label>Y</label><input type="number" id="lng" step="0.0001" /></div>
+    </div>
+    <label>Nazwa punktu</label>
+    <input type="text" id="name" />
+    <label>Typ</label>
+    <select id="type">
+      <option>Zasób</option>
+      <option>Obelisk</option>
+      <option>Baza</option>
+      <option>Ruiny</option>
+      <option>Duża struktura</option>
+      <option>Inne</option>
+    </select>
+    <label>Notatki</label>
+    <textarea id="notes"></textarea>
+    <label>Notatka planety</label>
+    <textarea id="planetNote"></textarea>
+    <button onclick="addPoint()">Dodaj punkt</button>
+    <h2>Planety</h2>
+    <div id="planetList"></div>
+  </div>
 
-  <h2>Import/Eksport</h2>
-  <button onclick="exportAtlas()">Eksport JSON</button>
-  <input type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
+  <!-- Zakładka Punkty -->
+  <div id="tab-points" class="tab-content">
+    <h2>Punkty na planecie</h2>
+    <label>Sortuj:</label>
+    <select id="sortPoints" onchange="refreshPointsList()">
+      <option value="nameAsc">Nazwa A–Z</option>
+      <option value="nameDesc">Nazwa Z–A</option>
+      <option value="type">Typ</option>
+      <option value="newest">Najnowsze</option>
+      <option value="oldest">Najstarsze</option>
+    </select>
+    <ul id="pointsList"></ul>
+  </div>
+
+  <!-- Zakładka Tekstura -->
+  <div id="tab-texture" class="tab-content">
+    <h2>Tekstura planety</h2>
+    <div class="texture-input">
+      <input type="file" id="planetTextureInput" accept="image/*" hidden />
+      <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
+      <button onclick="setPlanetTextureFromInput()">Ustaw</button>
+    </div>
+  </div>
+
+  <!-- Zakładka Glob -->
+  <div id="tab-globe" class="tab-content">
+    <h2>Skalowanie i pozycja globu</h2>
+    <label>Skala punktów</label>
+    <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="0.4" oninput="updatePointScale()" />
+    <label>Oddal glob</label>
+    <input type="range" id="globeScale" min="0.01" max="1" step="0.01" value="1" oninput="updateGlobeScale()" />
+    <label>Przesuń glob</label>
+    <input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
+    <button onclick="resetGlobePosition()">Reset pozycji globu</button>
+  </div>
+
+  <!-- Zakładka Import/Eksport -->
+  <div id="tab-import" class="tab-content">
+    <h2>Import/Eksport</h2>
+    <button onclick="exportAtlas()">Eksport JSON</button>
+    <input type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
+  </div>
 </div>
 
 <div id="globeViz"></div>
 
 <script>
+
+function openTab(tabName){
+  document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+  document.querySelector(`.tabs button[onclick="openTab('${tabName}')"]`).classList.add('active');
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+}
+  
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
 let planetNotes = JSON.parse(localStorage.getItem("planetNotes") || "{}");
