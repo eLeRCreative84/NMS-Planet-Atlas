@@ -305,23 +305,57 @@ function addPoles(planet){
 function refreshPlanetList(){
   const list = document.getElementById("planetList");
   list.innerHTML = "";
+
   Object.keys(atlas).forEach(p => {
+    // kontener na przycisk planety i przycisk usuń
+    const container = document.createElement("div");
+    container.style.display = "flex";
+    container.style.alignItems = "center";
+    container.style.margin = "0.2rem 0";
+
+    // 🔵 przycisk planety
     const btn = document.createElement("button");
     btn.textContent = p;
-    btn.style.width = "100%";
-    btn.style.margin = "0.2rem 0";
+    btn.style.flexGrow = "1";
+    btn.style.marginRight = "0.5rem";
     btn.onclick = () => {
       currentPlanet = p;
       document.getElementById("planet").value = p;
-      // jeśli mamy planetNote w storage, ustawiamy pole (pole istnieje)
-      if (document.getElementById("planetNote")) document.getElementById("planetNote").value = planetNotes[p] || "";
+      if (document.getElementById("planetNote")) {
+        document.getElementById("planetNote").value = planetNotes[p] || "";
+      }
       addPoles(p);
       refreshGlobePoints();
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
       setPlanetTexture(p);
       refreshPointsList();
     };
-    list.appendChild(btn);
+
+    // 🔴 mały przycisk usuń
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "✖";
+    delBtn.style.background = "#900";
+    delBtn.style.color = "#fff";
+    delBtn.style.border = "none";
+    delBtn.style.padding = "0 6px";
+    delBtn.style.cursor = "pointer";
+    delBtn.title = `Usuń planetę ${p}`;
+    delBtn.onclick = (e) => {
+      e.stopPropagation(); // żeby nie kliknął przypadkiem przycisku planety
+      if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
+        delete atlas[p];
+        delete planetNotes[p];
+        if (currentPlanet === p) currentPlanet = null;
+        saveAtlas();
+        refreshPlanetList();
+        refreshPointsList();
+        refreshGlobePoints();
+      }
+    };
+
+    container.appendChild(btn);
+    container.appendChild(delBtn);
+    list.appendChild(container);
   });
 }
 
