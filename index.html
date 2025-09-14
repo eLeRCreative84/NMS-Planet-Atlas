@@ -302,6 +302,14 @@ function addPoles(planet){
   }
 }
 
+function applyPlanetTexture(planet) {
+  if (planet && planetTextures[planet]) {
+    globe.globeImageUrl(planetTextures[planet]);
+  } else {
+    globe.globeImageUrl(null);
+  }
+}
+  
 function refreshPlanetList(){
   const list = document.getElementById("planetList");
   list.innerHTML = "";
@@ -327,7 +335,7 @@ function refreshPlanetList(){
       addPoles(p);
       refreshGlobePoints();
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
-      setPlanetTexture(p);
+      applyPlanetTexture(p);
       refreshPointsList();
     };
 
@@ -350,6 +358,7 @@ function refreshPlanetList(){
     delete planetDetails[p];  // usuń detale planety
     if (currentPlanet === p) {
       currentPlanet = null;
+      applyPlanetTexture(null);
       globe.globeImageUrl(null); // usuń teksturę globu
       globe.pointsData([]);
     }
@@ -551,10 +560,7 @@ function setPlanetTextureFromInput(){
   reader.onload = e => {
     planetTextures[planet] = e.target.result;
     currentPlanet = planet;
-
-    // wymuszenie odświeżenia globu
-    globe.globeImageUrl(null);
-    setTimeout(()=> globe.globeImageUrl(planetTextures[planet]), 50);
+    applyPlanetTexture(planet); // natychmiast odśwież glob
 
     saveAtlas();
     refreshGlobePoints();
