@@ -115,24 +115,87 @@
   </div>
 
   <!-- Zakładka DETALE PLANETY -->
-  <div id="detale" class="tab-content">
-    <h2>Detale planety</h2>
-    <label>Galaktyka</label><input type="text" id="detailGalaxy" />
-    <label>Region</label><input type="text" id="detailRegion" />
-    <label>Układ gwiazdowy</label><input type="text" id="detailSystem" />
-    <label>Biom</label><input type="text" id="detailBiome" />
-    <label>Pogoda</label><input type="text" id="detailWeather" />
-    <label>Strażnicy</label><input type="text" id="detailSentinels" />
-    <label>Flora</label><input type="text" id="detailFlora" />
-    <label>Fauna</label><input type="text" id="detailFauna" />
-    <label>Roszczenie przez</label><input type="text" id="detailClaimed" />
-    <label>Odkryty przez</label><input type="text" id="detailDiscovered" />
-    <label>Tryb gry</label><input type="text" id="detailMode" />
-    <label>Zaktualizowano</label><input type="text" id="detailUpdated" />
-    <label>Koordynaty</label><input type="text" id="detailCoords" />
-    <label>Notatki planety</label><textarea id="detailNotes"></textarea>
-    <button onclick="savePlanetDetails()">Zapisz opis planety</button>
-  </div>
+<div id="detale" class="tab-content">
+  <h2>Detale planety</h2>
+  <label>Galaktyka</label><input type="text" id="detailGalaxy" />
+  <label>Region</label><input type="text" id="detailRegion" />
+  <label>Układ gwiazdowy</label><input type="text" id="detailSystem" />
+
+  <label>Biom</label>
+  <select id="detailBiome">
+    <option value="">-- wybierz --</option>
+    <option>Bujna</option>
+    <option>Jałowa</option>
+    <option>Martwa</option>
+    <option>Egzotyczna</option>
+    <option>Mega Egzotyczna</option>
+    <option>Spalona</option>
+    <option>Zamrożona</option>
+    <option>Toksyczna</option>
+    <option>Napromieniowana</option>
+    <option>Bagno</option>
+    <option>Wulkaniczna</option>
+    <option>Gazowy Gigant</option>
+  </select>
+
+  <label>Pogoda</label><input type="text" id="detailWeather" />
+
+  <label>Strażnicy</label>
+  <select id="detailSentinels">
+    <option value="">-- wybierz --</option>
+    <option>Pasywne</option>
+    <option>Brak</option>
+    <option>Zrelaksowane</option>
+    <option>Ograniczone</option>
+    <option>Niskie</option>
+    <option>Niskie bezpieczeństwo</option>
+    <option>Minimalne</option>
+    <option>Aktywne</option>
+    <option>Średnie</option>
+    <option>Standardowe</option>
+    <option>Typowe</option>
+    <option>Uważne</option>
+  </select>
+
+  <label>Flora</label>
+  <select id="detailFlora">
+    <option value="">-- wybierz --</option>
+    <option>Brak</option>
+    <option>Sporadyczna</option>
+    <option>Skąpa</option>
+    <option>Średnia</option>
+    <option>Obfita</option>
+    <option>Ekstremalna</option>
+  </select>
+
+  <label>Fauna</label>
+  <select id="detailFauna">
+    <option value="">-- wybierz --</option>
+    <option>Brak</option>
+    <option>Sporadyczna</option>
+    <option>Skąpa</option>
+    <option>Średnia</option>
+    <option>Obfita</option>
+    <option>Ekstremalna</option>
+  </select>
+
+  <label>Roszczenie przez</label><input type="text" id="detailClaimed" />
+  <label>Odkryty przez</label><input type="text" id="detailDiscovered" />
+
+  <label>Tryb gry</label>
+  <select id="detailMode">
+    <option value="">-- wybierz --</option>
+    <option>Normalny</option>
+    <option>Kreatywny</option>
+    <option>Survival</option>
+    <option>Permadeath</option>
+  </select>
+
+  <label>Zaktualizowano</label><input type="text" id="detailUpdated" />
+  <label>Koordynaty</label><input type="text" id="detailCoords" />
+  <label>Notatki planety</label><textarea id="detailNotes"></textarea>
+  <button onclick="savePlanetDetails()">Zapisz opis planety</button>
+</div>
 </div>
 
 <div id="globeViz"></div>
