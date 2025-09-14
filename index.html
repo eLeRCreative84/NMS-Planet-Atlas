@@ -341,18 +341,24 @@ function refreshPlanetList(){
     delBtn.style.cursor = "pointer";
     delBtn.style.marginLeft = "auto"; // przesuwa na prawy róg
     delBtn.title = `Usuń planetę ${p}`;
-    delBtn.onclick = (e) => {
-      e.stopPropagation(); // żeby nie kliknął przypadkiem przycisku planety
-      if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
-        delete atlas[p];
-        delete planetNotes[p];
-        if (currentPlanet === p) currentPlanet = null;
-        saveAtlas();
-        refreshPlanetList();
-        refreshPointsList();
-        refreshGlobePoints();
-      }
-    };
+   delBtn.onclick = (e) => {
+  e.stopPropagation(); // żeby nie kliknął przypadkiem przycisku planety
+  if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
+    delete atlas[p];
+    delete planetNotes[p];
+    delete planetTextures[p]; // usuń też teksturę
+    delete planetDetails[p];  // usuń detale planety
+    if (currentPlanet === p) {
+      currentPlanet = null;
+      globe.globeImageUrl(null); // usuń teksturę globu
+      globe.pointsData([]);
+    }
+    saveAtlas();
+    refreshPlanetList();
+    refreshPointsList();
+    refreshGlobePoints();
+  }
+};
 
     container.appendChild(btn);
     container.appendChild(delBtn);
@@ -538,20 +544,24 @@ function setPlanetTextureFromInput(){
   const input = document.getElementById("planetTextureInput");
   if(!input.files[0]) return;
 
-  // pobieramy nazwę planety z pola input, jeśli currentPlanet nie ustawione
   const planet = currentPlanet || document.getElementById("planet").value.trim();
   if(!planet) { alert("Wybierz planetę lub wpisz jej nazwę!"); return; }
 
   const reader = new FileReader();
   reader.onload = e => {
     planetTextures[planet] = e.target.result;
-    currentPlanet = planet; // upewniamy się, że glob wie, na której planecie jesteśmy
-    setPlanetTexture(planet);
+    currentPlanet = planet;
+
+    // wymuszenie odświeżenia globu
+    globe.globeImageUrl(null);
+    setTimeout(()=> globe.globeImageUrl(planetTextures[planet]), 50);
+
     saveAtlas();
     refreshGlobePoints();
   };
   reader.readAsDataURL(input.files[0]);
 }
+
 
 function exportAtlas(){
   const blob = new Blob([JSON.stringify({atlas,planetTextures,planetNotes,planetDetails},null,2)], {type:"application/json"});
@@ -574,13 +584,25 @@ function importAtlas(event){
       if(data.planetTextures) planetTextures = data.planetTextures;
       if(data.planetNotes) planetNotes = data.planetNotes;
       if(data.planetDetails) planetDetails = data.planetDetails;
+
+      // ustaw pierwszą planetę jako currentPlanet
+      const planets = Object.keys(atlas);
+      currentPlanet = planets[0] || null;
+
+      // ustaw glob na planetę (tekstura) jeśli istnieje
+      if(currentPlanet) setPlanetTexture(currentPlanet);
+
       saveAtlas();
       refreshPlanetList();
+      refreshPointsList();
+      refreshGlobePoints();
+
       alert("Import zakończony!");
     } catch(err){ alert("Błąd importu JSON"); }
   };
   reader.readAsText(file);
 }
+
 
 // Skalowanie globu
 function updateGlobeScale(){
