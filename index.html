@@ -536,17 +536,17 @@ function refreshGlobePoints(){
 function applyPointFilter() {
   if (!currentPlanet || !atlas[currentPlanet]) return;
 
-  // Typy zaznaczone w filtrze
   const checkedTypes = Array.from(document.querySelectorAll('#filterPoints input:checked'))
                             .map(cb => cb.value);
 
-  // ------------------- Filtrujemy punkty dla globu i listy -------------------
+  // Filtrujemy punkty
   const visiblePoints = atlas[currentPlanet].filter(p => p.type === "Pole" || checkedTypes.includes(p.type));
 
-  // ------------------- Glob -------------------
+  // Glob
+  globe.pointsData(visiblePoints);
   globe.pointColor(d => {
     if (d.type === "Pole") return "red"; // bieguny zawsze widoczne
-    if (!checkedTypes.includes(d.type)) return "rgba(0,0,0,0)"; // ukryj punkt wizualnie
+    if (!checkedTypes.includes(d.type)) return "rgba(0,0,0,0)"; // ukryj punkt
     switch (d.type) {
       case "Zasób": return d.extracted ? "gray" : "gold";
       case "Obelisk": return d.visited ? "green" : "orange";
@@ -558,59 +558,64 @@ function applyPointFilter() {
     }
   });
 
-  globe.pointsData(visiblePoints);
-
-  // ------------------- Lista HUD -------------------
+  // Lista HUD
   const list = document.getElementById("pointsList");
   list.innerHTML = "";
 
   visiblePoints.forEach(point => {
-  if (point.type === "Pole") return;
+    if (point.type === "Pole") return; // pomijamy bieguny w liście
 
-  const li = document.createElement("li");
-  const idx = atlas[currentPlanet].indexOf(point); // prawidłowy indeks w atlas
-  li.dataset.index = idx; // przypisujemy indeks do li
+    const li = document.createElement("li");
+    const idx = atlas[currentPlanet].indexOf(point);
+    li.dataset.index = idx;
 
-  // ...info i buttony...
+    const infoDiv = document.createElement("div");
+    infoDiv.innerHTML = `${point.name} (${point.type}) X:${point.lat}, Y:${point.lng}`;
 
-  const editBtn = document.createElement("button");
-  editBtn.textContent = "Edytuj";
-  editBtn.className = "edit";
-  editBtn.onclick = () => editPoint(parseInt(li.dataset.index));
-  btnDiv.appendChild(editBtn);
+    const btnDiv = document.createElement("div");
 
-  const delBtn = document.createElement("button");
-  delBtn.textContent = "Usuń";
-  delBtn.className = "del";
-  delBtn.onclick = () => {
-    if(confirm("Czy na pewno usunąć punkt?")) {
-      atlas[currentPlanet].splice(parseInt(li.dataset.index), 1);
-      saveAtlas();
-      applyPointFilter();
-    }
-  };
-  btnDiv.appendChild(delBtn);
+    // Edytuj
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edytuj";
+    editBtn.className = "edit";
+    editBtn.onclick = () => editPoint(idx);
+    btnDiv.appendChild(editBtn);
 
-  // checkbox Zasób/Obelisk
-  if(point.type === "Zasób" || point.type === "Obelisk"){
-    const checkbox = document.createElement("input");
-    checkbox.type="checkbox";
-    checkbox.checked = point.type==="Zasób"? point.extracted : point.visited;
-    checkbox.onchange = () => {
-      const i = parseInt(li.dataset.index);
-      if(i===-1) return;
-      if(point.type==="Zasób") atlas[currentPlanet][i].extracted = checkbox.checked;
-      if(point.type==="Obelisk") atlas[currentPlanet][i].visited = checkbox.checked;
-      saveAtlas();
-      applyPointFilter();
+    // Usuń
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "Usuń";
+    delBtn.className = "del";
+    delBtn.onclick = () => {
+      if (confirm("Czy na pewno usunąć punkt?")) {
+        atlas[currentPlanet].splice(idx, 1);
+        saveAtlas();
+        applyPointFilter();
+      }
     };
-    btnDiv.appendChild(checkbox);
-  }
+    btnDiv.appendChild(delBtn);
 
-  li.appendChild(btnDiv);
-  list.appendChild(li);
-});
+    // Checkbox Zasób / Obelisk
+    if (point.type === "Zasób" || point.type === "Obelisk") {
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = point.type === "Zasób" ? point.extracted : point.visited;
+      checkbox.onchange = () => {
+        const i = parseInt(li.dataset.index);
+        if (i === -1) return;
+        if (point.type === "Zasób") atlas[currentPlanet][i].extracted = checkbox.checked;
+        if (point.type === "Obelisk") atlas[currentPlanet][i].visited = checkbox.checked;
+        saveAtlas();
+        applyPointFilter();
+      };
+      btnDiv.appendChild(checkbox);
+    }
+
+    li.appendChild(infoDiv);
+    li.appendChild(btnDiv);
+    list.appendChild(li);
+  });
 }
+
 
 
 
