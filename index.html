@@ -213,6 +213,7 @@ let planetNotes = JSON.parse(localStorage.getItem("planetNotes") || "{}");
 let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}"); // dla detali planety, jeśli używasz
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
+let editIndex = null; // indeks edytowanego punktu (null = dodawanie nowego)
 
 // Inicjalizacja globu — używamy https aby tło zawsze się załadowało
 const globe = Globe()(document.getElementById("globeViz"))
@@ -428,17 +429,32 @@ function addPoint(){
   const name = document.getElementById("name").value.trim();
   const type = document.getElementById("type").value;
   const notes = document.getElementById("notes").value.trim();
+ 
   // zapis notatki planety do planetNotes (pole istnieje w DOM)
-  planetNotes[planet] = document.getElementById("planetNote") ? document.getElementById("planetNote").value.trim() : (planetNotes[planet] || "");
+  planetNotes[planet] = document.getElementById("planetNote") 
+    ? document.getElementById("planetNote").value.trim() 
+    : (planetNotes[planet] || "");
+
   if(!planet || isNaN(lat) || isNaN(lng)){
     alert("Uzupełnij planetę i współrzędne!");
     return;
   }
   if(!atlas[planet]) atlas[planet] = [];
+
   const point = {planet, lat, lng, name, type, notes, timestamp: Date.now()};
   if(type==="Zasób") point.extracted=false;
   if(type==="Obelisk") point.visited=false;
-  atlas[planet].push(point);
+
+  if(editIndex !== null && atlas[planet][editIndex]) {
+    // tryb edycji → nadpisz istniejący punkt
+    atlas[planet][editIndex] = point;
+    editIndex = null;
+    document.querySelector("button[onclick='addPoint()']").textContent = "Dodaj punkt";
+  } else {
+    // tryb dodawania → dodaj nowy punkt
+    atlas[planet].push(point);
+  }
+
   saveAtlas();
   currentPlanet = planet;
   refreshPlanetList();
@@ -455,10 +471,9 @@ function editPoint(index){
   document.getElementById("name").value = p.name;
   document.getElementById("type").value = p.type;
   document.getElementById("notes").value = p.notes;
-  atlas[currentPlanet].splice(index,1);
-  saveAtlas();
-  refreshPointsList();
-  refreshGlobePoints();
+
+  editIndex = index; // zapamiętaj który punkt edytujemy
+  document.querySelector("button[onclick='addPoint()']").textContent = "Nadpisz punkt";
 
   // przełączenie na zakładkę START
   openTab('start');
