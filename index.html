@@ -9,7 +9,6 @@
   body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
   #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
   #globeViz { flex: 1; background: black; position: relative; }
-  /* upewniamy się że canvas zajmuje cały obszar kontenera */
   #globeViz canvas { width: 100% !important; height: 100% !important; display: block; background: transparent; }
 
   h2 { margin-top: 1rem; margin-bottom: 0.5rem; }
@@ -33,24 +32,24 @@
   #tabs button.active { background: #1976d2; }
   .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
   .tab-content.active { display: block; }
- 
-#filterPoints {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-#filterPoints label {
-  display: flex;
-  align-items: center;
-  background: #1a2b4d;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-#filterPoints input {
-  margin-right: 0.3rem;
-}
-  
+
+  #filterPoints {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+  }
+  #filterPoints label {
+    display: flex;
+    align-items: center;
+    background: #1a2b4d;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  #filterPoints input {
+    margin-right: 0.3rem;
+  }
 </style>
 </head>
 <body>
@@ -62,7 +61,7 @@
     <button onclick="openTab('detale')">Detale planety</button>
   </div>
 
-  <!-- Zakładka START -->
+  <!-- START -->
   <div id="start" class="tab-content active">
     <h2>Dodaj punkt</h2>
     <label>Planeta</label>
@@ -84,11 +83,8 @@
     </select>
     <label>Notatki</label>
     <textarea id="notes"></textarea>
-
-    <!-- UWAGA: element wymagany przez skrypt (by uniknąć błędów JS) -->
     <label>Notatka planety</label>
     <textarea id="planetNote"></textarea>
-
     <button onclick="addPoint()">Dodaj punkt</button>
 
     <h2>Tekstura planety</h2>
@@ -112,118 +108,104 @@
     <input type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
   </div>
 
-  <!-- Zakładka PLANETY -->
+  <!-- PLANETY -->
   <div id="planety" class="tab-content">
     <h2>Planety</h2>
     <div id="planetList"></div>
   </div>
 
-  <!-- Zakładka PUNKTY -->
+  <!-- PUNKTY -->
   <div id="punkty" class="tab-content">
     <h2>Punkty na planecie</h2>
-
-     <!-- Filtruj -->
-<div id="filterPoints" style="margin-bottom:0.5rem;">
-  <label><input type="checkbox" value="Zasób" checked onchange="applyPointFilter()"> Zasób</label>
-  <label><input type="checkbox" value="Obelisk" checked onchange="applyPointFilter()"> Obelisk</label>
-  <label><input type="checkbox" value="Baza" checked onchange="applyPointFilter()"> Baza</label>
-  <label><input type="checkbox" value="Ruiny" checked onchange="applyPointFilter()"> Ruiny</label>
-  <label><input type="checkbox" value="Duża struktura" checked onchange="applyPointFilter()"> Duża struktura</label>
-  <label><input type="checkbox" value="Inne" checked onchange="applyPointFilter()"> Inne</label>
-</div>
-
+    <div id="filterPoints">
+      <label><input type="checkbox" value="Zasób" checked onchange="applyPointFilter()"> Zasób</label>
+      <label><input type="checkbox" value="Obelisk" checked onchange="applyPointFilter()"> Obelisk</label>
+      <label><input type="checkbox" value="Baza" checked onchange="applyPointFilter()"> Baza</label>
+      <label><input type="checkbox" value="Ruiny" checked onchange="applyPointFilter()"> Ruiny</label>
+      <label><input type="checkbox" value="Duża struktura" checked onchange="applyPointFilter()"> Duża struktura</label>
+      <label><input type="checkbox" value="Inne" checked onchange="applyPointFilter()"> Inne</label>
+    </div>
     <ul id="pointsList"></ul>
   </div>
 
-  <!-- Zakładka DETALE PLANETY -->
-<div id="detale" class="tab-content">
-  <h2>Detale planety</h2>
-  <label>Galaktyka</label><input type="text" id="detailGalaxy" />
-  <label>Region</label><input type="text" id="detailRegion" />
-  <label>Układ gwiazdowy</label><input type="text" id="detailSystem" />
-
-  <label>Biom</label>
-  <select id="detailBiome">
-    <option value="">-- wybierz --</option>
-    <option>Bujna</option>
-    <option>Jałowa</option>
-    <option>Martwa</option>
-    <option>Egzotyczna</option>
-    <option>Mega Egzotyczna</option>
-    <option>Spalona</option>
-    <option>Zamrożona</option>
-    <option>Toksyczna</option>
-    <option>Napromieniowana</option>
-    <option>Bagno</option>
-    <option>Wulkaniczna</option>
-    <option>Gazowy Gigant</option>
-  </select>
-
-  <label>Pogoda</label><input type="text" id="detailWeather" />
-
-  <label>Strażnicy</label>
-  <select id="detailSentinels">
-    <option value="">-- wybierz --</option>
-    <option>Pasywne</option>
-    <option>Brak</option>
-    <option>Zrelaksowane</option>
-    <option>Ograniczone</option>
-    <option>Niskie</option>
-    <option>Niskie bezpieczeństwo</option>
-    <option>Minimalne</option>
-    <option>Aktywne</option>
-    <option>Średnie</option>
-    <option>Standardowe</option>
-    <option>Typowe</option>
-    <option>Uważne</option>
-  </select>
-
-  <label>Flora</label>
-  <select id="detailFlora">
-    <option value="">-- wybierz --</option>
-    <option>Brak</option>
-    <option>Sporadyczna</option>
-    <option>Skąpa</option>
-    <option>Średnia</option>
-    <option>Obfita</option>
-    <option>Ekstremalna</option>
-  </select>
-
-  <label>Fauna</label>
-  <select id="detailFauna">
-    <option value="">-- wybierz --</option>
-    <option>Brak</option>
-    <option>Sporadyczna</option>
-    <option>Skąpa</option>
-    <option>Średnia</option>
-    <option>Obfita</option>
-    <option>Ekstremalna</option>
-  </select>
-
-  <label>Roszczenie przez</label><input type="text" id="detailClaimed" />
-  <label>Odkryty przez</label><input type="text" id="detailDiscovered" />
-
-  <label>Tryb gry</label>
-  <select id="detailMode">
-    <option value="">-- wybierz --</option>
-    <option>Normalny</option>
-    <option>Kreatywny</option>
-    <option>Survival</option>
-    <option>Permadeath</option>
-  </select>
-
-  <label>Zaktualizowano</label><input type="text" id="detailUpdated" />
-  <label>Koordynaty</label><input type="text" id="detailCoords" />
-  <!-- Przycisk przejdź do NMS Portals -->
-<button onclick="window.open('https://nmsportals.github.io', '_blank')" 
+  <!-- DETALE PLANETY -->
+  <div id="detale" class="tab-content">
+    <h2>Detale planety</h2>
+    <label>Galaktyka</label><input type="text" id="detailGalaxy" />
+    <label>Region</label><input type="text" id="detailRegion" />
+    <label>Układ gwiazdowy</label><input type="text" id="detailSystem" />
+    <label>Biom</label>
+    <select id="detailBiome">
+      <option value="">-- wybierz --</option>
+      <option>Bujna</option>
+      <option>Jałowa</option>
+      <option>Martwa</option>
+      <option>Egzotyczna</option>
+      <option>Mega Egzotyczna</option>
+      <option>Spalona</option>
+      <option>Zamrożona</option>
+      <option>Toksyczna</option>
+      <option>Napromieniowana</option>
+      <option>Bagno</option>
+      <option>Wulkaniczna</option>
+      <option>Gazowy Gigant</option>
+    </select>
+    <label>Pogoda</label><input type="text" id="detailWeather" />
+    <label>Strażnicy</label>
+    <select id="detailSentinels">
+      <option value="">-- wybierz --</option>
+      <option>Pasywne</option>
+      <option>Brak</option>
+      <option>Zrelaksowane</option>
+      <option>Ograniczone</option>
+      <option>Niskie</option>
+      <option>Niskie bezpieczeństwo</option>
+      <option>Minimalne</option>
+      <option>Aktywne</option>
+      <option>Średnie</option>
+      <option>Standardowe</option>
+      <option>Typowe</option>
+      <option>Uważne</option>
+    </select>
+    <label>Flora</label>
+    <select id="detailFlora">
+      <option value="">-- wybierz --</option>
+      <option>Brak</option>
+      <option>Sporadyczna</option>
+      <option>Skąpa</option>
+      <option>Średnia</option>
+      <option>Obfita</option>
+      <option>Ekstremalna</option>
+    </select>
+    <label>Fauna</label>
+    <select id="detailFauna">
+      <option value="">-- wybierz --</option>
+      <option>Brak</option>
+      <option>Sporadyczna</option>
+      <option>Skąpa</option>
+      <option>Średnia</option>
+      <option>Obfita</option>
+      <option>Ekstremalna</option>
+    </select>
+    <label>Roszczenie przez</label><input type="text" id="detailClaimed" />
+    <label>Odkryty przez</label><input type="text" id="detailDiscovered" />
+    <label>Tryb gry</label>
+    <select id="detailMode">
+      <option value="">-- wybierz --</option>
+      <option>Normalny</option>
+      <option>Kreatywny</option>
+      <option>Survival</option>
+      <option>Permadeath</option>
+    </select>
+    <label>Zaktualizowano</label><input type="text" id="detailUpdated" />
+    <label>Koordynaty</label><input type="text" id="detailCoords" />
+    <button onclick="window.open('https://nmsportals.github.io', '_blank')" 
         style="margin-top:0.5rem; background:#1976d2; color:white; padding:0.5rem; border:none; border-radius:4px; cursor:pointer;">
-  Przejdź do NMS Portals
-</button>
-
-  
-  <label>Notatki planety</label><textarea id="detailNotes"></textarea>
-  <button onclick="savePlanetDetails()">Zapisz opis planety</button>
-</div>
+      Przejdź do NMS Portals
+    </button>
+    <label>Notatki planety</label><textarea id="detailNotes"></textarea>
+    <button onclick="savePlanetDetails()">Zapisz opis planety</button>
+  </div>
 </div>
 
 <div id="globeViz"></div>
@@ -232,41 +214,16 @@
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
 let planetNotes = JSON.parse(localStorage.getItem("planetNotes") || "{}");
-let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}"); // dla detali planety, jeśli używasz
+let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}");
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 
-// Inicjalizacja globu — używamy https aby tło zawsze się załadowało
 const globe = Globe()(document.getElementById("globeViz"))
-  .globeImageUrl(null) // brak domyślnej mapy (pusta/ciemna kula)
-  .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png') // 🌌 gwiazdy w tle
+  .globeImageUrl(null)
+  .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
   .pointLat("lat")
   .pointLng("lng")
-  .pointLabel(d => {
-    // zabezpieczenie: gdy nie ma currentPlanet, zwracamy opis punktu pojedynczo
-    if (!currentPlanet || !atlas[currentPlanet]) {
-      let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
-      if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
-      if (d.type === "Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
-      return label;
-    }
-
-    // grupowanie punktów w tym samym miejscu dla aktualnej planety
-    const sameLocation = atlas[currentPlanet].filter(p => p.lat === d.lat && p.lng === d.lng);
-    if (sameLocation.length > 1) {
-      return sameLocation.map(p => {
-        let label = `${p.name || "Bez nazwy"} (${p.type})`;
-        if (p.type === "Zasób") label += p.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
-        if (p.type === "Obelisk") label += p.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
-        return label;
-      }).join("<br>");
-    }
-
-    let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
-    if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
-    if (d.type === "Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
-    return label;
-  })
+  .pointLabel(d => `${d.name||'Bez nazwy'} (${d.type}) X:${d.lat}, Y:${d.lng}`)
   .pointColor(d=>{
     switch(d.type){
       case "Zasób": return d.extracted?"gray":"gold";
@@ -295,19 +252,15 @@ const globe = Globe()(document.getElementById("globeViz"))
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
-// ---------------------- TABY ----------------------
-function openTab(tabId) {
-  document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-  document.querySelectorAll("#tabs button").forEach(el => el.classList.remove("active"));
-  const tab = document.getElementById(tabId);
-  if(tab) tab.classList.add("active");
-  // oznacz odpowiedni przycisk jako active (przybliżone dopasowanie)
+function openTab(tabId){
+  document.querySelectorAll(".tab-content").forEach(el=>el.classList.remove("active"));
+  document.querySelectorAll("#tabs button").forEach(el=>el.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
   document.querySelectorAll("#tabs button").forEach(btn=>{
-    if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
+    if(btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
   });
 }
 
-// ---------------------- FUNKCJE ZAPIS/Odśwież ----------------------
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
   localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
@@ -317,28 +270,27 @@ function saveAtlas(){
 
 function addPoles(planet){
   if(!atlas[planet]) atlas[planet] = [];
-  if(!atlas[planet].some(p => p.type==="Pole")){
+  if(!atlas[planet].some(p=>p.type==="Pole")){
     atlas[planet].push({lat:90,lng:0,name:"Biegun Północny",type:"Pole"});
     atlas[planet].push({lat:-90,lng:0,name:"Biegun Południowy",type:"Pole"});
   }
 }
 
 function refreshPlanetList(){
-  const list = document.getElementById("planetList");
-  list.innerHTML = "";
-  Object.keys(atlas).forEach(p => {
-    const btn = document.createElement("button");
-    btn.textContent = p;
-    btn.style.width = "100%";
-    btn.style.margin = "0.2rem 0";
-    btn.onclick = () => {
-      currentPlanet = p;
-      document.getElementById("planet").value = p;
-      // jeśli mamy planetNote w storage, ustawiamy pole (pole istnieje)
-      if (document.getElementById("planetNote")) document.getElementById("planetNote").value = planetNotes[p] || "";
+  const list=document.getElementById("planetList");
+  list.innerHTML="";
+  Object.keys(atlas).forEach(p=>{
+    const btn=document.createElement("button");
+    btn.textContent=p;
+    btn.style.width="100%";
+    btn.style.margin="0.2rem 0";
+    btn.onclick=()=>{
+      currentPlanet=p;
+      document.getElementById("planet").value=p;
+      if(document.getElementById("planetNote")) document.getElementById("planetNote").value=planetNotes[p]||"";
       addPoles(p);
       refreshGlobePoints();
-      globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
+      globe.htmlElementsData(atlas[p].filter(pt=>pt.type==="Pole"));
       setPlanetTexture(p);
       applyPointFilter();
     };
@@ -353,36 +305,32 @@ function addPoint(){
   const name = document.getElementById("name").value.trim();
   const type = document.getElementById("type").value;
   const notes = document.getElementById("notes").value.trim();
-  // zapis notatki planety do planetNotes (pole istnieje w DOM)
-  planetNotes[planet] = document.getElementById("planetNote") ? document.getElementById("planetNote").value.trim() : (planetNotes[planet] || "");
-  if(!planet || isNaN(lat) || isNaN(lng)){
-    alert("Uzupełnij planetę i współrzędne!");
-    return;
-  }
+  planetNotes[planet] = document.getElementById("planetNote") ? document.getElementById("planetNote").value.trim() : (planetNotes[planet]||"");
+  if(!planet || isNaN(lat) || isNaN(lng)){ alert("Uzupełnij planetę i współrzędne!"); return; }
   if(!atlas[planet]) atlas[planet] = [];
-  const point = {planet, lat, lng, name, type, notes, timestamp: Date.now()};
+  const point={planet,lat,lng,name,type,notes,timestamp:Date.now()};
   if(type==="Zasób") point.extracted=false;
   if(type==="Obelisk") point.visited=false;
   atlas[planet].push(point);
   saveAtlas();
-  currentPlanet = planet;
-  refreshPlanetList();   // odświeża listę planet w zakładce Planety
-  applyPointFilter()   // odświeża listę punktów w zakładce Punkty (i filtr działa poprawnie)
-  refreshGlobePoints();  // aktualizuje punkty na globie
+  currentPlanet=planet;
+  refreshPlanetList();
+  applyPointFilter();
+  refreshGlobePoints();
 }
 
 function editPoint(index){
   if(!currentPlanet || !atlas[currentPlanet]) return;
-  const p = atlas[currentPlanet][index];
-  document.getElementById("planet").value = currentPlanet;
-  document.getElementById("lat").value = p.lat;
-  document.getElementById("lng").value = p.lng;
-  document.getElementById("name").value = p.name;
-  document.getElementById("type").value = p.type;
-  document.getElementById("notes").value = p.notes;
+  const p=atlas[currentPlanet][index];
+  document.getElementById("planet").value=currentPlanet;
+  document.getElementById("lat").value=p.lat;
+  document.getElementById("lng").value=p.lng;
+  document.getElementById("name").value=p.name;
+  document.getElementById("type").value=p.type;
+  document.getElementById("notes").value=p.notes;
   atlas[currentPlanet].splice(index,1);
   saveAtlas();
-  applyPointFilter()
+  applyPointFilter();
   refreshGlobePoints();
 }
 
@@ -392,11 +340,11 @@ function setPlanetTexture(planet){
 }
 
 function setPlanetTextureFromInput(){
-  const input = document.getElementById("planetTextureInput");
+  const input=document.getElementById("planetTextureInput");
   if(!input.files[0] || !currentPlanet) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    planetTextures[currentPlanet] = e.target.result;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    planetTextures[currentPlanet]=e.target.result;
     setPlanetTexture(currentPlanet);
     saveAtlas();
   };
@@ -404,26 +352,26 @@ function setPlanetTextureFromInput(){
 }
 
 function exportAtlas(){
-  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetNotes,planetDetails},null,2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "atlas.json";
+  const blob=new Blob([JSON.stringify({atlas,planetTextures,planetNotes,planetDetails},null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="atlas.json";
   a.click();
   URL.revokeObjectURL(url);
 }
 
 function importAtlas(event){
-  const file = event.target.files[0];
+  const file=event.target.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
+  const reader=new FileReader();
+  reader.onload=e=>{
     try{
-      const data = JSON.parse(e.target.result);
-      if(data.atlas) atlas = data.atlas;
-      if(data.planetTextures) planetTextures = data.planetTextures;
-      if(data.planetNotes) planetNotes = data.planetNotes;
-      if(data.planetDetails) planetDetails = data.planetDetails;
+      const data=JSON.parse(e.target.result);
+      if(data.atlas) atlas=data.atlas;
+      if(data.planetTextures) planetTextures=data.planetTextures;
+      if(data.planetNotes) planetNotes=data.planetNotes;
+      if(data.planetDetails) planetDetails=data.planetDetails;
       saveAtlas();
       refreshPlanetList();
       alert("Import zakończony!");
@@ -432,33 +380,28 @@ function importAtlas(event){
   reader.readAsText(file);
 }
 
-// Skalowanie globu
 function updateGlobeScale(){
-  const scale = parseFloat(document.getElementById("globeScale").value);
-  globe.scene().scale.set(scale, scale, scale);
+  const scale=parseFloat(document.getElementById("globeScale").value);
+  globe.scene().scale.set(scale,scale,scale);
 }
 
-// Skalowanie punktów
 function updatePointScale(){
-  pointScale = parseFloat(document.getElementById("pointScale").value);
+  pointScale=parseFloat(document.getElementById("pointScale").value);
   refreshGlobePoints();
 }
 
-// Przesuwanie globu w lewo/prawo
 function updateGlobeOffset(){
-  const offset = parseFloat(document.getElementById("globeOffset").value);
-  globe.scene().position.x = offset;
+  const offset=parseFloat(document.getElementById("globeOffset").value);
+  globe.scene().position.x=offset;
 }
 
 function resetGlobePosition(){
-  document.getElementById("globeOffset").value = 0;
-  globe.scene().position.x = 0;
-  // reset suwaka oddalenia globu
-  document.getElementById("globeScale").value = 1;
+  document.getElementById("globeOffset").value=0;
+  globe.scene().position.x=0;
+  document.getElementById("globeScale").value=1;
   globe.scene().scale.set(1,1,1);
 }
 
-// Detale planety 
 function loadPlanetDetails(){
   if(!currentPlanet) return;
   const details=planetDetails[currentPlanet]||{};
@@ -477,6 +420,7 @@ function loadPlanetDetails(){
   document.getElementById("detailCoords").value=details.coords||"";
   document.getElementById("detailNotes").value=details.notes||"";
 }
+
 function savePlanetDetails(){
   if(!currentPlanet) return;
   planetDetails[currentPlanet]={
@@ -499,31 +443,23 @@ function savePlanetDetails(){
   alert("Opis zapisany!");
 }
 
-// Odświeżenie punktów na globie
 function refreshGlobePoints(){
   if(!currentPlanet) return;
   globe.pointsData(atlas[currentPlanet]);
 }
 
-  // Filtrowanie punktów
-function applyPointFilter() {
-  if (!currentPlanet || !atlas[currentPlanet]) return;
+function applyPointFilter(){
+  if(!currentPlanet || !atlas[currentPlanet]) return;
+  const checkedTypes=Array.from(document.querySelectorAll('#filterPoints input:checked')).map(cb=>cb.value);
+  const visiblePoints=atlas[currentPlanet].filter(p=>p.type==="Pole" || checkedTypes.includes(p.type));
 
-  // Typy zaznaczone w filtrze
-  const checkedTypes = Array.from(document.querySelectorAll('#filterPoints input:checked'))
-                            .map(cb => cb.value);
-
-  // Filtrujemy punkty (bieguny zawsze widoczne na globie)
-  const visiblePoints = atlas[currentPlanet].filter(p => p.type === "Pole" || checkedTypes.includes(p.type));
-
-  // ------------------- Glob -------------------
   globe.pointsData(visiblePoints);
-  globe.pointColor(d => {
-    if (d.type === "Pole") return "red"; // bieguny zawsze widoczne
-    if (!checkedTypes.includes(d.type)) return "rgba(0,0,0,0)"; // ukryj punkt wizualnie
-    switch (d.type) {
-      case "Zasób": return d.extracted ? "gray" : "gold";
-      case "Obelisk": return d.visited ? "green" : "orange";
+  globe.pointColor(d=>{
+    if(d.type==="Pole") return "red";
+    if(!checkedTypes.includes(d.type)) return "rgba(0,0,0,0)";
+    switch(d.type){
+      case "Zasób": return d.extracted?"gray":"gold";
+      case "Obelisk": return d.visited?"green":"orange";
       case "Baza": return "blue";
       case "Ruiny": return "brown";
       case "Duża struktura": return "purple";
@@ -532,55 +468,34 @@ function applyPointFilter() {
     }
   });
 
-  // ------------------- Lista HUD -------------------
-  const list = document.getElementById("pointsList");
-  list.innerHTML = "";
-
-  visiblePoints.forEach(point => {
-    if (point.type === "Pole") return; // pomijamy bieguny w liście
-
-    const li = document.createElement("li");
-
-    // Pobieramy **prawdziwy indeks punktu w atlas[currentPlanet]**
-    const idx = atlas[currentPlanet].indexOf(point);
-    li.dataset.index = idx;
-
-    // Tekst nazwy
-    const span = document.createElement("span");
-    span.textContent = `${point.name || "Bez nazwy"} (${point.type})`;
+  const list=document.getElementById("pointsList");
+  list.innerHTML="";
+  visiblePoints.forEach(point=>{
+    if(point.type==="Pole") return;
+    const li=document.createElement("li");
+    const idx=atlas[currentPlanet].indexOf(point);
+    li.dataset.index=idx;
+    const span=document.createElement("span");
+    span.textContent=`${point.name||"Bez nazwy"} (${point.type})`;
     li.appendChild(span);
 
-    // Przycisk Edytuj
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edytuj";
-    editBtn.className = "edit";
-    editBtn.onclick = () => editPoint(idx);
+    const editBtn=document.createElement("button");
+    editBtn.textContent="Edytuj";
+    editBtn.className="edit";
+    editBtn.onclick=()=>editPoint(idx);
     li.appendChild(editBtn);
 
-    // Przycisk Usuń
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Usuń";
-    delBtn.className = "del";
-    delBtn.onclick = () => {
-      if (confirm("Czy na pewno usunąć punkt?")) {
-        atlas[currentPlanet].splice(idx, 1);
-        saveAtlas();
-        applyPointFilter(); // odśwież listę i glob
-      }
-    };
+    const delBtn=document.createElement("button");
+    delBtn.textContent="Usuń";
+    delBtn.className="del";
+    delBtn.onclick=()=>{ if(confirm("Czy na pewno usunąć punkt?")){ atlas[currentPlanet].splice(idx,1); saveAtlas(); applyPointFilter(); } };
     li.appendChild(delBtn);
 
-    // Checkbox Zasób/Obelisk
-    if (point.type === "Zasób" || point.type === "Obelisk") {
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = point.type === "Zasób" ? point.extracted : point.visited;
-      checkbox.onchange = () => {
-        if (point.type === "Zasób") atlas[currentPlanet][idx].extracted = checkbox.checked;
-        if (point.type === "Obelisk") atlas[currentPlanet][idx].visited = checkbox.checked;
-        saveAtlas();
-        applyPointFilter();
-      };
+    if(point.type==="Zasób" || point.type==="Obelisk"){
+      const checkbox=document.createElement("input");
+      checkbox.type="checkbox";
+      checkbox.checked=point.type==="Zasób"?point.extracted:point.visited;
+      checkbox.onchange=()=>{ if(point.type==="Zasób") atlas[currentPlanet][idx].extracted=checkbox.checked; if(point.type==="Obelisk") atlas[currentPlanet][idx].visited=checkbox.checked; saveAtlas(); applyPointFilter(); };
       li.appendChild(checkbox);
     }
 
@@ -588,10 +503,6 @@ function applyPointFilter() {
   });
 }
 
-
-
-  
-// start
 refreshPlanetList();
 </script>
 </body>
