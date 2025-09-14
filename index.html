@@ -349,25 +349,35 @@ function refreshPlanetList(){
     delBtn.style.cursor = "pointer";
     delBtn.style.marginLeft = "auto"; // przesuwa na prawy róg
     delBtn.title = `Usuń planetę ${p}`;
-   delBtn.onclick = (e) => {
-  e.stopPropagation(); // żeby nie kliknął przypadkiem przycisku planety
+  delBtn.onclick = (e) => {
+  e.stopPropagation();
   if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
     delete atlas[p];
     delete planetNotes[p];
-    delete planetTextures[p]; // usuń też teksturę
-    delete planetDetails[p];  // usuń detale planety
+    delete planetTextures[p];
+    delete planetDetails[p];
+
+    // wymuszenie wyboru nowej currentPlanet
+    const planets = Object.keys(atlas);
     if (currentPlanet === p) {
-      currentPlanet = null;
-      applyPlanetTexture(null);
-      globe.globeImageUrl(null); // usuń teksturę globu
+      currentPlanet = planets.length ? planets[0] : null;
+    }
+
+    // odśwież teksturę globu
+    if (currentPlanet) {
+      applyPlanetTexture(currentPlanet);
+    } else {
+      globe.globeImageUrl(null);
       globe.pointsData([]);
     }
+
     saveAtlas();
     refreshPlanetList();
     refreshPointsList();
     refreshGlobePoints();
   }
 };
+
 
     container.appendChild(btn);
     container.appendChild(delBtn);
@@ -556,18 +566,16 @@ function setPlanetTextureFromInput(){
   const planet = currentPlanet || document.getElementById("planet").value.trim();
   if(!planet) { alert("Wybierz planetę lub wpisz jej nazwę!"); return; }
 
-  const reader = new FileReader();
-  reader.onload = e => {
-    planetTextures[planet] = e.target.result;
-    currentPlanet = planet;
-    applyPlanetTexture(planet); // natychmiast odśwież glob
+  // tylko nazwa pliku zamiast base64
+  const fileName = input.files[0].name;
+  planetTextures[planet] = "textures/" + fileName;
 
-    saveAtlas();
-    refreshGlobePoints();
-  };
-  reader.readAsDataURL(input.files[0]);
+  currentPlanet = planet;
+  applyPlanetTexture(planet);
+
+  saveAtlas();
+  refreshGlobePoints();
 }
-
 
 function exportAtlas(){
   const blob = new Blob([JSON.stringify({atlas,planetTextures,planetNotes,planetDetails},null,2)], {type:"application/json"});
