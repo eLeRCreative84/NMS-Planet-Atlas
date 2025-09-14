@@ -404,18 +404,21 @@ function refreshPointsList(){
     editBtn.onclick = ()=>editPoint(point.timestamp);  // Musimy jednoznacznie wskazać który punkt w atlasie edytujemy. Najprościej przekazywać nie indeks, tylko unikalny identyfikator (timestamp, który już dodajemy do każdego punktu).
     btnDiv.appendChild(editBtn);
 
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Usuń";
-    delBtn.className = "del";
-    delBtn.onclick = ()=>{
-      if(confirm("Czy na pewno usunąć punkt?")){
-        atlas[currentPlanet].splice(index,1);
-        saveAtlas();
-        refreshPointsList();
-        refreshGlobePoints();
-      }
-    };
-    btnDiv.appendChild(delBtn);
+   const delBtn = document.createElement("button");
+delBtn.textContent = "Usuń";
+delBtn.className = "del";
+delBtn.onclick = ()=>{
+  if(confirm("Czy na pewno usunąć punkt?")){
+    const idx = atlas[currentPlanet].findIndex(p => p.timestamp === point.timestamp);
+    if(idx !== -1){
+      atlas[currentPlanet].splice(idx,1);
+      saveAtlas();
+      refreshPointsList();
+      refreshGlobePoints();
+    }
+  }
+};
+btnDiv.appendChild(delBtn);
 
     li.appendChild(btnDiv);
     list.appendChild(li);
