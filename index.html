@@ -329,7 +329,7 @@ function refreshPointsList(){
   list.innerHTML = "";
   if(!currentPlanet || !atlas[currentPlanet]) return;
 
-  let points = [...atlas[currentPlanet]];
+  let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
   const sort = document.getElementById("sortPoints").value;
   if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
   if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
@@ -351,7 +351,7 @@ function refreshPointsList(){
     btnDiv.style.display = "flex";
     btnDiv.style.gap = "0.5rem";
 
-    // 🔍 Nowy przycisk "Pokaż"
+    // Nowy przycisk "Pokaż"
     const showBtn = document.createElement("button");
     showBtn.textContent = "Pokaż";
     showBtn.className = "show";
@@ -459,6 +459,9 @@ function editPoint(index){
   saveAtlas();
   refreshPointsList();
   refreshGlobePoints();
+
+  // przełączenie na zakładkę START
+  openTab('start');
 }
 
 function setPlanetTexture(planet){
