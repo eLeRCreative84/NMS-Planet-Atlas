@@ -356,11 +356,12 @@ function refreshPlanetList(){
 
 function refreshPointsList() {
   if (!currentPlanet || !atlas[currentPlanet]) return;
-
+ 
   // posortuj atlas[currentPlanet] (z wyłączeniem biegunów)
   const sort = document.getElementById("sortPoints").value;
+
   atlas[currentPlanet].sort((a, b) => {
-    if (a.type === "Pole" || b.type === "Pole") return 0; // biegunów nie ruszamy
+    if (a.type === "Pole" || b.type === "Pole") return 0;
     if (sort === "nameAsc") return (a.name || "").localeCompare(b.name || "");
     if (sort === "nameDesc") return (b.name || "").localeCompare(a.name || "");
     if (sort === "type") return (a.type || "").localeCompare(b.type || "");
@@ -368,11 +369,9 @@ function refreshPointsList() {
     if (sort === "oldest") return (a.timestamp || 0) - (b.timestamp || 0);
     return 0;
   });
-
   // po sortowaniu przebuduj listę i glob
   applyPointFilter();
 }
-
 
 function addPoint(){
   const planet = document.getElementById("planet").value.trim();
@@ -394,9 +393,9 @@ function addPoint(){
   atlas[planet].push(point);
   saveAtlas();
   currentPlanet = planet;
-  refreshPlanetList();
-  refreshGlobePoints();
-  refreshPointsList();
+  refreshPlanetList();   // odświeża listę planet w zakładce Planety
+  refreshPointsList();   // odświeża listę punktów w zakładce Punkty (i filtr działa poprawnie)
+  refreshGlobePoints();  // aktualizuje punkty na globie
 }
 
 function editPoint(index){
@@ -541,6 +540,9 @@ function applyPointFilter() {
   const checkedTypes = Array.from(document.querySelectorAll('#filterPoints input:checked'))
                             .map(cb => cb.value);
 
+  // ------------------- Filtrujemy punkty dla globu i listy -------------------
+  const visiblePoints = atlas[currentPlanet].filter(p => p.type === "Pole" || checkedTypes.includes(p.type));
+
   // ------------------- Glob -------------------
   globe.pointColor(d => {
     if (d.type === "Pole") return "red"; // bieguny zawsze widoczne
@@ -556,17 +558,14 @@ function applyPointFilter() {
     }
   });
 
-  // Zaktualizuj glob z pełnym zestawem punktów (żadne nie giną)
-  globe.pointsData(atlas[currentPlanet]);
+  globe.pointsData(visiblePoints);
 
   // ------------------- Lista HUD -------------------
   const list = document.getElementById("pointsList");
   list.innerHTML = "";
 
-  atlas[currentPlanet].forEach((point, index) => {
-    // pomijamy bieguny w liście
-    if (point.type === "Pole") return;
-    if (!checkedTypes.includes(point.type)) return;
+  visiblePoints.forEach(point => {
+    if (point.type === "Pole") return; // pomijamy bieguny w liście
 
     const li = document.createElement("li");
     li.style.display = "flex";
@@ -589,10 +588,10 @@ function applyPointFilter() {
     showBtn.onclick = () => {
       globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1000);
       point.__highlight = true;
-      globe.pointsData(atlas[currentPlanet]);
+      globe.pointsData(visiblePoints);
       setTimeout(() => {
         delete point.__highlight;
-        globe.pointsData(atlas[currentPlanet]);
+        globe.pointsData(visiblePoints);
       }, 2000);
     };
     btnDiv.appendChild(showBtn);
@@ -603,19 +602,25 @@ function applyPointFilter() {
       checkbox.type = "checkbox";
       checkbox.checked = point.type === "Zasób" ? point.extracted : point.visited;
       checkbox.onchange = () => {
-        if (point.type === "Zasób") point.extracted = checkbox.checked;
-        if (point.type === "Obelisk") point.visited = checkbox.checked;
-        saveAtlas();
-        applyPointFilter();
-      };
+  // zawsze zapisujemy w atlas[currentPlanet], nie w liście widocznej
+  const index = atlas[currentPlanet].indexOf(point);
+  if(index === -1) return;
+
+  if (point.type === "Zasób") atlas[currentPlanet][index].extracted = checkbox.checked;
+  if (point.type === "Obelisk") atlas[currentPlanet][index].visited = checkbox.checked;
+
+  saveAtlas();
+  applyPointFilter(); // odśwież listę i glob
+};
       btnDiv.appendChild(checkbox);
     }
 
     // przyciski Edytuj / Usuń
+    const idx = atlas[currentPlanet].indexOf(point); // prawidłowy indeks względem atlas[currentPlanet]
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edytuj";
     editBtn.className = "edit";
-    editBtn.onclick = () => editPoint(index);
+    editBtn.onclick = () => editPoint(idx);
     btnDiv.appendChild(editBtn);
 
     const delBtn = document.createElement("button");
@@ -623,7 +628,7 @@ function applyPointFilter() {
     delBtn.className = "del";
     delBtn.onclick = () => {
       if (confirm("Czy na pewno usunąć punkt?")) {
-        atlas[currentPlanet].splice(index, 1);
+        atlas[currentPlanet].splice(idx, 1);
         saveAtlas();
         applyPointFilter();
       }
@@ -634,6 +639,7 @@ function applyPointFilter() {
     list.appendChild(li);
   });
 }
+
 
 
   
