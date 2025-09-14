@@ -357,17 +357,19 @@ function refreshPlanetList(){
 function refreshPointsList() {
   if (!currentPlanet || !atlas[currentPlanet]) return;
 
-  // przygotuj listę (bez biegunów)
-  let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
-
+  // posortuj atlas[currentPlanet] (z wyłączeniem biegunów)
   const sort = document.getElementById("sortPoints").value;
-  if (sort === "nameAsc") points.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-  if (sort === "nameDesc") points.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
-  if (sort === "type") points.sort((a, b) => (a.type || "").localeCompare(b.type || ""));
-  if (sort === "newest") points.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-  if (sort === "oldest") points.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+  atlas[currentPlanet].sort((a, b) => {
+    if (a.type === "Pole" || b.type === "Pole") return 0; // biegunów nie ruszamy
+    if (sort === "nameAsc") return (a.name || "").localeCompare(b.name || "");
+    if (sort === "nameDesc") return (b.name || "").localeCompare(a.name || "");
+    if (sort === "type") return (a.type || "").localeCompare(b.type || "");
+    if (sort === "newest") return (b.timestamp || 0) - (a.timestamp || 0);
+    if (sort === "oldest") return (a.timestamp || 0) - (b.timestamp || 0);
+    return 0;
+  });
 
-  // wywołaj filtr, żeby zbudować listę i zaktualizować glob
+  // po sortowaniu przebuduj listę i glob
   applyPointFilter();
 }
 
@@ -545,7 +547,6 @@ function applyPointFilter() {
 
   // w HUD: bez biegunów, tylko zaznaczone typy
   const filteredForList = allPoints.filter(p => p.type !== "Pole" && checkedTypes.includes(p.type));
-  refreshPointsList(null); // wyczyść
   const list = document.getElementById("pointsList");
   list.innerHTML = "";
 
