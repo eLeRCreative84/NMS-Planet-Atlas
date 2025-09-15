@@ -354,7 +354,6 @@ const globe = Globe()(document.getElementById("globeViz"))
 // element do wyświetlania współrzędnych
 const hoverDiv = document.getElementById("hoverCoords");
 
-// pokazywanie współrzędnych przy najechaniu na glob
 globe.onGlobeHover(coords => {
   if(coords) {
     const { lat, lng } = coords;
@@ -363,7 +362,13 @@ globe.onGlobeHover(coords => {
     hoverDiv.textContent = "";
   }
 });
-  
+
+// ustawienie punktów dla aktualnej planety
+if (currentPlanet && atlas[currentPlanet]) {
+  globe.pointsData(atlas[currentPlanet]);
+  globe.htmlElementsData(atlas[currentPlanet].filter(p => p.type === "Pole"));
+}
+
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
 // ---------------------- TABY ----------------------
