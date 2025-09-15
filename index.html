@@ -33,6 +33,12 @@
   #tabs button.active { background: #1976d2; }
   .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
   .tab-content.active { display: block; }
+
+.currentPlanetHeader {
+  margin-top: 0.5rem; /* mniejszy odstęp od góry */
+  margin-bottom: 0.3rem; /* mniejszy odstęp pod nagłówkiem */
+}
+  
 </style>
 </head>
 <body>
@@ -49,9 +55,16 @@
     <h2 class="currentPlanetHeader"></h2>
     <h2>Dodaj punkt</h2>
       <div class="xy-inputs">
-      <div><label>X</label><input type="number" id="lat" step="0.0001" /></div>
-      <div><label>Y</label><input type="number" id="lng" step="0.0001" /></div>
-    </div>
+  <div>
+    <label>X (−90 do 90)</label>
+    <input type="number" id="lat" step="1" min="-90" max="90" />
+  </div>
+  <div>
+    <label>Y (−180 do 180)</label>
+    <input type="number" id="lng" step="1" min="-180" max="180" />
+  </div>
+</div>
+
     <label>Nazwa punktu</label>
     <input type="text" id="name" />
     <label>Typ</label>
@@ -523,13 +536,13 @@ function refreshPointsList(){
 delBtn.textContent = "Usuń";
 delBtn.className = "del";
 delBtn.onclick = ()=>{
-  if(confirm("Czy na pewno usunąć punkt?")){
-    const idx = atlas[currentPlanet].findIndex(p => p.timestamp === point.timestamp);
-    if(idx !== -1){
-      atlas[currentPlanet].splice(idx,1);
-      saveAtlas();
-      refreshPointsList();
-      refreshGlobePoints();
+  if(confirm(`Czy na pewno usunąć punkt "${point.name || "Bez nazwy"}" typu "${point.type}" o współrzędnych X:${point.lat}, Y:${point.lng}?`)){
+  const idx = atlas[currentPlanet].findIndex(p => p.timestamp === point.timestamp);
+  if(idx !== -1){
+    atlas[currentPlanet].splice(idx,1);
+    saveAtlas();
+    refreshPointsList();
+    refreshGlobePoints();
     }
   }
 };
@@ -744,25 +757,12 @@ function refreshGlobePoints(){
 function updateCurrentPlanetHeader() {
   const headers = document.querySelectorAll(".currentPlanetHeader");
   headers.forEach(h => {
-    h.textContent = currentPlanet ? `${currentPlanet}` : "Brak wybranej planety";
+    h.textContent = currentPlanet ? `🌍 Aktualna planeta: ${currentPlanet}` : "🌍 Brak wybranej planety";
   });
 }
-
-// --- inicjalizacja na starcie ---
-const planets = Object.keys(atlas);
-if(planets.length > 0){
-  currentPlanet = planets[0];
-} else {
-  currentPlanet = null;
-}
-updateCurrentPlanetHeader();
-refreshPlanetList();
-refreshPointsList();
-refreshGlobePoints();
   
 // start
 refreshPlanetList();
-updateCurrentPlanetHeader(); // ustawia nagłówek na starcie
 
 </script>
 </body>
