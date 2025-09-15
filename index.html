@@ -568,7 +568,7 @@ function setPlanetTextureFromInput(){
 
   // tylko nazwa pliku zamiast base64
   const fileName = input.files[0].name;
-  planetTextures[planet] = "./textures/" + fileName;
+  planetTextures[planet] = location.origin + "/textures/" + fileName;
 
   currentPlanet = planet;
   applyPlanetTexture(planet);
