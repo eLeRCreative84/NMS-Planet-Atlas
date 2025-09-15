@@ -33,7 +33,32 @@
   #tabs button.active { background: #1976d2; }
   .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
   .tab-content.active { display: block; }
- 
+
+/* Nagłówek aktualnej planety */
+.currentPlanetHeader {
+  margin: 0.2rem 0 0.5rem 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  background-color: #1a3a6a; /* jasny granat, pasuje do zakładek */
+  padding: 0.3rem 0;
+  border-radius: 4px;
+  color: white;
+}
+
+/* Pola współrzędnych X i Y */
+.xy-inputs {
+  display: flex;
+  gap: 1cm; /* większy odstęp między polami */
+}
+.xy-inputs input {
+  width: 75%; /* o 50% szersze niż standardowe 50% */
+}
+.xy-inputs label {
+  display: block;
+  font-weight: bold;
+}
+  
 </style>
 </head>
 <body>
@@ -389,8 +414,8 @@ function refreshPlanetList(){
     btn.textContent = p;
 btn.style.flex = "1"; // zajmuje całą pozostałą szerokość
 btn.style.marginRight = "0.5rem";
-btn.style.background = "#555"; // szary
-btn.style.color = "white";
+btn.style.background = "#888"; // jasnoszary
+btn.style.color = "black";
 btn.style.border = "none";
 btn.style.padding = "0.3rem";
 btn.style.borderRadius = "4px";
