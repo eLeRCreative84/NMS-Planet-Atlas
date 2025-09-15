@@ -209,7 +209,6 @@
 <script>
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
-let planetNotes = JSON.parse(localStorage.getItem("planetNotes") || "{}");
 let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}"); // dla detali planety, jeśli używasz
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
@@ -290,7 +289,6 @@ function openTab(tabId) {
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
   localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
-  localStorage.setItem("planetNotes", JSON.stringify(planetNotes));
   localStorage.setItem("planetDetails", JSON.stringify(planetDetails));
 }
 
@@ -363,10 +361,11 @@ function refreshPlanetList(){
     btn.onclick = () => {
   currentPlanet = p;
 
-  const notesEl = document.getElementById("planetNotes");
-  if (notesEl) {
-    notesEl.value = planetNotes[p] || "";
-  }
+  const notesEl = document.getElementById("detailNotes");
+if (notesEl) {
+  notesEl.value = (planetDetails[p] && planetDetails[p].notes) || "";
+}
+
 
   addPoles(p);
   refreshGlobePoints();
@@ -390,7 +389,6 @@ function refreshPlanetList(){
   e.stopPropagation();
   if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
     delete atlas[p];
-    delete planetNotes[p];
     delete planetTextures[p];
     delete planetDetails[p];
 
@@ -609,7 +607,7 @@ function setPlanetTextureFromInput(){
 }
 
 function exportAtlas(){
-  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetNotes,planetDetails},null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetDetails},null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -627,7 +625,6 @@ function importAtlas(event){
       const data = JSON.parse(e.target.result);
       if(data.atlas) atlas = data.atlas;
       if(data.planetTextures) planetTextures = data.planetTextures;
-      if(data.planetNotes) planetNotes = data.planetNotes;
       if(data.planetDetails) planetDetails = data.planetDetails;
 
       // ustaw pierwszą planetę jako currentPlanet
