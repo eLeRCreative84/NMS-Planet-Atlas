@@ -62,10 +62,7 @@
 }
 
 .tab-content h2 {
-  background-color: #546c90;
-  color: white;
-  padding: 0.3rem 0.5rem;
-  border-radius: 4px;
+  text-align: center;
 }
  
 </style>
@@ -102,7 +99,7 @@
       <option>Obelisk</option>
       <option>Baza</option>
       <option>Ruiny</option>
-      <option>Duża struktura</option>
+      <option>Struktura</option>
       <option>Inne</option>
     </select>
     <label>Notatki</label>
@@ -183,7 +180,32 @@
     <option>Gazowy Gigant</option>
   </select>
 
-  <label>Pogoda</label><input type="text" id="detailWeather" />
+  <label>Pogoda</label>
+<select id="detailWeather">
+  <option value="">-- wybierz --</option>
+<option>Brak atmosfery</option>
+    <option>Słonecznie</option>
+    <option>Chłodno</option>
+    <option>Mroźno</option>
+    <option>Ciepło</option>
+    <option>Gorąco</option>
+    <option>Wilgotno</option>
+    <option>Deszczowo</option>
+    <option>Burzowo</option>
+    <option>Radioaktywne</option>
+    <option>Toksyczne</option>
+    <option>Kwasyczne</option>
+    <option>Pyłowe</option>
+    <option>Wulkaniczne</option>
+    <option>Burze piaskowe</option>
+    <option>Tornada</option>
+    <option>Meteoryty</option>
+    <option>Burze ogniste</option>
+    <option>Wysokie ciśnienie</option>
+    <option>Niskie ciśnienie</option>
+    <option>Burze magnetyczne</option>
+    <option>Burze elektryczne</option>
+</select>
 
   <label>Strażnicy</label>
   <select id="detailSentinels">
@@ -295,7 +317,7 @@ const globe = Globe()(document.getElementById("globeViz"))
       case "Obelisk": return d.visited?"green":"orange";
       case "Baza": return "blue";
       case "Ruiny": return "brown";
-      case "Duża struktura": return "purple";
+      case "Struktura": return "purple";
       case "Inne": return "pink";
       case "Pole": return "red";
       default: return "red";
