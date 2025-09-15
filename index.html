@@ -271,20 +271,7 @@
 </div>
 
 <div id="globeViz">
-  <!-- Wyświetlanie współrzędnych przy najechaniu -->
-  <div id="hoverCoords" style="
-    position:absolute;
-    top:5px;
-    left:5px;
-    color:white;
-    font-weight:bold;
-    background:rgba(0,0,0,0.5);
-    padding:0.2rem 0.5rem;
-    border-radius:4px;
-    pointer-events:none;
-    z-index:10;
-  "></div>
-</div>
+ </div>
 
 <script>
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
@@ -350,17 +337,6 @@ const globe = Globe()(document.getElementById("globeViz"))
       return el;
     }
   });
-
-// --- HUD do współrzędnych ---
-const hoverDiv = document.getElementById("hoverCoords");
-
-globe.onGlobeHover((point, { lat, lng }) => {
-  if(lat != null && lng != null) {
-    hoverDiv.textContent = `X: ${lat.toFixed(2)}, Y: ${lng.toFixed(2)}`;
-  } else {
-    hoverDiv.textContent = "";
-  }
-});
 
 // ustawienie punktów dla aktualnej planety
 if (currentPlanet && atlas[currentPlanet]) {
