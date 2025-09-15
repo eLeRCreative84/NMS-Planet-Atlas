@@ -132,13 +132,22 @@
   <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
 </div>
 
-      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+<h2>Kolor planety</h2>
+<div class="texture-input">
+  <input type="color" id="planetColorInput" value="#4caf50" />
+  <button onclick="setPlanetColor()">Ustaw kolor</button>
+</div>
+     
+    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Tekstura planety</h2>
     <div class="texture-input">
       <input type="file" id="planetTextureInput" accept="image/*" hidden />
       <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
       <button onclick="setPlanetTextureFromInput()">Ustaw</button>
     </div>
+
+    
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Lista planet</h2>
     <div id="planetList"></div>
@@ -278,6 +287,7 @@
 <script>
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
+let planetColors = JSON.parse(localStorage.getItem("planetColors") || "{}");
 let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}"); // dla detali planety, jeśli używasz
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
@@ -364,6 +374,7 @@ function openTab(tabId) {
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
   localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
+  localStorage.setItem("planetColors", JSON.stringify(planetColors));
   localStorage.setItem("planetDetails", JSON.stringify(planetDetails));
 }
 
@@ -430,9 +441,11 @@ function addNewPlanet() {
   
 function applyPlanetTexture(planet) {
   if (planet && planetTextures[planet]) {
+    delete planetColors[planet]; // usuń kolor
     globe.globeImageUrl(planetTextures[planet]);
   } else {
     globe.globeImageUrl(null);
+    applyPlanetColor(planet); // jeśli brak tekstury, sprawdź kolor
   }
 }
   
@@ -706,6 +719,35 @@ function setPlanetTextureFromInput(){
   refreshGlobePoints();
 }
 
+  function setPlanetColor() {
+  const input = document.getElementById("planetColorInput");
+  const color = input.value;
+
+  const planet = currentPlanet || document.getElementById("planet").value.trim();
+  if(!planet) { alert("Wybierz planetę lub wpisz jej nazwę!"); return; }
+
+  // usuń teksturę jeśli była
+  delete planetTextures[planet];
+
+  // ustaw kolor
+  planetColors[planet] = color;
+  currentPlanet = planet;
+
+  applyPlanetColor(planet);
+
+  saveAtlas();
+  refreshGlobePoints();
+}
+
+function applyPlanetColor(planet) {
+  if (planet && planetColors[planet]) {
+    globe.globeImageUrl(null); // usuń teksturę
+    globe.globeMaterial().color = new THREE.Color(planetColors[planet]);
+  } else {
+    globe.globeMaterial().color = new THREE.Color(0xffffff); // domyślnie biały
+  }
+}
+
 function exportAtlas(){
   const blob = new Blob([JSON.stringify({atlas,planetTextures,planetDetails},null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
@@ -725,6 +767,7 @@ function importAtlas(event){
       const data = JSON.parse(e.target.result);
       if(data.atlas) atlas = data.atlas;
       if(data.planetTextures) planetTextures = data.planetTextures;
+      if(data.planetColors) planetColors = data.planetColors;
       if(data.planetDetails) planetDetails = data.planetDetails;
 
       // ustaw pierwszą planetę jako currentPlanet
