@@ -65,10 +65,6 @@
     <label>Notatki</label>
     <textarea id="notes"></textarea>
 
-    <!-- UWAGA: element wymagany przez skrypt (by uniknąć błędów JS) -->
-    <label>Notatka planety</label>
-    <textarea id="planetNote"></textarea>
-
     <button onclick="addPoint()">Dodaj punkt</button>
 
     <h2>Tekstura planety</h2>
@@ -366,8 +362,7 @@ function refreshPlanetList(){
     btn.onclick = () => {
       currentPlanet = p;
       document.getElementById("planet").value = p;
-      if (document.getElementById("planetNote")) {
-        document.getElementById("planetNote").value = planetNotes[p] || "";
+      document.getElementById("planetNotes").value = planetNotes[p] || "";
       }
       addPoles(p);
       refreshGlobePoints();
@@ -529,18 +524,12 @@ btnDiv.appendChild(delBtn);
 //Przycisk zmienia podpis w zależności od trybu.
   
 function addPoint(){
-  const planet = document.getElementById("planet").value.trim();
   const lat = parseFloat(document.getElementById("lat").value);
   const lng = parseFloat(document.getElementById("lng").value);
   const name = document.getElementById("name").value.trim();
   const type = document.getElementById("type").value;
   const notes = document.getElementById("notes").value.trim();
  
-  // zapis notatki planety do planetNotes (pole istnieje w DOM)
-  planetNotes[planet] = document.getElementById("planetNote") 
-    ? document.getElementById("planetNote").value.trim() 
-    : (planetNotes[planet] || "");
-
   if(!planet || isNaN(lat) || isNaN(lng)){
     alert("Uzupełnij planetę i współrzędne!");
     return;
