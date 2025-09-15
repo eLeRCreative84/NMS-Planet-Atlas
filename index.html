@@ -654,11 +654,12 @@ function importAtlas(event){
       // ustaw glob na planetę (tekstura) jeśli istnieje
       if(currentPlanet) setPlanetTexture(currentPlanet);
 
+      updateCurrentPlanetHeader(); // aby nagłówek był poprawny nawet jeśli currentPlanet jest null
       saveAtlas();
       refreshPlanetList();
       refreshPointsList();
       refreshGlobePoints();
-      updateCurrentPlanetHeader();
+      
 
       alert("Import zakończony!");
     } catch(err){ alert("Błąd importu JSON"); }
@@ -749,6 +750,7 @@ function updateCurrentPlanetHeader() {
   
 // start
 refreshPlanetList();
+updateCurrentPlanetHeader(); // ustawia nagłówek na starcie
 
 </script>
 </body>
