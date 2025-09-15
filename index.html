@@ -47,9 +47,7 @@
   <!-- Zakładka START -->
   <div id="start" class="tab-content active">
     <h2>Dodaj punkt</h2>
-    <label>Planeta</label>
-    <input type="text" id="planet" placeholder="Nazwa planety" />
-    <div class="xy-inputs">
+      <div class="xy-inputs">
       <div><label>X</label><input type="number" id="lat" step="0.0001" /></div>
       <div><label>Y</label><input type="number" id="lng" step="0.0001" /></div>
     </div>
@@ -96,7 +94,14 @@
 
   <!-- Zakładka PLANETY -->
   <div id="planety" class="tab-content">
-    <h2>Planety</h2>
+    <h3>Dodaj nową planetę</h3>
+
+    <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+  <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" style="flex:1;" oninput="checkNewPlanetInput()" />
+  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj</button>
+</div>
+
+    <h2>Lista planet</h2>
     <div id="planetList"></div>
   </div>
 
@@ -179,7 +184,6 @@
     <option>Ekstremalna</option>
   </select>
 
-  <label>Roszczenie przez</label><input type="text" id="detailClaimed" />
   <label>Odkryty przez</label><input type="text" id="detailDiscovered" />
 
   <label>Tryb gry</label>
@@ -302,6 +306,39 @@ function addPoles(planet){
   }
 }
 
+// Dodawanie nowych planet
+
+  function checkNewPlanetInput() {
+  const input = document.getElementById("newPlanetName");
+  const button = document.getElementById("addPlanetBtn");
+  button.disabled = input.value.trim() === "";
+}
+
+function addNewPlanet() {
+  const input = document.getElementById("newPlanetName");
+  const name = input.value.trim();
+  if (!name) return;
+
+  if (atlas[name]) {
+    alert("Planeta już istnieje!");
+    return;
+  }
+
+  atlas[name] = [];
+  addPoles(name);
+  currentPlanet = name;
+  saveAtlas();
+  refreshPlanetList();
+  refreshPointsList();
+  refreshGlobePoints();
+  applyPlanetTexture(name);
+  input.value = "";
+  checkNewPlanetInput();
+
+  alert(`Dodano nową planetę: ${name}`);
+}
+// Dodawanie tekstury planety
+  
 function applyPlanetTexture(planet) {
   if (planet && planetTextures[planet]) {
     globe.globeImageUrl(planetTextures[planet]);
