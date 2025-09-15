@@ -747,6 +747,18 @@ function updateCurrentPlanetHeader() {
     h.textContent = currentPlanet ? `${currentPlanet}` : "Brak wybranej planety";
   });
 }
+
+// --- inicjalizacja na starcie ---
+const planets = Object.keys(atlas);
+if(planets.length > 0){
+  currentPlanet = planets[0];
+} else {
+  currentPlanet = null;
+}
+updateCurrentPlanetHeader();
+refreshPlanetList();
+refreshPointsList();
+refreshGlobePoints();
   
 // start
 refreshPlanetList();
