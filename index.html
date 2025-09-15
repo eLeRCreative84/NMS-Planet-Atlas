@@ -351,12 +351,11 @@ const globe = Globe()(document.getElementById("globeViz"))
     }
   });
 
-// element do wyświetlania współrzędnych
+// --- HUD do współrzędnych ---
 const hoverDiv = document.getElementById("hoverCoords");
 
-globe.onGlobeHover(coords => {
-  if(coords) {
-    const { lat, lng } = coords;
+globe.onGlobeHover((point, { lat, lng }) => {
+  if(lat != null && lng != null) {
     hoverDiv.textContent = `X: ${lat.toFixed(2)}, Y: ${lng.toFixed(2)}`;
   } else {
     hoverDiv.textContent = "";
