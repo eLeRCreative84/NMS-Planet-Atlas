@@ -97,6 +97,11 @@
 
   <!-- Zakładka START -->
   <div id="start" class="tab-content active">
+   
+    <div id="noPlanetsMessage" style="color: #ffcc00; font-weight: bold; text-align: center; margin: 0.5rem 0;">
+  Stwórz nową planetę lub importuj dane JSON
+</div>
+
     <h2 class="currentPlanetHeader"></h2>
     <h2>Dodaj punkt</h2>
       <div class="xy-inputs">
@@ -422,7 +427,7 @@ function addNewPlanet() {
 
   atlas[name] = [];
   addPoles(name);
-
+  
   // Dodaj pustą strukturę detali od razu:
   planetDetails[name] = {
     galaxy: "",
@@ -451,6 +456,7 @@ function addNewPlanet() {
   checkNewPlanetInput();
 
   alert(`Dodano nową planetę: ${name}`);
+  updateNoPlanetsMessage()
 }
   
 // Dodawanie tekstury planety
@@ -538,13 +544,14 @@ delBtn.title = `Usuń planetę ${p}`;
         saveAtlas();
         refreshPlanetList();
         refreshPointsList();
-      }
+       }
     };
 
     container.appendChild(btn);
     container.appendChild(delBtn);
     list.appendChild(container);
   });
+  updateNoPlanetsMessage();
 }
 
   // Lista punktow
@@ -812,7 +819,7 @@ function importAtlas(event){
       refreshPlanetList();
       refreshPointsList();
       refreshGlobePoints();
-      
+      updateNoPlanetsMessage()
 
       alert("Import zakończony!");
     } catch(err){ alert("Błąd importu JSON"); }
@@ -900,10 +907,22 @@ function updateCurrentPlanetHeader() {
     h.textContent = currentPlanet ? `${currentPlanet}` : "Brak wybranej planety";
   });
 }
+
+function updateNoPlanetsMessage() {
+  const msg = document.getElementById("noPlanetsMessage");
+  const planets = Object.keys(atlas);
+  if (planets.length === 0) {
+    msg.style.display = "block";
+  } else {
+    msg.style.display = "none";
+  }
+}
+
   
 // start
 refreshPlanetList();
-
+updateNoPlanetsMessage();
+  
 </script>
 </body>
 </html>
