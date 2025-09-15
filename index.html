@@ -320,6 +320,24 @@ function addNewPlanet() {
 
   atlas[name] = [];
   addPoles(name);
+
+  // 🔧 Dodaj pustą strukturę detali od razu:
+  planetDetails[name] = {
+    galaxy: "",
+    region: "",
+    system: "",
+    biome: "",
+    weather: "",
+    sentinels: "",
+    flora: "",
+    fauna: "",
+    discovered: "",
+    mode: "",
+    updated: "",
+    coords: "",
+    notes: ""
+  };
+
   currentPlanet = name;
   saveAtlas();
   refreshPlanetList();
@@ -331,6 +349,7 @@ function addNewPlanet() {
 
   alert(`Dodano nową planetę: ${name}`);
 }
+  
 // Dodawanie tekstury planety
   
 function applyPlanetTexture(planet) {
@@ -359,21 +378,14 @@ function refreshPlanetList(){
     btn.style.marginRight = "0.5rem";
     
     btn.onclick = () => {
-  currentPlanet = p;
-
-  const notesEl = document.getElementById("detailNotes");
-if (notesEl) {
-  notesEl.value = (planetDetails[p] && planetDetails[p].notes) || "";
-}
-
-
-  addPoles(p);
-  refreshGlobePoints();
-  globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
-  applyPlanetTexture(p);
-  refreshPointsList();
-  loadPlanetDetails(); // dodatkowo ładujemy detale, jeśli są
-};
+      currentPlanet = p;
+      addPoles(p);
+      refreshGlobePoints();
+      globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
+      applyPlanetTexture(p);
+      refreshPointsList();
+      loadPlanetDetails(); // dodatkowo ładujemy detale, jeśli są
+    };
 
     // 🔴 mały przycisk usuń
     const delBtn = document.createElement("button");
@@ -684,7 +696,6 @@ function loadPlanetDetails(){
   document.getElementById("detailSentinels").value=details.sentinels||"";
   document.getElementById("detailFlora").value=details.flora||"";
   document.getElementById("detailFauna").value=details.fauna||"";
-  document.getElementById("detailClaimed").value=details.claimed||"";
   document.getElementById("detailDiscovered").value=details.discovered||"";
   document.getElementById("detailMode").value=details.mode||"";
   document.getElementById("detailUpdated").value=details.updated||"";
@@ -702,7 +713,6 @@ function savePlanetDetails(){
     sentinels:document.getElementById("detailSentinels").value,
     flora:document.getElementById("detailFlora").value,
     fauna:document.getElementById("detailFauna").value,
-    claimed:document.getElementById("detailClaimed").value,
     discovered:document.getElementById("detailDiscovered").value,
     mode:document.getElementById("detailMode").value,
     updated:document.getElementById("detailUpdated").value,
