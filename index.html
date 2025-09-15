@@ -92,9 +92,9 @@
   <div id="planety" class="tab-content">
     <h3>Dodaj nową planetę</h3>
 
-    <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
-  <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" style="flex:1;" oninput="checkNewPlanetInput()" />
-  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj</button>
+    <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+  <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
+  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
 </div>
 
     <h2>Lista planet</h2>
@@ -359,17 +359,22 @@ function refreshPlanetList(){
     btn.textContent = p;
     btn.style.flexGrow = "1";
     btn.style.marginRight = "0.5rem";
+    
     btn.onclick = () => {
-      currentPlanet = p;
-      document.getElementById("planetNotes").value = planetNotes[p] || "";
+  currentPlanet = p;
 
-      addPoles(p);
-      refreshGlobePoints();
-      globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
-      applyPlanetTexture(p);
-      refreshPointsList();
-      loadPlanetDetails(); // dodatkowo ładujemy detale, jeśli są
-    };
+  const notesEl = document.getElementById("planetNotes");
+  if (notesEl) {
+    notesEl.value = planetNotes[p] || "";
+  }
+
+  addPoles(p);
+  refreshGlobePoints();
+  globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
+  applyPlanetTexture(p);
+  refreshPointsList();
+  loadPlanetDetails(); // dodatkowo ładujemy detale, jeśli są
+};
 
     // 🔴 mały przycisk usuń
     const delBtn = document.createElement("button");
