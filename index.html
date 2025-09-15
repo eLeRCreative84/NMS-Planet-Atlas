@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8" />
@@ -34,10 +34,17 @@
   .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
   .tab-content.active { display: block; }
 
+/* wszystkie nagłówki h2/h3 w formie mają minimalny margines */
+#form h2, #form h3 {
+  margin: 0.2rem 0;
+  padding: 0;
+}
+
+/* nagłówek aktualnej planety */
 .currentPlanetHeader {
-  margin: 0;          /* usuwa wszystkie domyślne marginesy */
-  padding: 0.3rem 0;  /* ustala odstęp wewnętrzny */
-  font-size: 1.2rem;  /* możesz dopasować rozmiar */
+  margin: 0.1rem 0; /* minimalny margines */
+  padding: 0;
+  font-size: 1.2rem;
   font-weight: bold;
 }
   
@@ -338,7 +345,7 @@ function addNewPlanet() {
   atlas[name] = [];
   addPoles(name);
 
-  // 🔧 Dodaj pustą strukturę detali od razu:
+  // Dodaj pustą strukturę detali od razu:
   planetDetails[name] = {
     galaxy: "",
     region: "",
@@ -396,7 +403,7 @@ function refreshPlanetList(){
     btn.textContent = p;
     btn.style.flexGrow = "1"; // zajmuje resztę szerokości
     btn.style.marginRight = "0.5rem";
-    btn.style.background = "#1976d2";
+    btn.style.background = "#555"; // szary
     btn.style.color = "white";
     btn.style.border = "none";
     btn.style.padding = "0.3rem";
@@ -416,11 +423,11 @@ function refreshPlanetList(){
 
     // 🔴 przycisk usuń planetę
     const delBtn = document.createElement("button");
-    delBtn.textContent = "Usuń";
+    delBtn.textContent = "✖"; // krótki znak, tak jak w liście punktów
     delBtn.style.background = "#c62828";
     delBtn.style.color = "white";
     delBtn.style.border = "none";
-    delBtn.style.padding = "0.3rem 0.5rem";
+    delBtn.style.padding = "0.2rem 0.4rem"; // krótki, dopasowany do napisu
     delBtn.style.borderRadius = "4px";
     delBtn.style.cursor = "pointer";
     delBtn.style.marginLeft = "auto"; // wyrównanie do prawej
