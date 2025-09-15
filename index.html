@@ -51,14 +51,23 @@
   display: flex;
   gap: 1cm; /* większy odstęp między polami */
 }
+.xy-inputs div {
+  display: flex;
+  flex-direction: column;
+  width: max-content; /* szerokość dopasowana do napisu */
+}
+
 .xy-inputs input {
-  width: 75%; /* o 50% szersze niż standardowe 50% */
+  width: 100%; /* dopasowuje się do szerokości rodzica */
 }
-.xy-inputs label {
-  display: block;
-  font-weight: bold;
+
+.tab-content h2 {
+  background-color: #546c90;
+  color: white;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
 }
-  
+ 
 </style>
 </head>
 <body>
@@ -414,7 +423,7 @@ function refreshPlanetList(){
     btn.textContent = p;
 btn.style.flex = "1"; // zajmuje całą pozostałą szerokość
 btn.style.marginRight = "0.5rem";
-btn.style.background = "#888"; // jasnoszary
+btn.style.background = "#e5e5e5"; // jasnoszary
 btn.style.color = "black";
 btn.style.border = "none";
 btn.style.padding = "0.3rem";
