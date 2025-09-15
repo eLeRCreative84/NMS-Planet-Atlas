@@ -361,14 +361,14 @@ function refreshPlanetList(){
     btn.style.marginRight = "0.5rem";
     btn.onclick = () => {
       currentPlanet = p;
-      document.getElementById("planet").value = p;
       document.getElementById("planetNotes").value = planetNotes[p] || "";
-      }
+
       addPoles(p);
       refreshGlobePoints();
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
       applyPlanetTexture(p);
       refreshPointsList();
+      loadPlanetDetails(); // dodatkowo ładujemy detale, jeśli są
     };
 
     // 🔴 mały przycisk usuń
@@ -524,41 +524,41 @@ btnDiv.appendChild(delBtn);
 //Przycisk zmienia podpis w zależności od trybu.
   
 function addPoint(){
+  if (!currentPlanet) {
+    alert("Najpierw wybierz planetę w zakładce 'Planety'!");
+    return;
+  }
+
   const lat = parseFloat(document.getElementById("lat").value);
   const lng = parseFloat(document.getElementById("lng").value);
   const name = document.getElementById("name").value.trim();
   const type = document.getElementById("type").value;
   const notes = document.getElementById("notes").value.trim();
- 
-  if(!planet || isNaN(lat) || isNaN(lng)){
-    alert("Uzupełnij planetę i współrzędne!");
+
+  if (isNaN(lat) || isNaN(lng)) {
+    alert("Podaj współrzędne X i Y!");
     return;
   }
-  if(!atlas[planet]) atlas[planet] = [];
 
-  const point = {planet, lat, lng, name, type, notes, timestamp: Date.now()};
+  const point = {planet: currentPlanet, lat, lng, name, type, notes, timestamp: Date.now()};
   if(type==="Zasób") point.extracted=false;
   if(type==="Obelisk") point.visited=false;
 
-  if(editIndex !== null && atlas[planet][editIndex]) {
-    // tryb edycji → nadpisz istniejący punkt
-    atlas[planet][editIndex] = point;
+  if(editIndex !== null && atlas[currentPlanet][editIndex]) {
+    atlas[currentPlanet][editIndex] = point;
     editIndex = null;
     document.querySelector("button[onclick='addPoint()']").textContent = "Dodaj punkt";
   } else {
-    // tryb dodawania → dodaj nowy punkt
-    atlas[planet].push(point);
+    atlas[currentPlanet].push(point);
   }
 
   saveAtlas();
-  currentPlanet = planet;
   refreshPlanetList();
   refreshGlobePoints();
   refreshPointsList();
 }
 
-// Musimy jednoznacznie wskazać który punkt w atlasie edytujemy. Najprościej przekazywać nie indeks, tylko unikalny identyfikator (timestamp, który już dodajemy do każdego punktu).
-  
+
 function editPoint(timestamp){   
   if(!currentPlanet || !atlas[currentPlanet]) return;
   
@@ -720,29 +720,6 @@ function refreshGlobePoints(){
 // start
 refreshPlanetList();
 
-// --- Obsługa zmiany planety w formularzu START ---
-document.getElementById("planet").addEventListener("input", () => {
-  const planet = document.getElementById("planet").value.trim();
-  if (!planet) return;
-
-  // ustaw aktualną planetę
-  currentPlanet = planet;
-
-  // jeśli planeta nie istnieje w atlasie -> tworzymy ją
-  if (!atlas[planet]) {
-    atlas[planet] = [];
-    addPoles(planet);
-    saveAtlas();
-  }
-
-  // odśwież dane widoku
-  addPoles(planet);
-  applyPlanetTexture(planet);
-  refreshPlanetList();
-  refreshPointsList();
-  refreshGlobePoints();
-});
-  
 </script>
 </body>
 </html>
