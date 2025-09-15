@@ -87,6 +87,11 @@
     <h2 class="currentPlanetHeader"></h2>
     <h3>Dodaj nową planetę</h3>
 
+    <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+  <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
+  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
+</div>
+
     <h2>Tekstura planety</h2>
     <div class="texture-input">
       <input type="file" id="planetTextureInput" accept="image/*" hidden />
@@ -94,11 +99,6 @@
       <button onclick="setPlanetTextureFromInput()">Ustaw</button>
     </div>
     
-    <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
-  <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
-  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
-</div>
-
     <h2>Lista planet</h2>
     <div id="planetList"></div>
   </div>
@@ -745,7 +745,7 @@ function refreshGlobePoints(){
 function updateCurrentPlanetHeader() {
   const headers = document.querySelectorAll(".currentPlanetHeader");
   headers.forEach(h => {
-    h.textContent = currentPlanet ? `Aktualna planeta: ${currentPlanet}` : "Brak wybranej planety";
+    h.textContent = currentPlanet ? `${currentPlanet}` : "Brak wybranej planety";
   });
 }
   
