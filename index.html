@@ -440,16 +440,11 @@ function addNewPlanet() {
 // Dodawanie tekstury planety
   
 function applyPlanetTexture(planet) {
-  const mat = globe.globeMaterial();
-
   if (planet && planetTextures[planet]) {
     delete planetColors[planet]; // usuń kolor
     globe.globeImageUrl(planetTextures[planet]);
-    mat.color = new THREE.Color(0xffffff); // 🚀 upewnij się, że tekstura nie jest przyciemniana
-    mat.needsUpdate = true;
   } else {
-    globe.globeImageUrl(null);
-    applyPlanetColor(planet); // jeśli brak tekstury, sprawdź kolor
+    applyPlanetColor(planet); // jeśli brak tekstury, pokaż kolor
   }
 }
   
@@ -745,16 +740,24 @@ function setPlanetTextureFromInput(){
 
 function applyPlanetColor(planet) {
   if (planet && planetColors[planet]) {
-    globe.globeImageUrl(null); // usuń teksturę
-    const mat = globe.globeMaterial();
-    mat.map = null;             // 🚀 usuń mapę tekstury
-    mat.color = new THREE.Color(planetColors[planet]); 
-    mat.needsUpdate = true;     // 🚀 wymuś odświeżenie
+    // 🔥 generujemy jednolitą teksturę w wybranym kolorze
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 2;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = planetColors[planet];
+    ctx.fillRect(0, 0, 2, 2);
+
+    const dataUrl = canvas.toDataURL();
+    globe.globeImageUrl(dataUrl);
   } else {
-    const mat = globe.globeMaterial();
-    mat.map = null;
-    mat.color = new THREE.Color(0xffffff); 
-    mat.needsUpdate = true;
+    // domyślny biały
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 2;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, 2, 2);
+
+    globe.globeImageUrl(canvas.toDataURL());
   }
 }
 
