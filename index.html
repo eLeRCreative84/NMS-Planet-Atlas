@@ -276,21 +276,41 @@
  </div>
 
 <script>
+<script>
 let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
 let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
-let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}"); 
-let planetColors = JSON.parse(localStorage.getItem("planetColors") || "{}"); // fallback color
+let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}");
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 let editIndex = null;
 
-// ---------------------- GLOB ----------------------
+// ---------------------- GLOBE ----------------------
 const globe = Globe()(document.getElementById("globeViz"))
   .globeImageUrl(null)
   .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
   .pointLat("lat")
   .pointLng("lng")
-  .pointLabel(d => `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`)
+  .pointLabel(d=>{
+    if (!currentPlanet || !atlas[currentPlanet]) {
+      let label = `${d.name||""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
+      if(d.type==="Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+      if(d.type==="Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+      return label;
+    }
+    const sameLocation = atlas[currentPlanet].filter(p => p.lat===d.lat && p.lng===d.lng);
+    if(sameLocation.length>1){
+      return sameLocation.map(p=>{
+        let label = `${p.name||"Bez nazwy"} (${p.type})`;
+        if(p.type==="Zasób") label += p.extracted?" [Wydobyty]":" [Nie wydobyty]";
+        if(p.type==="Obelisk") label += p.visited?" [Odwiedzony]":" [Nie odwiedzony]";
+        return label;
+      }).join("<br>");
+    }
+    let label = `${d.name||""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
+    if(d.type==="Zasób") label += d.extracted?" [Wydobyty]":" [Nie wydobyty]";
+    if(d.type==="Obelisk") label += d.visited?" [Odwiedzony]":" [Nie odwiedzony]";
+    return label;
+  })
   .pointColor(d=>{
     switch(d.type){
       case "Zasób": return d.extracted?"gray":"gold";
@@ -303,7 +323,7 @@ const globe = Globe()(document.getElementById("globeViz"))
       default: return "red";
     }
   })
-  .pointRadius(() => pointScale)
+  .pointRadius(()=>pointScale)
   .htmlElementsData([])
   .htmlElement(d=>{
     if(d.type==="Pole"){
@@ -319,115 +339,343 @@ const globe = Globe()(document.getElementById("globeViz"))
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
-// ---------------------- FUNKCJE TEKSTUR ----------------------
-function getBasePath() {
-  return window.location.origin + window.location.pathname.replace(/\/[^/]*$/, "/");
+if(currentPlanet && atlas[currentPlanet]){
+  globe.pointsData(atlas[currentPlanet]);
+  globe.htmlElementsData(atlas[currentPlanet].filter(p=>p.type==="Pole"));
 }
 
-// Ustawienie tekstury z inputu pliku
-function setPlanetTextureFromInput() {
-  const input = document.getElementById("planetTextureInput");
-  if(!input.files[0]) return;
-
-  if(!currentPlanet) { alert("Wybierz planetę!"); return; }
-
-  const fileName = input.files[0].name;
-  planetTextures[currentPlanet] = getBasePath() + "textures/" + fileName;
-
-  applyPlanetTexture(currentPlanet);
-  saveAtlas();
+// ---------------------- TABY ----------------------
+function openTab(tabId){
+  document.querySelectorAll(".tab-content").forEach(el=>el.classList.remove("active"));
+  document.querySelectorAll("#tabs button").forEach(el=>el.classList.remove("active"));
+  const tab = document.getElementById(tabId);
+  if(tab) tab.classList.add("active");
+  document.querySelectorAll("#tabs button").forEach(btn=>{
+    if(btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
+  });
 }
 
-// Zastosowanie tekstury lub koloru do globu
-function applyPlanetTexture(planet) {
-  if(!planet) return;
-
-  if(planetTextures[planet]) {
-    globe.globeImageUrl(planetTextures[planet]);
-    return;
-  }
-
-  if(planetColors[planet]) {
-    globe.globeImageUrl(null);
-    globe.globeMaterial().color.set(planetColors[planet]);
-    return;
-  }
-
-  globe.globeImageUrl(null);
-  globe.globeMaterial().color.set('#000000');
-}
-
-// ---------------------- ZAPIS / ODCZYT ----------------------
+// ---------------------- ZAPIS/ODŚWIEŻ ----------------------
 function saveAtlas(){
   localStorage.setItem("atlas", JSON.stringify(atlas));
   localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
   localStorage.setItem("planetDetails", JSON.stringify(planetDetails));
-  localStorage.setItem("planetColors", JSON.stringify(planetColors));
+}
+
+function addPoles(planet){
+  if(!atlas[planet]) atlas[planet]=[];
+  if(!atlas[planet].some(p=>p.type==="Pole")){
+    atlas[planet].push({lat:90,lng:0,name:"Biegun Północny",type:"Pole"});
+    atlas[planet].push({lat:-90,lng:0,name:"Biegun Południowy",type:"Pole"});
+  }
 }
 
 // ---------------------- PLANETY ----------------------
-function addNewPlanet() {
+function checkNewPlanetInput(){
+  const input=document.getElementById("newPlanetName");
+  document.getElementById("addPlanetBtn").disabled = input.value.trim()==="";
+}
+
+function addNewPlanet(){
   const input = document.getElementById("newPlanetName");
   const name = input.value.trim();
-  if (!name) return;
+  if(!name) return;
+  if(atlas[name]) { alert("Planeta już istnieje!"); return; }
 
-  if (atlas[name]) { alert("Planeta już istnieje!"); return; }
-
-  atlas[name] = [];
+  atlas[name]=[];
   addPoles(name);
+  planetDetails[name]={
+    galaxy:"", region:"", system:"", biome:"", weather:"", sentinels:"",
+    flora:"", fauna:"", discovered:"", mode:"", updated:"", coords:"", notes:""
+  };
 
-  planetDetails[name] = { galaxy:"", region:"", system:"", biome:"", weather:"", sentinels:"", flora:"", fauna:"", discovered:"", mode:"", updated:"", coords:"", notes:"" };
-
-  // fallback color na losowy (jeśli nie dodano tekstury)
-  planetColors[name] = "#"+Math.floor(Math.random()*16777215).toString(16);
-
-  currentPlanet = name;
+  currentPlanet=name;
   saveAtlas();
   refreshPlanetList();
   refreshPointsList();
   applyPlanetTexture(name);
   updateCurrentPlanetHeader();
-  input.value = "";
+  input.value="";
   alert(`Dodano planetę: ${name}`);
+}
+
+function refreshPlanetList(){
+  const list = document.getElementById("planetList");
+  list.innerHTML="";
+  Object.keys(atlas).forEach(p=>{
+    const container=document.createElement("div");
+    container.style.display="flex"; container.style.alignItems="center"; container.style.margin="0.2rem 0";
+
+    const btn=document.createElement("button");
+    btn.textContent=p; btn.style.flex="1"; btn.style.marginRight="0.5rem";
+    btn.style.background="#e5e5e5"; btn.style.color="black"; btn.style.border="none"; btn.style.padding="0.3rem"; btn.style.borderRadius="4px"; btn.style.cursor="pointer";
+    btn.onclick=()=>{
+      currentPlanet=p; addPoles(p);
+      refreshGlobePoints(); globe.htmlElementsData(atlas[p].filter(pt=>pt.type==="Pole"));
+      applyPlanetTexture(p); refreshPointsList(); loadPlanetDetails(); updateCurrentPlanetHeader();
+    };
+
+    const delBtn=document.createElement("button");
+    delBtn.textContent="Usuń"; delBtn.style.flex="0"; delBtn.style.background="#c62828"; delBtn.style.color="white";
+    delBtn.style.border="none"; delBtn.style.padding="0.2rem 0.5rem"; delBtn.style.borderRadius="4px"; delBtn.style.cursor="pointer"; delBtn.style.marginLeft="auto";
+    delBtn.title=`Usuń planetę ${p}`;
+    delBtn.onclick=(e)=>{
+      e.stopPropagation();
+      if(confirm(`Na pewno usunąć planetę "${p}" wraz z punktami?`)){
+        delete atlas[p]; delete planetTextures[p]; delete planetDetails[p];
+        const planets=Object.keys(atlas);
+        if(currentPlanet===p) currentPlanet=planets.length?planets[0]:null;
+        updateCurrentPlanetHeader();
+        if(currentPlanet){ applyPlanetTexture(currentPlanet); refreshGlobePoints(); } 
+        else{ globe.globeImageUrl(null); globe.pointsData([]); }
+        saveAtlas(); refreshPlanetList(); refreshPointsList();
+      }
+    };
+
+    container.appendChild(btn); container.appendChild(delBtn); list.appendChild(container);
+  });
+}
+
+// ---------------------- PUNKTY ----------------------
+function refreshPointsList(){
+  const list=document.getElementById("pointsList");
+  list.innerHTML="";
+  if(!currentPlanet||!atlas[currentPlanet]) return;
+
+  let points=atlas[currentPlanet].filter(p=>p.type!=="Pole");
+  const sort=document.getElementById("sortPoints").value;
+  if(sort==="nameAsc") points.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  if(sort==="nameDesc") points.sort((a,b)=>(b.name||"").localeCompare(a.name||""));
+  if(sort==="type") points.sort((a,b)=>(a.type||"").localeCompare(b.type||""));
+  if(sort==="newest") points.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+  if(sort==="oldest") points.sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));
+
+  points.forEach(point=>{
+    const li=document.createElement("li"); li.style.display="flex"; li.style.flexDirection="column"; li.style.alignItems="flex-start";
+    const info=document.createElement("span");
+    info.innerHTML=`${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
+    li.appendChild(info);
+
+    const btnDiv=document.createElement("div"); btnDiv.style.display="flex"; btnDiv.style.gap="0.5rem";
+
+    const showBtn=document.createElement("button");
+    showBtn.textContent="Pokaż"; showBtn.style.background="#388e3c"; showBtn.style.color="white";
+    showBtn.onclick=()=>{
+      globe.pointOfView({lat:point.lat,lng:point.lng,altitude:1.5},1000);
+      point.__highlight=true;
+      globe.pointColor(d=>{
+        if(d.__highlight) return "orange";
+        switch(d.type){
+          case "Zasób": return d.extracted?"gray":"gold";
+          case "Obelisk": return d.visited?"green":"orange";
+          case "Baza": return "blue";
+          case "Ruiny": return "brown";
+          case "Duża struktura": return "purple";
+          case "Inne": return "pink";
+          case "Pole": return "red";
+          default: return "red";
+        }
+      });
+      globe.pointsData(atlas[currentPlanet]);
+      setTimeout(()=>{ delete point.__highlight; globe.pointsData(atlas[currentPlanet]); },2000);
+    };
+    btnDiv.appendChild(showBtn);
+
+    if(point.type==="Zasób"||point.type==="Obelisk"){
+      const checkbox=document.createElement("input");
+      checkbox.type="checkbox"; checkbox.checked = point.type==="Zasób"?point.extracted:point.visited;
+      checkbox.onchange=()=>{
+        if(point.type==="Zasób") point.extracted=checkbox.checked;
+        if(point.type==="Obelisk") point.visited=checkbox.checked;
+        saveAtlas(); refreshGlobePoints(); refreshPointsList();
+      };
+      btnDiv.appendChild(checkbox);
+    }
+
+    const editBtn=document.createElement("button"); editBtn.textContent="Edytuj"; editBtn.className="edit";
+    editBtn.onclick=()=>editPoint(point.timestamp); btnDiv.appendChild(editBtn);
+
+    const delBtn=document.createElement("button"); delBtn.textContent="Usuń"; delBtn.className="del";
+    delBtn.onclick=()=>{ 
+      if(confirm(`Czy na pewno usunąć punkt "${point.name||"Bez nazwy"}"?`)){
+        const idx=atlas[currentPlanet].findIndex(p=>p.timestamp===point.timestamp);
+        if(idx!==-1){ atlas[currentPlanet].splice(idx,1); saveAtlas(); refreshPointsList(); refreshGlobePoints(); }
+      }
+    };
+    btnDiv.appendChild(delBtn);
+
+    li.appendChild(btnDiv); list.appendChild(li);
+  });
+}
+
+function addPoint(){
+  if(!currentPlanet){ alert("Wybierz planetę!"); return; }
+  const lat=parseFloat(document.getElementById("lat").value);
+  const lng=parseFloat(document.getElementById("lng").value);
+  const name=document.getElementById("name").value.trim();
+  const type=document.getElementById("type").value;
+  const notes=document.getElementById("notes").value.trim();
+
+  if(isNaN(lat)||isNaN(lng)){ alert("Podaj współrzędne!"); return; }
+
+  const point={planet:currentPlanet,lat,lng,name,type,notes,timestamp:Date.now()};
+  if(type==="Zasób") point.extracted=false;
+  if(type==="Obelisk") point.visited=false;
+
+  if(editIndex!==null&&atlas[currentPlanet][editIndex]){
+    atlas[currentPlanet][editIndex]=point; editIndex=null;
+    document.querySelector("button[onclick='addPoint()']").textContent="Dodaj punkt";
+  } else atlas[currentPlanet].push(point);
+
+  saveAtlas(); refreshPlanetList(); refreshGlobePoints(); refreshPointsList();
+}
+
+function editPoint(timestamp){
+  if(!currentPlanet||!atlas[currentPlanet]) return;
+  const index=atlas[currentPlanet].findIndex(p=>p.timestamp===timestamp);
+  if(index===-1) return;
+
+  const p=atlas[currentPlanet][index];
+  document.getElementById("lat").value=p.lat;
+  document.getElementById("lng").value=p.lng;
+  document.getElementById("name").value=p.name;
+  document.getElementById("type").value=p.type;
+  document.getElementById("notes").value=p.notes;
+
+  editIndex=index;
+  document.querySelector("button[onclick='addPoint()']").textContent="Nadpisz punkt";
+  openTab('start');
+}
+
+// ---------------------- TEKSTURY ----------------------
+function getBasePath(){ return window.location.origin+window.location.pathname.replace(/\/[^/]*$/,"/"); }
+
+function setPlanetTextureFromInput(){
+  const input=document.getElementById("planetTextureInput");
+  if(!input.files[0]) return;
+  if(!currentPlanet){ alert("Wybierz planetę!"); return; }
+  const fileName=input.files[0].name;
+  planetTextures[currentPlanet]=getBasePath()+"textures/"+fileName;
+  applyPlanetTexture(currentPlanet); saveAtlas();
+}
+
+function applyPlanetTexture(planet){
+  if(!planet) return;
+  if(planetTextures[planet]){
+    globe.globeImageUrl(planetTextures[planet]);
+  } else {
+    globe.globeImageUrl(null); globe.globeMaterial().color.set('#000000');
+  }
+}
+
+// ---------------------- SKALOWANIE ----------------------
+function updateGlobeScale(){
+  const scale=parseFloat(document.getElementById("globeScale").value);
+  globe.scene().scale.set(scale,scale,scale);
+}
+
+function updatePointScale(){
+  pointScale=parseFloat(document.getElementById("pointScale").value);
+  refreshGlobePoints();
+}
+
+function updateGlobeOffset(){
+  const offset=parseFloat(document.getElementById("globeOffset").value);
+  globe.scene().position.x=offset;
+}
+
+function resetGlobePosition(){
+  document.getElementById("globeOffset").value=0;
+  globe.scene().position.x=0;
+  document.getElementById("globeScale").value=1;
+  globe.scene().scale.set(1,1,1);
+}
+
+// ---------------------- DETALE PLANETY ----------------------
+function loadPlanetDetails(){
+  if(!currentPlanet) return;
+  const details=planetDetails[currentPlanet]||{};
+  document.getElementById("detailGalaxy").value=details.galaxy||"";
+  document.getElementById("detailRegion").value=details.region||"";
+  document.getElementById("detailSystem").value=details.system||"";
+  document.getElementById("detailBiome").value=details.biome||"";
+  document.getElementById("detailWeather").value=details.weather||"";
+  document.getElementById("detailSentinels").value=details.sentinels||"";
+  document.getElementById("detailFlora").value=details.flora||"";
+  document.getElementById("detailFauna").value=details.fauna||"";
+  document.getElementById("detailDiscovered").value=details.discovered||"";
+  document.getElementById("detailMode").value=details.mode||"";
+  document.getElementById("detailUpdated").value=details.updated||"";
+  document.getElementById("detailCoords").value=details.coords||"";
+  document.getElementById("detailNotes").value=details.notes||"";
+}
+
+function savePlanetDetails(){
+  if(!currentPlanet) return;
+  planetDetails[currentPlanet]={
+    galaxy:document.getElementById("detailGalaxy").value,
+    region:document.getElementById("detailRegion").value,
+    system:document.getElementById("detailSystem").value,
+    biome:document.getElementById("detailBiome").value,
+    weather:document.getElementById("detailWeather").value,
+    sentinels:document.getElementById("detailSentinels").value,
+    flora:document.getElementById("detailFlora").value,
+    fauna:document.getElementById("detailFauna").value,
+    discovered:document.getElementById("detailDiscovered").value,
+    mode:document.getElementById("detailMode").value,
+    updated:document.getElementById("detailUpdated").value,
+    coords:document.getElementById("detailCoords").value,
+    notes:document.getElementById("detailNotes").value
+  };
+  saveAtlas(); alert("Opis zapisany!");
 }
 
 // ---------------------- IMPORT / EXPORT ----------------------
 function exportAtlas(){
-  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetDetails,planetColors},null,2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "atlas.json";
-  a.click();
-  URL.revokeObjectURL(url);
+  const blob=new Blob([JSON.stringify({atlas,planetTextures,planetDetails},null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob); const a=document.createElement("a");
+  a.href=url; a.download="atlas.json"; a.click(); URL.revokeObjectURL(url);
 }
 
 function importAtlas(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
     try{
-      const data = JSON.parse(e.target.result);
-      if(data.atlas) atlas = data.atlas;
-      if(data.planetTextures) planetTextures = data.planetTextures;
-      if(data.planetDetails) planetDetails = data.planetDetails;
-      if(data.planetColors) planetColors = data.planetColors;
+      const data=JSON.parse(e.target.result);
+      if(data.atlas) atlas=data.atlas;
+      if(data.planetTextures) planetTextures=data.planetTextures;
+      if(data.planetDetails) planetDetails=data.planetDetails;
 
-      const planets = Object.keys(atlas);
-      currentPlanet = planets[0] || null;
+      const planets=Object.keys(atlas);
+      currentPlanet=planets[0]||null;
       if(currentPlanet) applyPlanetTexture(currentPlanet);
 
       updateCurrentPlanetHeader();
       saveAtlas();
-      refreshPlanetList();
-      refreshPointsList();
-      refreshGlobePoints();
+      refreshPlanetList(); refreshPointsList(); refreshGlobePoints();
       alert("Import zakończony!");
     } catch(err){ alert("Błąd importu JSON"); }
   };
   reader.readAsText(file);
 }
+
+// ---------------------- INNE ----------------------
+function refreshGlobePoints(){ 
+  if(!currentPlanet) return; 
+  globe.pointsData(atlas[currentPlanet].filter(p=>p.type!=="Pole")); 
+  globe.htmlElementsData(atlas[currentPlanet].filter(p=>p.type==="Pole"));
+}
+
+function updateCurrentPlanetHeader(){
+  document.getElementById("currentPlanetHeader").textContent = currentPlanet||"Brak planety";
+}
+
+// ---------------------- INIT ----------------------
+refreshPlanetList(); refreshPointsList(); loadPlanetDetails();
+if(currentPlanet) applyPlanetTexture(currentPlanet);
+</script>
+
 
 
 </script>
