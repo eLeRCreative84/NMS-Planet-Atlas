@@ -441,7 +441,6 @@ function addNewPlanet() {
   refreshPlanetList();
   refreshPointsList();
   refreshGlobePoints();
-  applyPlanetTexture(name);
   updateCurrentPlanetHeader();
   input.value = "";
   checkNewPlanetInput();
@@ -717,10 +716,11 @@ function addPoles(planet){
   //          Usuwasz teksturę → glob wraca do wcześniej ustawionego koloru. (usunięcie do implementacji)
   
 // 🟢 ustawienie koloru planety
-function setPlanetColor(planet, color) {
-  planetColors[planet] = color;
-  // Nie usuwamy tekstury! Kolor działa tylko jeśli tekstury nie ma
-  applyPlanetTexture(planet);
+function setPlanetColor() {
+  if (!currentPlanet) return;
+  const color = document.getElementById("planetColorInput").value;
+  planetColors[currentPlanet] = color;
+  applyPlanetTexture(currentPlanet);
   saveAtlas();
 }
 
@@ -736,6 +736,10 @@ function setPlanetTexture(planet, textureDataUrl) {
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
+  // Reset globu
+  globe.globeImageUrl(null); // najpierw wyłącz poprzednią teksturę
+  globe.globeMaterial().color.set('#000000'); // domyślny czarny
+
   // tekstura ma pierwszeństwo
   if (planetTextures[planet]) {
     globe.globeImageUrl(planetTextures[planet]);
@@ -744,33 +748,25 @@ function applyPlanetTexture(planet) {
 
   // jeśli nie ma tekstury → kolor
   if (planetColors[planet]) {
-    globe.globeImageUrl(null);
     globe.globeMaterial().color.set(planetColors[planet]);
     return;
   }
-
-  // domyślne: czarny glob
-  globe.globeImageUrl(null);
-  globe.globeMaterial().color.set('#000000');
 }
 
   // Pobranie tekstury z dysku, zapis nazwy pliku w planetTexture, aktualizacja globu
 function setPlanetTextureFromInput(){
   const input = document.getElementById("planetTextureInput");
   if(!input.files[0]) return;
+  if(!currentPlanet) { alert("Wybierz planetę!"); return; }
 
-  const planet = currentPlanet || document.getElementById("planet").value.trim();
-  if(!planet) { alert("Wybierz planetę lub wpisz jej nazwę!"); return; }
-
-  // tylko nazwa pliku zamiast base64
   const fileName = input.files[0].name;
-  planetTextures[planet] = "textures/" + fileName;
+  planetTextures[currentPlanet] = "textures/" + fileName;
 
-  currentPlanet = planet;
   applyPlanetTexture(currentPlanet);
   saveAtlas();
   refreshGlobePoints();
 }
+
 
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import Atlasu ---------------//
