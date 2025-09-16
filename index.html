@@ -349,6 +349,7 @@ function updateCurrentPlanetHeader() {
 }
 
 
+
 function updateNoPlanetsMessage() {
   const msg = document.getElementById("noPlanetsMessage");
   const planets = Object.keys(atlas);
@@ -503,33 +504,30 @@ delBtn.style.marginLeft = "auto"; // wyrównanie do prawej
 delBtn.title = `Usuń planetę ${p}`;
 
     delBtn.onclick = (e) => {
-      e.stopPropagation();
-      if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
-        delete atlas[p];
-        delete planetTextures[p];
-        delete planetDetails[p];
- // wymuszenie wyboru nowej currentPlanet
-        const planets = Object.keys(atlas);
-        if (currentPlanet === p) {
-          currentPlanet = planets.length ? planets[0] : null;
-        }
- // aktualizacja nagłówka aktualnej planety
-        updateCurrentPlanetHeader();
-  // odświeżenie globu i punktów
-        if (currentPlanet) {
-          applyPlanetTexture(currentPlanet);
-          refreshGlobePoints();
-        } else {
-          globe.globeImageUrl(null);
-          globe.pointsData([]);
-        }
+  e.stopPropagation();
+  if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
+    delete atlas[p];
+    delete planetTextures[p];
+    delete planetColors[p];
+    delete planetDetails[p];
 
-        saveAtlas();
-        refreshPlanetList();
-        refreshPointsList();
-       }
-    };
+    const planets = Object.keys(atlas);
+    currentPlanet = planets.length ? planets[0] : null; // 🔥 poprawne ustawienie
 
+    if (currentPlanet) {
+      applyPlanetTexture(currentPlanet);
+      refreshGlobePoints();
+    } else {
+      globe.globeImageUrl(null);
+      globe.pointsData([]);
+    }
+
+    updateCurrentPlanetHeader(); // 🔥 dopiero na końcu
+    saveAtlas();
+    refreshPlanetList();
+    refreshPointsList();
+  }
+};
     container.appendChild(btn);
     container.appendChild(delBtn);
     list.appendChild(container);
@@ -766,6 +764,7 @@ function setPlanetTextureFromInput() {
 function removePlanetTexture() {
   if (!currentPlanet) return;
   delete planetTextures[currentPlanet];
+  delete planetColors[currentPlanet]; // 🔥 wyczyść też kolor
   applyPlanetTexture(currentPlanet);
   saveAtlas();
 }
@@ -773,9 +772,11 @@ function removePlanetTexture() {
 function removePlanetColor() {
   if (!currentPlanet) return;
   delete planetColors[currentPlanet];
+  delete planetTextures[currentPlanet]; // 🔥 wyczyść też teksturę
   applyPlanetTexture(currentPlanet);
   saveAtlas();
 }
+
 
 function applyPlanetTexture(planet) {
   if (!planet) return;
