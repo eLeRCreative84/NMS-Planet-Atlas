@@ -437,15 +437,15 @@ function addNewPlanet() {
   };
 
   currentPlanet = name;
-  planetColors[name] = null;
-  planetTextures[name] = null;
+  updateCurrentPlanetHeader();
+  delete planetColors[name];
+  delete planetTextures[name];
   applyPlanetTexture(name);
   saveAtlas();
   refreshPlanetList();
   refreshPointsList();
   refreshGlobePoints();
-  updateCurrentPlanetHeader();
-  input.value = "";
+    input.value = "";
   checkNewPlanetInput();
   alert(`Dodano nową planetę: ${name}`);
   updateNoPlanetsMessage()
@@ -777,22 +777,26 @@ function removePlanetColor() {
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
-  // reset globu
+  // reset materiału
   globe.globeMaterial().map = null;
   globe.globeMaterial().needsUpdate = true;
 
-  // jeśli jest tekstura, ustaw ją
+  // 🔵 priorytet: tekstura
   if (planetTextures[planet]) {
     globe.globeImageUrl(planetTextures[planet]);
-  } else if (planetColors[planet]) {
-    globe.globeMaterial().color.set(planetColors[planet]);
-    globe.globeImageUrl(null);
-  } else {
-    globe.globeMaterial().color.set('#000000'); // domyślny kolor
-    globe.globeImageUrl(null);
+    return;
   }
 
-  updateColorTextureButtons();
+  // 🟢 jeśli nie ma tekstury → kolor
+  if (planetColors[planet]) {
+    globe.globeImageUrl(null); 
+    globe.globeMaterial().color.set(planetColors[planet]);
+    return;
+  }
+
+  // ⚫ jeśli brak obu → czarny glob
+  globe.globeImageUrl(null);
+  globe.globeMaterial().color.set('#000000');
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -824,11 +828,11 @@ function importAtlas(event){
       // ustaw pierwszą planetę jako currentPlanet
       const planets = Object.keys(atlas);
       currentPlanet = planets[0] || null;
-
+       updateCurrentPlanetHeader(); // aby nagłówek był poprawny nawet jeśli currentPlanet jest null
+     
       // ustaw glob na planetę (tekstura lub kolor) jeśli istnieje
         if(currentPlanet) applyPlanetTexture(currentPlanet);
-
-      updateCurrentPlanetHeader(); // aby nagłówek był poprawny nawet jeśli currentPlanet jest null
+     
       saveAtlas();
       refreshPlanetList();
       refreshPointsList();
