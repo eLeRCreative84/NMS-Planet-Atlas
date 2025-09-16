@@ -460,14 +460,27 @@ function addNewPlanet() {
 }
   
 // Dodawanie tekstury planety
-  
-function applyPlanetTexture(planet) {
-  if (planet && planetTextures[planet]) {
-    delete planetColors[planet]; // usuń kolor
+  function applyPlanetTexture(planet) {
+  if (!planet) return;
+
+  // 🔵 najpierw sprawdzamy teksturę
+  if (planetTextures[planet]) {
     globe.globeImageUrl(planetTextures[planet]);
-  } else {
-    applyPlanetColor(planet); // jeśli brak tekstury, pokaż kolor
+    return;
   }
+
+  // 🟢 jeśli nie ma tekstury, ale jest kolor
+  if (planetColors[planet]) {
+    globe.globeImageUrl(null); // usuń teksturę
+    globe.backgroundColor(planetColors[planet]);
+    globe.globeMaterial().color.set(planetColors[planet]);
+    return;
+  }
+
+  // ⚪ domyślnie (brak koloru i tekstury)
+  globe.globeImageUrl(null);
+  globe.backgroundColor('#ffffff');
+  globe.globeMaterial().color.set('#ffffff');
 }
   
 // Lista planet
@@ -696,7 +709,6 @@ function addPoint(){
   refreshPointsList();
 }
 
-
 function editPoint(timestamp){   
   if(!currentPlanet || !atlas[currentPlanet]) return;
   
@@ -716,11 +728,6 @@ function editPoint(timestamp){
 
   // 🔥 przełączenie na zakładkę START
   openTab('start');
-}
-
-function setPlanetTexture(planet){
-  if(planetTextures[planet]) globe.globeImageUrl(planetTextures[planet]);
-  else globe.globeImageUrl(null);
 }
 
 function setPlanetTextureFromInput(){
@@ -784,7 +791,6 @@ function applyPlanetColor(planet) {
   }
 }
 
-
 function exportAtlas(){
   const blob = new Blob([JSON.stringify({atlas,planetTextures,planetDetails},null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
@@ -811,8 +817,8 @@ function importAtlas(event){
       const planets = Object.keys(atlas);
       currentPlanet = planets[0] || null;
 
-      // ustaw glob na planetę (tekstura) jeśli istnieje
-      if(currentPlanet) setPlanetTexture(currentPlanet);
+      // ustaw glob na planetę (tekstura lub kolor) jeśli istnieje
+        if(currentPlanet) applyPlanetTexture(currentPlanet);
 
       updateCurrentPlanetHeader(); // aby nagłówek był poprawny nawet jeśli currentPlanet jest null
       saveAtlas();
@@ -826,7 +832,6 @@ function importAtlas(event){
   };
   reader.readAsText(file);
 }
-
 
 // Skalowanie globu
 function updateGlobeScale(){
