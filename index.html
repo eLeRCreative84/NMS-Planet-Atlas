@@ -719,7 +719,7 @@ function setPlanetColor(planet, color) {
   saveAtlas();
 }
 
-// 🟢 ustawienie tekstury planety
+// 🟢 ustawienie tekstury planety, pobranie z URL i przekazania jako argument
 function setPlanetTexture(planet, textureDataUrl) {
   planetTextures[planet] = textureDataUrl;
   delete planetColors[planet]; // usunięcie ewentualnego koloru
@@ -743,7 +743,8 @@ function applyPlanetTexture(planet) {
     globe.globeMaterial().color.set(planetColors[planet]);
     return;
   }
-
+}
+  // Pobranie tekstury z dysku, zapis nazwy pliku w planetTexture, aktualizacja globu
 function setPlanetTextureFromInput(){
   const input = document.getElementById("planetTextureInput");
   if(!input.files[0]) return;
