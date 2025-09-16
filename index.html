@@ -719,11 +719,12 @@ function addPoles(planet){
   //          Usuwasz teksturę → glob wraca do wcześniej ustawionego koloru. (usunięcie do implementacji)
   
 function updateColorTextureButtons() {
+  if (!currentPlanet) return;
   const hasTexture = !!planetTextures[currentPlanet];
   const hasColor = !!planetColors[currentPlanet];
 
-  document.getElementById("setColorBtn").disabled = hasTexture;  // blokada koloru jeśli jest tekstura
-  document.getElementById("setTextureBtn").disabled = hasColor;  // blokada tekstury jeśli jest kolor
+  document.getElementById("setColorBtn").disabled = hasTexture;
+  document.getElementById("setTextureBtn").disabled = hasColor;
 }
 
 function setPlanetColor() {
@@ -759,44 +760,40 @@ function setPlanetTextureFromInput() {
   reader.readAsDataURL(file);
 }
 
-function removePlanetColor() {
-  if (!currentPlanet) return;
-  delete planetColors[currentPlanet];
-  globe.globeMaterial().color.set('#000000');  // domyślny czarny
-  updateColorTextureButtons();
-  saveAtlas();
-}
-
 function removePlanetTexture() {
   if (!currentPlanet) return;
   delete planetTextures[currentPlanet];
-  globe.globeMaterial().color.set('#000000');  // domyślny czarny
-  updateColorTextureButtons();
+  applyPlanetTexture(currentPlanet);
   saveAtlas();
 }
 
-// Po zmianie planety od razu aktualizujemy stan przycisków
+function removePlanetColor() {
+  if (!currentPlanet) return;
+  delete planetColors[currentPlanet];
+  applyPlanetTexture(currentPlanet);
+  saveAtlas();
+}
+
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
-  // usuń poprzednią teksturę
+  // reset globu
   globe.globeMaterial().map = null;
   globe.globeMaterial().needsUpdate = true;
-  globe.globeImageUrl(null);
 
-  // ustaw domyślny kolor
-  globe.globeMaterial().color.set('#000000');
-
-  // najpierw tekstura
+  // jeśli jest tekstura, ustaw ją
   if (planetTextures[planet]) {
     globe.globeImageUrl(planetTextures[planet]);
   } else if (planetColors[planet]) {
     globe.globeMaterial().color.set(planetColors[planet]);
+    globe.globeImageUrl(null);
+  } else {
+    globe.globeMaterial().color.set('#000000'); // domyślny kolor
+    globe.globeImageUrl(null);
   }
 
   updateColorTextureButtons();
 }
-
 
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import Atlasu ---------------//
