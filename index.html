@@ -342,9 +342,12 @@ function openTab(tabId) {
 function updateCurrentPlanetHeader() {
   const headers = document.querySelectorAll(".currentPlanetHeader");
   headers.forEach(h => {
-    h.textContent = currentPlanet ? `${currentPlanet}` : "Brak wybranej planety";
+    h.textContent = currentPlanet
+      ? `${currentPlanet}`
+      : "Brak wybranej planety";
   });
 }
+
 
 function updateNoPlanetsMessage() {
   const msg = document.getElementById("noPlanetsMessage");
@@ -777,24 +780,20 @@ function removePlanetColor() {
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
-  // reset materiału
-  globe.globeMaterial().map = null;
-  globe.globeMaterial().needsUpdate = true;
-
   // 🔵 priorytet: tekstura
   if (planetTextures[planet]) {
     globe.globeImageUrl(planetTextures[planet]);
     return;
   }
 
-  // 🟢 jeśli nie ma tekstury → kolor
+  // 🟢 kolor
   if (planetColors[planet]) {
-    globe.globeImageUrl(null); 
+    globe.globeImageUrl(null);
     globe.globeMaterial().color.set(planetColors[planet]);
     return;
   }
 
-  // ⚫ jeśli brak obu → czarny glob
+  // ⚫ domyślnie czarny
   globe.globeImageUrl(null);
   globe.globeMaterial().color.set('#000000');
 }
