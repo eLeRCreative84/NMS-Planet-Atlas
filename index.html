@@ -459,27 +459,8 @@ function addNewPlanet() {
   updateNoPlanetsMessage()
 }
   
-// Dodawanie tekstury planety
-  function applyPlanetTexture(planet) {
-  if (!planet) return;
-
-  // 🔵 najpierw sprawdzamy teksturę
-  if (planetTextures[planet]) {
-    globe.globeImageUrl(planetTextures[planet]);
-    return;
-  }
-
-  // 🟢 jeśli nie ma tekstury, ale jest kolor
-  if (planetColors[planet]) {
-    globe.globeImageUrl(null); // usuń teksturę
-    globe.backgroundColor(planetColors[planet]);
-    globe.globeMaterial().color.set(planetColors[planet]);
-    return;
-  }
-
-  // ⚪ domyślnie (brak koloru i tekstury)
+  // jeśli brak tekstury i koloru → domyślnie biały glob
   globe.globeImageUrl(null);
-  globe.backgroundColor('#ffffff');
   globe.globeMaterial().color.set('#ffffff');
 }
   
@@ -730,6 +711,39 @@ function editPoint(timestamp){
   openTab('start');
 }
 
+// 🟢 ustawienie koloru planety
+function setPlanetColor(planet, color) {
+  planetColors[planet] = color;
+  delete planetTextures[planet]; // usunięcie ewentualnej tekstury
+  applyPlanetTexture(planet);    // nałóż kolor na glob
+  saveAtlas();
+}
+
+// 🟢 ustawienie tekstury planety
+function setPlanetTexture(planet, textureDataUrl) {
+  planetTextures[planet] = textureDataUrl;
+  delete planetColors[planet]; // usunięcie ewentualnego koloru
+  applyPlanetTexture(planet);  // nałóż teksturę na glob
+  saveAtlas();
+}  
+
+// 🟢 ustawienie tekstury lub koloru planety
+function applyPlanetTexture(planet) {
+  if (!planet) return;
+
+  // jeśli planeta ma teksturę → nakładamy teksturę
+  if (planetTextures[planet]) {
+    globe.globeImageUrl(planetTextures[planet]);
+    return;
+  }
+
+  // jeśli planeta nie ma tekstury, ale ma kolor → nakładamy kolor
+  if (planetColors[planet]) {
+    globe.globeImageUrl(null); // usuń teksturę
+    globe.globeMaterial().color.set(planetColors[planet]);
+    return;
+  }
+
 function setPlanetTextureFromInput(){
   const input = document.getElementById("planetTextureInput");
   if(!input.files[0]) return;
@@ -747,50 +761,7 @@ function setPlanetTextureFromInput(){
   saveAtlas();
   refreshGlobePoints();
 }
-
-  function setPlanetColor() {
-  const input = document.getElementById("planetColorInput");
-  const color = input.value;
-
-  const planet = currentPlanet || document.getElementById("planet").value.trim();
-  if(!planet) { alert("Wybierz planetę lub wpisz jej nazwę!"); return; }
-
-  // usuń teksturę jeśli była
-  delete planetTextures[planet];
-
-  // ustaw kolor
-  planetColors[planet] = color;
-  currentPlanet = planet;
-
-  applyPlanetColor(planet);
-
-  saveAtlas();
-  refreshGlobePoints();
-}
-
-function applyPlanetColor(planet) {
-  if (planet && planetColors[planet]) {
-    // 🔥 generujemy jednolitą teksturę w wybranym kolorze
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 2;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = planetColors[planet];
-    ctx.fillRect(0, 0, 2, 2);
-
-    const dataUrl = canvas.toDataURL();
-    globe.globeImageUrl(dataUrl);
-  } else {
-    // domyślny biały
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 2;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, 2, 2);
-
-    globe.globeImageUrl(canvas.toDataURL());
-  }
-}
-
+  
 function exportAtlas(){
   const blob = new Blob([JSON.stringify({atlas,planetTextures,planetDetails},null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
