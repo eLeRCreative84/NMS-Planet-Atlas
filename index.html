@@ -715,10 +715,6 @@ function addPoles(planet){
 //------------------- Tekstury i kolory planet -------------------//
 ////////////////////////////////////////////////////////////////////  
 
-  // Logika:  Ustawiasz kolor → glob jest w tym kolorze.
-  //          Ustawiasz teksturę → glob wyświetla teksturę.
-  //          Usuwasz teksturę → glob wraca do wcześniej ustawionego koloru. (usunięcie do implementacji)
-  
 function updateColorTextureButtons() {
   if (!currentPlanet) return;
   const hasTexture = !!planetTextures[currentPlanet];
@@ -751,20 +747,16 @@ function setPlanetTextureFromInput() {
   if (!input.files[0]) return;
 
   const file = input.files[0];
-  const reader = new FileReader();
-  reader.onload = e => {
-    planetTextures[currentPlanet] = e.target.result;
-    applyPlanetTexture(currentPlanet);
-    saveAtlas();
-    updateColorTextureButtons();
-  };
-  reader.readAsDataURL(file);
+  // zamiast base64 zapisujemy tylko nazwę
+  planetTextures[currentPlanet] = file.name;
+  applyPlanetTexture(currentPlanet);
+  saveAtlas();
+  updateColorTextureButtons();
 }
 
 function removePlanetTexture() {
   if (!currentPlanet) return;
   delete planetTextures[currentPlanet];
-  delete planetColors[currentPlanet]; // 🔥 wyczyść też kolor
   applyPlanetTexture(currentPlanet);
   saveAtlas();
 }
@@ -772,18 +764,17 @@ function removePlanetTexture() {
 function removePlanetColor() {
   if (!currentPlanet) return;
   delete planetColors[currentPlanet];
-  delete planetTextures[currentPlanet]; // 🔥 wyczyść też teksturę
   applyPlanetTexture(currentPlanet);
   saveAtlas();
 }
-
 
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
   // 🔵 priorytet: tekstura
   if (planetTextures[planet]) {
-    globe.globeImageUrl(planetTextures[planet]);
+    const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${planetTextures[planet]}`;
+    globe.globeImageUrl(url);
     return;
   }
 
