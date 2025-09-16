@@ -436,6 +436,7 @@ function addNewPlanet() {
   };
 
   currentPlanet = name;
+  applyPlanetTexture(currentPlanet)
   saveAtlas();
   refreshPlanetList();
   refreshPointsList();
@@ -735,23 +736,24 @@ function setPlanetTexture(planet, textureDataUrl) {
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
+  // tekstura ma pierwszeństwo
   if (planetTextures[planet]) {
-    // Tekstura ma pierwszeństwo
     globe.globeImageUrl(planetTextures[planet]);
     return;
   }
 
+  // jeśli nie ma tekstury → kolor
   if (planetColors[planet]) {
-    // Kolor działa tylko jeśli brak tekstury
     globe.globeImageUrl(null);
     globe.globeMaterial().color.set(planetColors[planet]);
     return;
   }
 
-  // Domyślnie czarny glob jeśli brak koloru i tekstury
+  // domyślne: czarny glob
   globe.globeImageUrl(null);
   globe.globeMaterial().color.set('#000000');
 }
+
   // Pobranie tekstury z dysku, zapis nazwy pliku w planetTexture, aktualizacja globu
 function setPlanetTextureFromInput(){
   const input = document.getElementById("planetTextureInput");
@@ -765,7 +767,7 @@ function setPlanetTextureFromInput(){
   planetTextures[planet] = "textures/" + fileName;
 
   currentPlanet = planet;
-  applyPlanetTexture(planet);
+  applyPlanetTexture(currentPlanet);
   saveAtlas();
   refreshGlobePoints();
 }
