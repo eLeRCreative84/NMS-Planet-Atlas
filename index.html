@@ -437,7 +437,9 @@ function addNewPlanet() {
   };
 
   currentPlanet = name;
-  applyPlanetTexture(currentPlanet)
+  planetColors[name] = null;
+  planetTextures[name] = null;
+  applyPlanetTexture(name);
   saveAtlas();
   refreshPlanetList();
   refreshPointsList();
@@ -777,9 +779,15 @@ function removePlanetTexture() {
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
+  // usuń poprzednią teksturę
+  globe.globeMaterial().map = null;
+  globe.globeMaterial().needsUpdate = true;
   globe.globeImageUrl(null);
-  globe.globeMaterial().color.set('#000000'); // domyślny czarny
 
+  // ustaw domyślny kolor
+  globe.globeMaterial().color.set('#000000');
+
+  // najpierw tekstura
   if (planetTextures[planet]) {
     globe.globeImageUrl(planetTextures[planet]);
   } else if (planetColors[planet]) {
