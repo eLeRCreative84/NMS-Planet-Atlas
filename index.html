@@ -314,7 +314,11 @@ let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 let editIndex = null; // indeks edytowanego punktu (null = dodawanie nowego)
 
-// Inicjalizacja globu — używamy https aby tło zawsze się załadowało
+////////////////////////////////////////////////////////////////////
+//---------------------- Inicjalizacja globu ---------------------//
+//////////////////////////////////////////////////////////////////// 
+
+  // Inicjalizacja globu — używamy https aby tło zawsze się załadowało
 const globe = Globe()(document.getElementById("globeViz"))
   .globeImageUrl(null) // brak domyślnej mapy (pusta/ciemna kula)
   .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png') // 🌌 gwiazdy w tle
@@ -379,36 +383,11 @@ if (currentPlanet && atlas[currentPlanet]) {
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
-// ---------------------- TABY ----------------------
-function openTab(tabId) {
-  document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-  document.querySelectorAll("#tabs button").forEach(el => el.classList.remove("active"));
-  const tab = document.getElementById(tabId);
-  if(tab) tab.classList.add("active");
-  // oznacz odpowiedni przycisk jako active (przybliżone dopasowanie)
-  document.querySelectorAll("#tabs button").forEach(btn=>{
-    if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
-  });
-}
-
-// ---------------------- FUNKCJE ZAPIS/Odśwież ----------------------
-function saveAtlas(){
-  localStorage.setItem("atlas", JSON.stringify(atlas));
-  localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
-  localStorage.setItem("planetColors", JSON.stringify(planetColors));
-  localStorage.setItem("planetDetails", JSON.stringify(planetDetails));
-}
-
-function addPoles(planet){
-  if(!atlas[planet]) atlas[planet] = [];
-  if(!atlas[planet].some(p => p.type==="Pole")){
-    atlas[planet].push({lat:90,lng:0,name:"Biegun Północny",type:"Pole"});
-    atlas[planet].push({lat:-90,lng:0,name:"Biegun Południowy",type:"Pole"});
-  }
-}
-
+////////////////////////////////////////////////////////////////////
+//------------------ Planety, lista, tworzenie -------------------//
+//////////////////////////////////////////////////////////////////// 
+  
 // Dodawanie nowych planet
-
   function checkNewPlanetInput() {
   const input = document.getElementById("newPlanetName");
   const button = document.getElementById("addPlanetBtn");
@@ -454,7 +433,6 @@ function addNewPlanet() {
   updateCurrentPlanetHeader();
   input.value = "";
   checkNewPlanetInput();
-
   alert(`Dodano nową planetę: ${name}`);
   updateNoPlanetsMessage()
 }
@@ -465,7 +443,6 @@ function addNewPlanet() {
 }
   
 // Lista planet
-  
 function refreshPlanetList(){
   const list = document.getElementById("planetList");
   list.innerHTML = "";
@@ -548,7 +525,11 @@ delBtn.title = `Usuń planetę ${p}`;
   updateNoPlanetsMessage();
 }
 
-  // Lista punktow
+////////////////////////////////////////////////////////////////////
+//--------------- Punkty, lista, tworzenie, edycja ---------------//
+//////////////////////////////////////////////////////////////////// 
+  
+// Lista punktow
 function refreshPointsList(){
   const list = document.getElementById("pointsList");
   list.innerHTML = "";
@@ -576,7 +557,7 @@ function refreshPointsList(){
     btnDiv.style.display = "flex";
     btnDiv.style.gap = "0.5rem";
 
-    // Nowy przycisk "Pokaż"
+    // Przycisk "Pokaż punk na globie"
     const showBtn = document.createElement("button");
     showBtn.textContent = "Pokaż";
     showBtn.className = "show";
@@ -711,38 +692,59 @@ function editPoint(timestamp){
   openTab('start');
 }
 
+// Utomatyczne tworzenie biegunów
+function addPoles(planet){
+  if(!atlas[planet]) atlas[planet] = [];
+  if(!atlas[planet].some(p => p.type==="Pole")){
+    atlas[planet].push({lat:90,lng:0,name:"Biegun Północny",type:"Pole"});
+    atlas[planet].push({lat:-90,lng:0,name:"Biegun Południowy",type:"Pole"});
+  }
+}
+  
+////////////////////////////////////////////////////////////////////
+//------------------- Tekstury i kolory planet -------------------//
+////////////////////////////////////////////////////////////////////  
+
+  // Logika:  Ustawiasz kolor → glob jest w tym kolorze.
+  //          Ustawiasz teksturę → glob wyświetla teksturę.
+  //          Usuwasz teksturę → glob wraca do wcześniej ustawionego koloru. (usunięcie do implementacji)
+  
 // 🟢 ustawienie koloru planety
 function setPlanetColor(planet, color) {
   planetColors[planet] = color;
-  delete planetTextures[planet]; // usunięcie ewentualnej tekstury
-  applyPlanetTexture(planet);    // nałóż kolor na glob
+  // Nie usuwamy tekstury! Kolor działa tylko jeśli tekstury nie ma
+  applyPlanetTexture(planet);
   saveAtlas();
 }
 
 // 🟢 ustawienie tekstury planety, pobranie z URL i przekazania jako argument
 function setPlanetTexture(planet, textureDataUrl) {
   planetTextures[planet] = textureDataUrl;
-  delete planetColors[planet]; // usunięcie ewentualnego koloru
-  applyPlanetTexture(planet);  // nałóż teksturę na glob
+  // Nie usuwamy koloru! Tekstura zawsze ma pierwszeństwo
+  applyPlanetTexture(planet);
   saveAtlas();
-}  
+}
 
-// 🟢 ustawienie tekstury lub koloru planety
+// 🟢 nakładanie tekstury lub koloru planety
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
-  // jeśli planeta ma teksturę → nakładamy teksturę
   if (planetTextures[planet]) {
+    // Tekstura ma pierwszeństwo
     globe.globeImageUrl(planetTextures[planet]);
     return;
   }
 
-  // jeśli planeta nie ma tekstury, ale ma kolor → nakładamy kolor
   if (planetColors[planet]) {
-    globe.globeImageUrl(null); // usuń teksturę
+    // Kolor działa tylko jeśli brak tekstury
+    globe.globeImageUrl(null);
     globe.globeMaterial().color.set(planetColors[planet]);
     return;
   }
+
+  // Domyślnie czarny glob jeśli brak koloru i tekstury
+  globe.globeImageUrl(null);
+  globe.globeMaterial().color.set('#000000');
 }
   // Pobranie tekstury z dysku, zapis nazwy pliku w planetTexture, aktualizacja globu
 function setPlanetTextureFromInput(){
@@ -758,9 +760,19 @@ function setPlanetTextureFromInput(){
 
   currentPlanet = planet;
   applyPlanetTexture(planet);
-
   saveAtlas();
   refreshGlobePoints();
+}
+
+////////////////////////////////////////////////////////////////////
+//---------------- Zapis / Eksport / Import Atlasu ---------------//
+////////////////////////////////////////////////////////////////////  
+
+function saveAtlas(){
+  localStorage.setItem("atlas", JSON.stringify(atlas));
+  localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
+  localStorage.setItem("planetColors", JSON.stringify(planetColors));
+  localStorage.setItem("planetDetails", JSON.stringify(planetDetails));
 }
   
 function exportAtlas(){
@@ -805,6 +817,10 @@ function importAtlas(event){
   reader.readAsText(file);
 }
 
+////////////////////////////////////////////////////////////////////
+//---------------- Skalowanie / Przesuwanie Globu ----------------//
+////////////////////////////////////////////////////////////////////  
+  
 // Skalowanie globu
 function updateGlobeScale(){
   const scale = parseFloat(document.getElementById("globeScale").value);
@@ -829,6 +845,46 @@ function resetGlobePosition(){
   // reset suwaka oddalenia globu
   document.getElementById("globeScale").value = 1;
   globe.scene().scale.set(1,1,1);
+}
+
+// Odświeżenie punktów na globie
+function refreshGlobePoints(){
+  if(!currentPlanet) return;
+  globe.pointsData(atlas[currentPlanet]);
+}
+
+////////////////////////////////////////////////////////////////////
+//----------------- Zakładki i inne elementy HUD -----------------//
+//////////////////////////////////////////////////////////////////// 
+  
+// Zakładki
+function openTab(tabId) {
+  document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll("#tabs button").forEach(el => el.classList.remove("active"));
+  const tab = document.getElementById(tabId);
+  if(tab) tab.classList.add("active");
+  // oznacz odpowiedni przycisk jako active (przybliżone dopasowanie)
+  document.querySelectorAll("#tabs button").forEach(btn=>{
+    if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
+  });
+}
+  
+//zmiana nagłówka z nazwą planety
+function updateCurrentPlanetHeader() {
+  const headers = document.querySelectorAll(".currentPlanetHeader");
+  headers.forEach(h => {
+    h.textContent = currentPlanet ? `${currentPlanet}` : "Brak wybranej planety";
+  });
+}
+
+function updateNoPlanetsMessage() {
+  const msg = document.getElementById("noPlanetsMessage");
+  const planets = Object.keys(atlas);
+  if (planets.length === 0) {
+    msg.style.display = "block";
+  } else {
+    msg.style.display = "none";
+  }
 }
 
 // Detale planety (założyłeś te funkcje wcześniej — zostawiamy je działające)
@@ -869,32 +925,6 @@ function savePlanetDetails(){
   saveAtlas();
   alert("Opis zapisany!");
 }
-
-// Odświeżenie punktów na globie
-function refreshGlobePoints(){
-  if(!currentPlanet) return;
-  globe.pointsData(atlas[currentPlanet]);
-}
-
-//zmiana nagłówka z nazwą planety
-
-function updateCurrentPlanetHeader() {
-  const headers = document.querySelectorAll(".currentPlanetHeader");
-  headers.forEach(h => {
-    h.textContent = currentPlanet ? `${currentPlanet}` : "Brak wybranej planety";
-  });
-}
-
-function updateNoPlanetsMessage() {
-  const msg = document.getElementById("noPlanetsMessage");
-  const planets = Object.keys(atlas);
-  if (planets.length === 0) {
-    msg.style.display = "block";
-  } else {
-    msg.style.display = "none";
-  }
-}
-
   
 // start
 refreshPlanetList();
