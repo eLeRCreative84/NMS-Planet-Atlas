@@ -160,14 +160,15 @@
 <h2>Kolor / tekstura planety</h2>
 <div class="texture-input">
   <input type="color" id="planetColorInput" value="#4caf50" />
-  <button onclick="setPlanetColor()">Ustaw kolor</button>
+  <button id="setColorBtn" onclick="setPlanetColor()">Ustaw kolor</button>
+  <button id="removeColorBtn" onclick="removePlanetColor()">Usuń</button>
 </div>
-      <div class="texture-input">
-      <input type="file" id="planetTextureInput" accept="image/*" hidden />
-      <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
-      <button onclick="setPlanetTextureFromInput()">Ustaw teksturę</button>
-    </div>
-
+<div class="texture-input">
+  <input type="file" id="planetTextureInput" accept="image/*" hidden />
+  <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
+  <button id="setTextureBtn" onclick="setPlanetTextureFromInput()">Ustaw teksturę</button>
+  <button id="removeTextureBtn" onclick="removePlanetTexture()">Usuń</button>
+</div>
     
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Lista planet</h2>
@@ -715,56 +716,77 @@ function addPoles(planet){
   //          Ustawiasz teksturę → glob wyświetla teksturę.
   //          Usuwasz teksturę → glob wraca do wcześniej ustawionego koloru. (usunięcie do implementacji)
   
-// 🟢 ustawienie koloru planety
+function updateColorTextureButtons() {
+  const hasTexture = !!planetTextures[currentPlanet];
+  const hasColor = !!planetColors[currentPlanet];
+
+  document.getElementById("setColorBtn").disabled = hasTexture;  // blokada koloru jeśli jest tekstura
+  document.getElementById("setTextureBtn").disabled = hasColor;  // blokada tekstury jeśli jest kolor
+}
+
 function setPlanetColor() {
   if (!currentPlanet) return;
+  if (planetTextures[currentPlanet]) {
+    alert("Najpierw usuń teksturę!");
+    return;
+  }
   const color = document.getElementById("planetColorInput").value;
   planetColors[currentPlanet] = color;
   applyPlanetTexture(currentPlanet);
   saveAtlas();
+  updateColorTextureButtons();
 }
 
-// 🟢 ustawienie tekstury planety, pobranie z URL i przekazania jako argument
-function setPlanetTexture(planet, textureDataUrl) {
-  planetTextures[planet] = textureDataUrl;
-  // Nie usuwamy koloru! Tekstura zawsze ma pierwszeństwo
-  applyPlanetTexture(planet);
+function setPlanetTextureFromInput() {
+  if (!currentPlanet) return;
+  if (planetColors[currentPlanet]) {
+    alert("Najpierw usuń kolor!");
+    return;
+  }
+  const input = document.getElementById("planetTextureInput");
+  if (!input.files[0]) return;
+
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = e => {
+    planetTextures[currentPlanet] = e.target.result;
+    applyPlanetTexture(currentPlanet);
+    saveAtlas();
+    updateColorTextureButtons();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePlanetColor() {
+  if (!currentPlanet) return;
+  delete planetColors[currentPlanet];
+  globe.globeMaterial().color.set('#000000');  // domyślny czarny
+  updateColorTextureButtons();
   saveAtlas();
 }
 
-// 🟢 nakładanie tekstury lub koloru planety
+function removePlanetTexture() {
+  if (!currentPlanet) return;
+  delete planetTextures[currentPlanet];
+  globe.globeMaterial().color.set('#000000');  // domyślny czarny
+  updateColorTextureButtons();
+  saveAtlas();
+}
+
+// Po zmianie planety od razu aktualizujemy stan przycisków
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
-  // Reset globu
-  globe.globeImageUrl(null); // najpierw wyłącz poprzednią teksturę
+  globe.globeImageUrl(null);
   globe.globeMaterial().color.set('#000000'); // domyślny czarny
 
-  // tekstura ma pierwszeństwo
   if (planetTextures[planet]) {
     globe.globeImageUrl(planetTextures[planet]);
-    return;
-  }
-
-  // jeśli nie ma tekstury → kolor
-  if (planetColors[planet]) {
+  } else if (planetColors[planet]) {
     globe.globeMaterial().color.set(planetColors[planet]);
-    return;
   }
-}
 
-  // Pobranie tekstury z dysku, zapis nazwy pliku w planetTexture, aktualizacja globu
-function setPlanetTextureFromInput(){
-  const input = document.getElementById("planetTextureInput");
-  if(!input.files[0]) return;
-  if(!currentPlanet) { alert("Wybierz planetę!"); return; }
-
-  const fileName = input.files[0].name;
-  planetTextures[currentPlanet] = "textures/" + fileName;
-
-  applyPlanetTexture(currentPlanet);
-  saveAtlas();
-  refreshGlobePoints();
+  updateColorTextureButtons();
 }
 
 
