@@ -2,83 +2,115 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Proste Planety</title>
+<title>Prosty Atlas Planet</title>
 <script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <style>
-  body 
-  { margin:0; display:flex; height:100vh; font-family:Arial; }
-#form { width:250px; min-width:250px; max-width:300px; background:#0a1e3a; color:white; padding:1rem; overflow:auto; flex-shrink:0; }
-#globeViz { flex:1; }
-  button { width:100%; margin-top:0.5rem; }
-  input { width:100%; margin-top:0.3rem; }
+  html, body {
+    margin:0;
+    padding:0;
+    height:100%;
+    width:100%;
+    font-family: Arial, sans-serif;
+    overflow:hidden;
+  }
+  #hud {
+    position:absolute;
+    top:0;
+    left:0;
+    width:300px;
+    height:100%;
+    background:#0a1e3a;
+    color:white;
+    padding:1rem;
+    box-sizing:border-box;
+    overflow:auto;
+  }
+  #globeViz {
+    position:absolute;
+    top:0;
+    left:300px;
+    right:0;
+    bottom:0;
+    background:black;
+  }
+  input, button { width:100%; margin-top:0.5rem; padding:0.4rem; box-sizing:border-box; }
 </style>
 </head>
 <body>
 
-<div id="form">
-  <h3>Dodaj planetę</h3>
+<div id="hud">
+  <h2>Planety</h2>
   <input type="text" id="planetName" placeholder="Nazwa planety">
   <button onclick="addPlanet()">Dodaj planetę</button>
 
-  <h3>Planety</h3>
+  <h3>Lista planet</h3>
   <div id="planetList"></div>
 
   <h3>Tekstura planety</h3>
-  <input type="text" id="textureUrl" placeholder="Wpisz URL PNG">
+  <input type="text" id="planetTexture" placeholder="Wklej URL tekstury">
   <button onclick="setTexture()">Ustaw teksturę</button>
 </div>
 
 <div id="globeViz"></div>
 
 <script>
-let atlas = {};
+const atlas = {};
+const planetTextures = {};
 let currentPlanet = null;
 
-// inicjalizacja globu
-const globe = Globe()(document.getElementById("globeViz"))
-  .globeImageUrl(null)
-  .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png');
+const globe = Globe()(document.getElementById('globeViz'))
+  .globeImageUrl(null);
 
-function addPlanet() {
-  const name = document.getElementById("planetName").value.trim();
-  if(!name) return;
-  if(atlas[name]) { alert("Planeta już istnieje!"); return; }
-
-  atlas[name] = { texture: null };
-  currentPlanet = name;
-  refreshPlanetList();
-  updateGlobeTexture();
-  document.getElementById("planetName").value = "";
-}
-
-function refreshPlanetList() {
-  const div = document.getElementById("planetList");
-  div.innerHTML = "";
-  Object.keys(atlas).forEach(name => {
-    const btn = document.createElement("button");
-    btn.textContent = name;
-    btn.onclick = () => {
-      currentPlanet = name;
-      updateGlobeTexture();
-    };
-    div.appendChild(btn);
+function updatePlanetList(){
+  const list = document.getElementById('planetList');
+  list.innerHTML = '';
+  Object.keys(atlas).forEach(p=>{
+    const btn = document.createElement('button');
+    btn.textContent = p;
+    btn.style.marginTop = "0.3rem";
+    btn.onclick = () => { currentPlanet = p; applyTexture(); };
+    list.appendChild(btn);
   });
 }
 
-function setTexture() {
-  if(!currentPlanet) { alert("Wybierz planetę"); return; }
-  const url = document.getElementById("textureUrl").value.trim();
-  if(!url) return;
-  atlas[currentPlanet].texture = url;
-  updateGlobeTexture();
+function addPlanet(){
+  const name = document.getElementById('planetName').value.trim();
+  if(!name) return alert("Wpisz nazwę planety!");
+  if(atlas[name]) return alert("Planeta już istnieje!");
+  atlas[name] = {};
+  currentPlanet = name;
+  updatePlanetList();
+  applyTexture();
 }
 
-function updateGlobeTexture() {
-  if(currentPlanet && atlas[currentPlanet].texture) {
-    globe.globeImageUrl(atlas[currentPlanet].texture);
+function setTexture(){
+  if(!currentPlanet) return alert("Wybierz planetę!");
+  const url = document.getElementById('planetTexture').value.trim();
+  if(!url) return alert("Wpisz URL tekstury!");
+  planetTextures[currentPlanet] = url;
+  applyTexture();
+}
+
+function applyTexture(){
+  if(!currentPlanet) return;
+  const url = planetTextures[currentPlanet];
+  if(url){
+    new THREE.TextureLoader().load(
+      url,
+      texture => {
+        const mat = globe.globeMaterial();
+        mat.map = texture;
+        mat.color.set("#ffffff");
+        mat.needsUpdate = true;
+      },
+      undefined,
+      err => { alert("Błąd ładowania tekstury"); console.error(err); }
+    );
   } else {
-    globe.globeImageUrl(null);
+    globe.globeMaterial().map = null;
+    globe.globeMaterial().color.set("#444444");
+    globe.globeMaterial().needsUpdate = true;
   }
 }
 </script>
