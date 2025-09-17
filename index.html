@@ -722,19 +722,28 @@ function setPlanetColor() {
 
 function setPlanetTextureFromInput() {
   if (!currentPlanet) return;
+
+  // jeśli jest kolor, nie pozwalamy na nakładanie tekstury
   if (planetColors[currentPlanet]) {
-    alert("Najpierw usuń kolor!");
+    alert("Najpierw usuń kolor planety, zanim nałożysz teksturę!");
     return;
   }
+
   const input = document.getElementById("planetTextureInput");
   if (!input.files[0]) return;
 
   const file = input.files[0];
-  // zamiast base64 zapisujemy tylko nazwę
+
+  // zapisujemy tylko nazwę pliku
   planetTextures[currentPlanet] = file.name;
+
+  // od razu nakładamy teksturę
   applyPlanetTexture(currentPlanet);
+
+  // aktualizacja przycisków (kolor vs tekstura)
   updateColorTextureButtons();
 }
+
 
 function removePlanetTexture() {
   if (!currentPlanet) return;
