@@ -307,25 +307,18 @@
  </div>
 
 <script>
-let atlas = JSON.parse(localStorage.getItem("atlas") || "{}");
-let planetTextures = JSON.parse(localStorage.getItem("planetTextures") || "{}");
-let planetColors = JSON.parse(localStorage.getItem("planetColors") || "{}");
-let planetDetails = JSON.parse(localStorage.getItem("planetDetails") || "{}"); // dla detali planety, jeśli używasz
+let atlas = {};
+let planetTextures = {};
+let planetColors = {};
+let planetDetails = {};
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
-let editIndex = null; // indeks edytowanego punktu (null = dodawanie nowego)
+let editIndex = null;
 
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
 //////////////////////////////////////////////////////////////////// 
 
-function saveAtlas(){
-  localStorage.setItem("atlas", JSON.stringify(atlas));
-  localStorage.setItem("planetTextures", JSON.stringify(planetTextures));
-  localStorage.setItem("planetColors", JSON.stringify(planetColors));
-  localStorage.setItem("planetDetails", JSON.stringify(planetDetails));
-}
-  
 // Zakładki
 function openTab(tabId) {
   document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
@@ -347,8 +340,6 @@ function updateCurrentPlanetHeader() {
       : "Brak wybranej planety";
   });
 }
-
-
 
 function updateNoPlanetsMessage() {
   const msg = document.getElementById("noPlanetsMessage");
@@ -395,7 +386,6 @@ function savePlanetDetails(){
     coords:document.getElementById("detailCoords").value,
     notes:document.getElementById("detailNotes").value
   };
-  saveAtlas();
   alert("Opis zapisany!");
 }
 
@@ -445,7 +435,6 @@ function addNewPlanet() {
   delete planetColors[name];
   delete planetTextures[name];
   applyPlanetTexture(name);
-  saveAtlas();
   refreshPlanetList();
   refreshPointsList();
   refreshGlobePoints();
@@ -523,7 +512,6 @@ delBtn.title = `Usuń planetę ${p}`;
     }
 
     updateCurrentPlanetHeader(); // 🔥 dopiero na końcu
-    saveAtlas();
     refreshPlanetList();
     refreshPointsList();
   }
@@ -606,7 +594,6 @@ function refreshPointsList(){
       checkbox.onchange = ()=>{
         if(point.type==="Zasób") point.extracted = checkbox.checked;
         if(point.type==="Obelisk") point.visited = checkbox.checked;
-        saveAtlas();
         refreshGlobePoints();
         refreshPointsList();
       };
@@ -627,7 +614,6 @@ delBtn.onclick = ()=>{
   const idx = atlas[currentPlanet].findIndex(p => p.timestamp === point.timestamp);
   if(idx !== -1){
     atlas[currentPlanet].splice(idx,1);
-    saveAtlas();
     refreshPointsList();
     refreshGlobePoints();
     }
@@ -674,8 +660,6 @@ function addPoint(){
   } else {
     atlas[currentPlanet].push(point);
   }
-
-  saveAtlas();
   refreshPlanetList();
   refreshGlobePoints();
   refreshPointsList();
@@ -733,7 +717,6 @@ function setPlanetColor() {
   const color = document.getElementById("planetColorInput").value;
   planetColors[currentPlanet] = color;
   applyPlanetTexture(currentPlanet);
-  saveAtlas();
   updateColorTextureButtons();
 }
 
@@ -750,7 +733,6 @@ function setPlanetTextureFromInput() {
   // zamiast base64 zapisujemy tylko nazwę
   planetTextures[currentPlanet] = file.name;
   applyPlanetTexture(currentPlanet);
-  saveAtlas();
   updateColorTextureButtons();
 }
 
@@ -758,14 +740,12 @@ function removePlanetTexture() {
   if (!currentPlanet) return;
   delete planetTextures[currentPlanet];
   applyPlanetTexture(currentPlanet);
-  saveAtlas();
 }
 
 function removePlanetColor() {
   if (!currentPlanet) return;
   delete planetColors[currentPlanet];
   applyPlanetTexture(currentPlanet);
-  saveAtlas();
 }
 
 function applyPlanetTexture(planet) {
@@ -844,7 +824,6 @@ function importAtlas(event){
       // ustaw glob na planetę (tekstura lub kolor) jeśli istnieje
         if(currentPlanet) applyPlanetTexture(currentPlanet);
      
-      saveAtlas();
       refreshPlanetList();
       refreshPointsList();
       refreshGlobePoints();
