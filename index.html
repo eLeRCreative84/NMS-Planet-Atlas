@@ -6,25 +6,77 @@
 <script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <style>
-  body { margin:0; }
-  #globeViz { width:100vw; height:100vh; }
+  body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: Arial, sans-serif; }
+  #controls { padding: 1rem; background: #222; color: white; }
+  #globeViz { flex: 1; }
+  input, button { padding: 0.5rem; margin: 0.2rem 0; width: 100%; box-sizing: border-box; }
 </style>
 </head>
 <body>
-<div id="globeViz"></div>
-<script>
-const globe = Globe()(document.getElementById('globeViz'))
-  .globeImageUrl(null) // brak domyślnej mapy
-  .backgroundImageUrl(null); // brak tła
 
-// Funkcja do ustawiania tekstury
-function setTexture(url){
+<div id="controls">
+  <label>Nazwa planety:</label>
+  <input type="text" id="planetName" placeholder="Wpisz nazwę planety">
+  <button onclick="addPlanet()">Dodaj planetę</button>
+
+  <label>URL tekstury:</label>
+  <input type="text" id="textureUrl" placeholder="https://.../Planeta1.png">
+  <button onclick="setPlanetTexture()">Ustaw teksturę</button>
+
+  <h3>Lista planet:</h3>
+  <div id="planetList"></div>
+</div>
+
+<div id="globeViz"></div>
+
+<script>
+let globe = Globe()(document.getElementById('globeViz'))
+  .globeImageUrl(null)
+  .backgroundImageUrl(null);
+
+let planets = {}; // { nazwa: {textureUrl} }
+let currentPlanet = null;
+
+function addPlanet() {
+  const name = document.getElementById('planetName').value.trim();
+  if(!name) { alert('Wpisz nazwę planety!'); return; }
+  if(planets[name]) { alert('Planeta już istnieje!'); return; }
+  planets[name] = { textureUrl: null };
+  currentPlanet = name;
+  refreshPlanetList();
+  alert(`Dodano planetę: ${name}`);
+}
+
+function refreshPlanetList() {
+  const listDiv = document.getElementById('planetList');
+  listDiv.innerHTML = '';
+  Object.keys(planets).forEach(name => {
+    const btn = document.createElement('button');
+    btn.textContent = name + (name===currentPlanet?' (aktualna)':'');
+    btn.onclick = () => {
+      currentPlanet = name;
+      if(planets[name].textureUrl) setTexture(planets[name].textureUrl);
+      else globe.globeMaterial().map = null;
+    };
+    listDiv.appendChild(btn);
+  });
+}
+
+function setPlanetTexture() {
+  if(!currentPlanet) { alert('Najpierw wybierz planetę!'); return; }
+  const url = document.getElementById('textureUrl').value.trim();
+  if(!url) { alert('Podaj URL tekstury!'); return; }
+  planets[currentPlanet].textureUrl = url;
+  setTexture(url);
+}
+
+function setTexture(url) {
   const material = globe.globeMaterial();
   new THREE.TextureLoader().load(
     url,
     texture => {
       material.map = texture;
-      material.color.set('#ffffff'); // reset koloru
+      material.color.set('#ffffff');
       material.needsUpdate = true;
       console.log('Tekstura załadowana!');
     },
@@ -32,5 +84,7 @@ function setTexture(url){
     err => console.error('Błąd ładowania tekstury:', err)
   );
 }
+</script>
 
-// Ustawienie testowej tekstury z GitHub
+</body>
+</html>
