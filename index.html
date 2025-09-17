@@ -382,101 +382,41 @@ function savePlanetDetails(){
 //------------------ Planety, lista, tworzenie -------------------//
 ////////////////////////////////////////////////////////////////////
 
-function checkNewPlanetInput() {
-  const input = document.getElementById("newPlanetName");
-  document.getElementById("addPlanetBtn").disabled = input.value.trim() === "";
+// Funkcje
+function updatePlanetList() {
+  const list = document.getElementById('planetList');
+  list.innerHTML = '';
+  planetData.forEach(p => {
+    const btn = document.createElement('button');
+    btn.textContent = p.name;
+    btn.onclick = () => selectPlanet(p.name);
+    list.appendChild(btn);
+  });
 }
 
-function addNewPlanet() {
-  const input = document.getElementById("newPlanetName");
-  const name = input.value.trim();
-  if (!name) return;
+function addPlanet() {
+  const name = document.getElementById('newPlanetName').value.trim();
+  const texture = document.getElementById('planetTextureUrl').value.trim();
+  if (!name || !texture) { alert("Podaj nazwę i URL tekstury!"); return; }
 
-  if (planets.some(p=>p.name===name)) {
-    alert("Planeta już istnieje!");
+  // Sprawdzenie czy planeta już istnieje
+  if (planetData.some(p => p.name === name)) {
+    alert("Planeta o tej nazwie już istnieje!");
     return;
   }
 
-  const newPlanet = {
-    name,
-    points: [],
-    texture: null,
-    color: null,
-    details: {
-      galaxy:"",region:"",system:"",biome:"",weather:"",
-      sentinels:"",flora:"",fauna:"",discovered:"",
-      mode:"",updated:"",coords:"",notes:""
-    }
-  };
-  addPoles(newPlanet);
-  planets.push(newPlanet);
-  currentPlanet = newPlanet;
-
-  updateCurrentPlanetHeader();
-  applyPlanetAppearance(currentPlanet);
-  refreshPlanetList();
-  refreshPointsList();
-  refreshGlobePoints();
-
-  input.value = "";
-  checkNewPlanetInput();
-  alert(`Dodano nową planetę: ${name}`);
-  updateNoPlanetsMessage();
+  planetData.push({ name, texture });
+  document.getElementById('newPlanetName').value = '';
+  document.getElementById('planetTextureUrl').value = '';
+  updatePlanetList();
+  selectPlanet(name);
 }
 
-function refreshPlanetList(){
-  const list = document.getElementById("planetList");
-  list.innerHTML = "";
-
-  planets.forEach(p => {
-    const container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.alignItems = "center";
-    container.style.margin = "0.2rem 0";
-
-    const btn = document.createElement("button");
-    btn.textContent = p.name;
-    btn.style.flex = "1";
-    btn.style.marginRight = "0.5rem";
-    btn.style.background = "#e5e5e5";
-    btn.style.color = "black";
-    btn.style.border = "none";
-    btn.style.padding = "0.3rem";
-    btn.style.borderRadius = "4px";
-    btn.style.cursor = "pointer";
-    btn.onclick = () => selectPlanet(p);
-
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Usuń";
-    delBtn.style.background = "#c62828";
-    delBtn.style.color = "white";
-    delBtn.style.border = "none";
-    delBtn.style.padding = "0.2rem 0.5rem";
-    delBtn.style.borderRadius = "4px";
-    delBtn.style.cursor = "pointer";
-    delBtn.onclick = e => {
-      e.stopPropagation();
-      if(confirm(`Na pewno usunąć planetę "${p.name}"?`)){
-        planets = planets.filter(pl=>pl!==p);
-        currentPlanet = planets[0] || null;
-        if (currentPlanet) {
-          applyPlanetAppearance(currentPlanet);
-          refreshGlobePoints();
-        } else {
-          globe.globeImageUrl(null);
-          globe.pointsData([]);
-        }
-        updateCurrentPlanetHeader();
-        refreshPlanetList();
-        refreshPointsList();
-      }
-    };
-
-    container.appendChild(btn);
-    container.appendChild(delBtn);
-    list.appendChild(container);
-  });
-  updateNoPlanetsMessage();
+function selectPlanet(name) {
+  const planet = planetData.find(p => p.name === name);
+  if (!planet) return;
+  currentPlanet = planet.name;
+  globe.globeImageUrl(planet.texture);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -535,71 +475,6 @@ function addPoles(planet){
     planet.points.push({lat:-90,lng:0,name:"Biegun Południowy",type:"Pole"});
   }
 }
-
-////////////////////////////////////////////////////////////////////
-//---------------- Tekstury i kolory -----------------------------//
-////////////////////////////////////////////////////////////////////
-
-function setPlanetColor() {
-  if (!currentPlanet) return;
-  currentPlanet.color = document.getElementById("planetColorInput").value;
-  currentPlanet.texture = null;
-  globe.globeImageUrl(null);
-  globe.globeMaterial().color.set(currentPlanet.color);
-}
-
-function setPlanetTextureFromInput() {
-  if (!currentPlanet) return;
-
-  const input = document.getElementById("planetTextureInput");
-  if (!input.files[0]) return;
-
-  const file = input.files[0];
-  currentPlanet.texture = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${file.name}`;
-  currentPlanet.color = null;
-  globe.globeImageUrl(currentPlanet.texture);
-}
-
-function removePlanetTexture() {
-  if (!currentPlanet) return;
-  currentPlanet.texture = null;
-  globe.globeImageUrl(null);
-}
-
-function removePlanetColor() {
-  if (!currentPlanet) return;
-  currentPlanet.color = null;
-  globe.globeMaterial().color.set("#000000");
-}
-
-function applyPlanetAppearance(planet) {
-  if (!planet) return;
-  if (planet.texture) {
-    globe.globeImageUrl(planet.texture);
-  } else if (planet.color) {
-    globe.globeImageUrl(null);
-    globe.globeMaterial().color.set(planet.color);
-  } else {
-    globe.globeImageUrl(null);
-    globe.globeMaterial().color.set("#000000");
-  }
-}
-
-////////////////////////////////////////////////////////////////////
-//---------------- Wybór planety ---------------------------------//
-////////////////////////////////////////////////////////////////////
-
-function selectPlanet(p) {
-  currentPlanet = p;
-  addPoles(p);
-  refreshGlobePoints();
-  globe.htmlElementsData(p.points.filter(pt => pt.type==="Pole"));
-  applyPlanetAppearance(currentPlanet);
-  refreshPointsList();
-  loadPlanetDetails();
-  updateCurrentPlanetHeader();
-}
-
 
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import -------------------------------//
