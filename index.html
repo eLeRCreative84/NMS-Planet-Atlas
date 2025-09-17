@@ -542,108 +542,59 @@ function addPoles(planet){
 
 function setPlanetColor() {
   if (!currentPlanet) return;
-  // usuwamy mapę tekstury i ustawiamy kolor
   currentPlanet.color = document.getElementById("planetColorInput").value;
   currentPlanet.texture = null;
-  // usuń ewentualną mapę z globu
   globe.globeImageUrl(null);
-  const mat = globe.globeMaterial();
-  mat.map = null;
-  mat.color.set(currentPlanet.color || "#000000");
-  mat.needsUpdate = true;
+  globe.globeMaterial().color.set(currentPlanet.color);
 }
 
 function setPlanetTextureFromInput() {
   if (!currentPlanet) return;
 
-  // jeśli jest kolor, nie pozwalamy na nakładanie tekstury
-  if (currentPlanet.color) {
-    alert("Najpierw usuń kolor planety, zanim nałożysz teksturę!");
-    return;
-  }
-
   const input = document.getElementById("planetTextureInput");
   if (!input.files[0]) return;
 
   const file = input.files[0];
-
-  // zapisujemy tylko nazwę pliku (zakładasz że plik na GitHub ma taką nazwę)
-  currentPlanet.texture = file.name;
+  currentPlanet.texture = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${file.name}`;
   currentPlanet.color = null;
-
-  // zbuduj pełny URL do GitHub Pages i ustaw glob.globImageUrl zamiast TextureLoader
-  const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${currentPlanet.texture}`;
-  console.log("Ustawiam teksturę (globeImageUrl):", url);
-  globe.globeImageUrl(url);
-  // jeśli chcesz upewnić się, że materiał jest zresetowany:
-  const mat = globe.globeMaterial();
-  mat.color.set("#ffffff");
-  mat.needsUpdate = true;
+  globe.globeImageUrl(currentPlanet.texture);
 }
 
 function removePlanetTexture() {
   if (!currentPlanet) return;
-  delete currentPlanet.texture;
-  // usuń teksturę z globu
+  currentPlanet.texture = null;
   globe.globeImageUrl(null);
-  const mat = globe.globeMaterial();
-  mat.map = null;
-  mat.color.set(currentPlanet.color || "#000000");
-  mat.needsUpdate = true;
 }
 
 function removePlanetColor() {
   if (!currentPlanet) return;
-  delete currentPlanet.color;
-  // jeśli nie ma tekstury, ustaw czarny (domyślny)
-  if(!currentPlanet.texture){
-    globe.globeImageUrl(null);
-    const mat = globe.globeMaterial();
-    mat.map = null;
-    mat.color.set("#000000");
-    mat.needsUpdate = true;
-  }
+  currentPlanet.color = null;
+  globe.globeMaterial().color.set("#000000");
 }
 
-function applyPlanetTexture(planet) {
+function applyPlanetAppearance(planet) {
   if (!planet) return;
-  
-  const mat = globe.globeMaterial();
-
-  // Reset materiału globu przed ustawieniem nowej planety
-  mat.map = null;
-  mat.color.set("#000000");
-  mat.needsUpdate = true;
-  globe.globeImageUrl(null);
-
   if (planet.texture) {
-    // Jeśli planeta ma teksturę
-    const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${planet.texture}`;
-
-    // Bezpośrednio ustawiamy kolor na biały, żeby glob poprawnie wyświetlał teksturę
-    mat.color.set("#ffffff");
-    mat.needsUpdate = true;
-
-    globe.globeImageUrl(url);
-
+    globe.globeImageUrl(planet.texture);
   } else if (planet.color) {
-    // Jeśli planeta ma tylko kolor
-    mat.map = null;
-    mat.color.set(planet.color);
-    mat.needsUpdate = true;
+    globe.globeImageUrl(null);
+    globe.globeMaterial().color.set(planet.color);
+  } else {
+    globe.globeImageUrl(null);
+    globe.globeMaterial().color.set("#000000");
   }
 }
-  
-// Funkcja, która wprowadza czysty sposób wyboru aktualnej planety i stosowania jej koloru lub tekstury
+
+////////////////////////////////////////////////////////////////////
+//---------------- Wybór planety ---------------------------------//
+////////////////////////////////////////////////////////////////////
+
 function selectPlanet(p) {
   currentPlanet = p;
   addPoles(p);
   refreshGlobePoints();
   globe.htmlElementsData(p.points.filter(pt => pt.type==="Pole"));
-
-  // Zastosowanie koloru lub tekstury z planety
-  applyPlanetTexture(currentPlanet);
-
+  applyPlanetAppearance(currentPlanet);
   refreshPointsList();
   loadPlanetDetails();
   updateCurrentPlanetHeader();
