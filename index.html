@@ -939,6 +939,14 @@ if (currentPlanet && atlas[currentPlanet]) {
 }
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
+
+// zabezpieczenie przed przypadkowym zamknięciem / odświeżeniem
+window.addEventListener("beforeunload", function (e) {
+  if (Object.keys(atlas).length > 0) { 
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
   
 // start
 window.onload = () => {
@@ -947,7 +955,7 @@ window.onload = () => {
   refreshPointsList();
   updateNoPlanetsMessage();
 };
-  
+
 </script>
 </body>
 </html>
