@@ -3,40 +3,37 @@
 <head>
 <meta charset="UTF-8" />
 <title>Atlas Planetarny</title>
-<script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <style>
-  body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
-  #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
-  #globeViz { flex: 1; background: black; position: relative; }
-  #globeViz canvas { width: 100% !important; height: 100% !important; display: block; background: transparent; }
-  input, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
-  button { cursor: pointer; }
-  .texture-input { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-  .texture-input input[type="text"] { flex: 1; }
+body { margin:0; display:flex; height:100vh; font-family:Arial; }
+#form { flex:0 0 25%; min-width:280px; max-width:450px; padding:1rem; background:#0a1e3a; color:white; overflow-y:auto; }
+#globeViz { flex:1; background:black; }
+input,button { width:100%; margin:0.3rem 0; padding:0.4rem; box-sizing:border-box; }
+button { cursor:pointer; }
 </style>
 </head>
 <body>
 <div id="form">
-  <h2>Tworzenie planety</h2>
-  <input type="text" id="planetName" placeholder="Nazwa planety"/>
-  <button onclick="addPlanet()">Dodaj planetę</button>
+<h2>Tworzenie planety</h2>
+<input type="text" id="planetName" placeholder="Nazwa planety"/>
+<button onclick="addPlanet()">Dodaj planetę</button>
 
-  <h2>Lista planet</h2>
-  <div id="planetList"></div>
+<h2>Lista planet</h2>
+<div id="planetList"></div>
 
-  <h2>Tekstura planety</h2>
-  <input type="text" id="textureUrl" placeholder="Wpisz URL tekstury"/>
-  <button onclick="setTexture()">Ustaw teksturę</button>
+<h2>Tekstura planety</h2>
+<input type="text" id="textureUrl" placeholder="Wpisz URL tekstury"/>
+<button onclick="setTexture()">Ustaw teksturę</button>
 </div>
 
 <div id="globeViz"></div>
 
 <script>
-let globe = Globe()(document.getElementById('globeViz')).globeImageUrl(null);
-let planets = [];
+const globe = Globe()(document.getElementById('globeViz')).globeImageUrl(null);
+
+let planets = []; // lista nazw planet
+let planetTextures = {}; // przypisane tekstury
 let currentPlanet = null;
-let planetTextures = {};
 
 function addPlanet() {
   const name = document.getElementById('planetName').value.trim();
@@ -44,9 +41,10 @@ function addPlanet() {
   if(planets.includes(name)) return alert('Planeta już istnieje!');
   planets.push(name);
   currentPlanet = name;
+  planetTextures[currentPlanet] = null; // domyślnie brak tekstury
+  document.getElementById('planetName').value = '';
   updatePlanetList();
   applyTexture();
-  document.getElementById('planetName').value = '';
 }
 
 function updatePlanetList() {
@@ -73,8 +71,8 @@ function setTexture() {
 
 function applyTexture() {
   if(!currentPlanet) return;
-  const url = planetTextures[currentPlanet] || null;
-  globe.globeImageUrl(url);
+  const url = planetTextures[currentPlanet];
+  globe.globeImageUrl(url || null);
 }
 </script>
 </body>
