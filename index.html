@@ -149,31 +149,14 @@
   <!-- Zakładka PLANETY -->
   <div id="planety" class="tab-content">
     <h2 class="currentPlanetHeader"></h2>
-    <h3>Dodaj nową planetę</h3>
+     <h2>Twórz planetę</h2>
+  <input type="text" id="newPlanetName" placeholder="Nazwa planety" />
+  <input type="text" id="planetTextureUrl" placeholder="URL tekstury" />
+  <button onclick="addPlanet()">Dodaj planetę</button>
 
-    <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
-  <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
-  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
+  <h2>Lista planet</h2>
+  <div id="planetList"></div>
 </div>
-
-    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-<h2>Kolor / tekstura planety</h2>
-<div class="texture-input">
-  <input type="color" id="planetColorInput" value="#4caf50" />
-  <button id="setColorBtn" onclick="setPlanetColor()">Ustaw kolor</button>
-  <button id="removeColorBtn" onclick="removePlanetColor()">Usuń</button>
-</div>
-<div class="texture-input">
-  <input type="file" id="planetTextureInput" accept="image/*" hidden />
-  <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
-  <button id="setTextureBtn" onclick="setPlanetTextureFromInput()">Ustaw teksturę</button>
-  <button id="removeTextureBtn" onclick="removePlanetTexture()">Usuń</button>
-</div>
-    
-      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-    <h2>Lista planet</h2>
-    <div id="planetList"></div>
-  </div>
 
   <!-- Zakładka PUNKTY -->
   <div id="punkty" class="tab-content">
