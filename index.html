@@ -444,24 +444,7 @@ function refreshPlanetList(){
     btn.style.padding = "0.3rem";
     btn.style.borderRadius = "4px";
     btn.style.cursor = "pointer";
-    btn.onclick = () => {
-      currentPlanet = p;
-      addPoles(p);
-      refreshGlobePoints();
-      globe.htmlElementsData(p.points.filter(pt => pt.type==="Pole"));
-
-      // resetujemy glob przed zastosowaniem nowej planety
-      const mat = globe.globeMaterial();
-      mat.map = null;
-      mat.color.set("#000000");
-      mat.needsUpdate = true;
-      globe.globeImageUrl(null);
-
-      applyPlanetTexture(p);  // teraz na pewno zastosuje się poprawnie kolor lub tekstura
-      refreshPointsList();
-      loadPlanetDetails();
-      updateCurrentPlanetHeader();
-    };
+    btn.onclick = () => selectPlanet(p);
 
     const delBtn = document.createElement("button");
     delBtn.textContent = "Usuń";
@@ -625,20 +608,52 @@ function removePlanetColor() {
 function applyPlanetTexture(planet) {
   if (!planet) return;
 
+  const mat = globe.globeMaterial();
+
+  // Reset globu
+  mat.map = null;
+  mat.color.set("#000000");
+  mat.needsUpdate = true;
+  globe.globeImageUrl(null);
+
   if (planet.texture) {
-    // Tekstura — ustaw globImageUrl na URL pliku
+    // Jeśli planeta ma teksturę
     const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${planet.texture}`;
     globe.globeImageUrl(url);
-    // dla pewności materiał ma biały kolor
-    globe.globeMaterial().color.set("#ffffff");
-  } else {
-    // Brak tekstury — globImageUrl na null i ustaw kolor planety
-    globe.globeImageUrl(null);
-    const mat = globe.globeMaterial();
-    mat.map = null; // usuń poprzednią mapę
-    mat.color.set(planet.color || "#000000");
+
+    // Po krótkim delayu ustawiamy kolor na biały, żeby nie dziedziczyć starego koloru
+    setTimeout(() => {
+      mat.color.set("#ffffff");
+      mat.needsUpdate = true;
+    }, 50);
+
+  } else if (planet.color) {
+    // Jeśli planeta ma kolor, brak tekstury
+    mat.color.set(planet.color);
     mat.needsUpdate = true;
   }
+}
+  
+// Funkcja, która wprowadza czysty sposób wyboru aktualnej planety i stosowania jej koloru lub tekstury
+  function selectPlanet(p) {
+  currentPlanet = p;
+  addPoles(p);
+  refreshGlobePoints();
+  globe.htmlElementsData(p.points.filter(pt => pt.type==="Pole"));
+
+  // Reset materiału globu przed ustawieniem nowej planety
+  const mat = globe.globeMaterial();
+  mat.map = null;
+  mat.color.set("#000000");
+  mat.needsUpdate = true;
+  globe.globeImageUrl(null);
+
+  // Zastosuj kolor lub teksturę z tablicy planety
+  applyPlanetTexture(currentPlanet);
+
+  refreshPointsList();
+  loadPlanetDetails();
+  updateCurrentPlanetHeader();
 }
 
 ////////////////////////////////////////////////////////////////////
