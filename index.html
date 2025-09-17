@@ -413,7 +413,7 @@ function addNewPlanet() {
   currentPlanet = newPlanet;
 
   updateCurrentPlanetHeader();
-  applyPlanetTexture(currentPlanet);
+  applyPlanetAppearance(currentPlanet);
   refreshPlanetList();
   refreshPointsList();
   refreshGlobePoints();
@@ -460,7 +460,7 @@ function refreshPlanetList(){
         planets = planets.filter(pl=>pl!==p);
         currentPlanet = planets[0] || null;
         if (currentPlanet) {
-          applyPlanetTexture(currentPlanet);
+          applyPlanetAppearance(currentPlanet);
           refreshGlobePoints();
         } else {
           globe.globeImageUrl(null);
@@ -622,7 +622,7 @@ function importAtlas(event){
       const data = JSON.parse(e.target.result);
       if(data.planets) planets = data.planets;
       currentPlanet = planets[0] || null;
-      if(currentPlanet) applyPlanetTexture(currentPlanet);
+      if(currentPlanet) applyPlanetAppearance(currentPlanet);
       refreshPlanetList(); refreshPointsList(); refreshGlobePoints();
       updateCurrentPlanetHeader();
       alert("Import zakończony!");
