@@ -607,10 +607,10 @@ function removePlanetColor() {
 
 function applyPlanetTexture(planet) {
   if (!planet) return;
-
+  
   const mat = globe.globeMaterial();
 
-  // Reset globu
+  // Reset materiału globu przed ustawieniem nowej planety
   mat.map = null;
   mat.color.set("#000000");
   mat.needsUpdate = true;
@@ -619,42 +619,36 @@ function applyPlanetTexture(planet) {
   if (planet.texture) {
     // Jeśli planeta ma teksturę
     const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${planet.texture}`;
+
+    // Bezpośrednio ustawiamy kolor na biały, żeby glob poprawnie wyświetlał teksturę
+    mat.color.set("#ffffff");
+    mat.needsUpdate = true;
+
     globe.globeImageUrl(url);
 
-    // Po krótkim delayu ustawiamy kolor na biały, żeby nie dziedziczyć starego koloru
-    setTimeout(() => {
-      mat.color.set("#ffffff");
-      mat.needsUpdate = true;
-    }, 50);
-
   } else if (planet.color) {
-    // Jeśli planeta ma kolor, brak tekstury
+    // Jeśli planeta ma tylko kolor
+    mat.map = null;
     mat.color.set(planet.color);
     mat.needsUpdate = true;
   }
 }
   
 // Funkcja, która wprowadza czysty sposób wyboru aktualnej planety i stosowania jej koloru lub tekstury
-  function selectPlanet(p) {
+function selectPlanet(p) {
   currentPlanet = p;
   addPoles(p);
   refreshGlobePoints();
   globe.htmlElementsData(p.points.filter(pt => pt.type==="Pole"));
 
-  // Reset materiału globu przed ustawieniem nowej planety
-  const mat = globe.globeMaterial();
-  mat.map = null;
-  mat.color.set("#000000");
-  mat.needsUpdate = true;
-  globe.globeImageUrl(null);
-
-  // Zastosuj kolor lub teksturę z tablicy planety
+  // Zastosowanie koloru lub tekstury z planety
   applyPlanetTexture(currentPlanet);
 
   refreshPointsList();
   loadPlanetDetails();
   updateCurrentPlanetHeader();
 }
+
 
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import -------------------------------//
