@@ -369,7 +369,7 @@ function savePlanetDetails(){
 function updatePlanetList() {
   const list = document.getElementById('planetList');
   list.innerHTML = '';
-  planetData.forEach(p => {
+  planets.forEach(p => {
     const btn = document.createElement('button');
     btn.textContent = p.name;
     btn.onclick = () => selectPlanet(p.name);
@@ -383,12 +383,12 @@ function addPlanet() {
   if (!name || !texture) { alert("Podaj nazwę i URL tekstury!"); return; }
 
   // Sprawdzenie czy planeta już istnieje
-  if (planetData.some(p => p.name === name)) {
+  if (planets.some(p => p.name === name)) {
     alert("Planeta o tej nazwie już istnieje!");
     return;
   }
 
-  planetData.push({ name, texture });
+  planets.push({ name, texture });
   document.getElementById('newPlanetName').value = '';
   document.getElementById('planetTextureUrl').value = '';
   updatePlanetList();
@@ -396,7 +396,7 @@ function addPlanet() {
 }
 
 function selectPlanet(name) {
-  const planet = planetData.find(p => p.name === name);
+  const planet = planets.find(p => p.name === name);
   if (!planet) return;
   currentPlanet = planet.name;
   globe.globeImageUrl(planet.texture);
