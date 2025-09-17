@@ -2,87 +2,35 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Proste planety z teksturą</title>
+<title>Test Tekstury Globe.gl</title>
 <script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <style>
-  body { margin:0; display:flex; height:100vh; font-family:Arial; color:white; }
-  #control { width:300px; padding:1rem; background:#222; }
-  #globeViz { flex:1; }
-  input, button { width:100%; margin:0.3rem 0; padding:0.3rem; }
-  button { cursor:pointer; }
+  body { margin:0; }
+  #globeViz { width:100vw; height:100vh; }
 </style>
 </head>
 <body>
-
-<div id="control">
-  <h2>Tworzenie planety</h2>
-  <label>Nazwa planety:</label>
-  <input type="text" id="planetName">
-  <button onclick="addPlanet()">Dodaj planetę</button>
-
-  <label>Tekstura (np. Planeta1.png):</label>
-  <input type="text" id="planetTexture">
-  <button onclick="setTexture()">Ustaw teksturę</button>
-
-  <h3>Lista planet:</h3>
-  <div id="planetList"></div>
-</div>
-
 <div id="globeViz"></div>
-
 <script>
-let planets = {};
-let currentPlanet = null;
+const globe = Globe()(document.getElementById('globeViz'))
+  .globeImageUrl(null) // brak domyślnej mapy
+  .backgroundImageUrl(null); // brak tła
 
-const globe = Globe()(document.getElementById("globeViz"))
-  .globeImageUrl(null);
-
-function addPlanet() {
-  const name = document.getElementById("planetName").value.trim();
-  if(!name) return alert("Podaj nazwę planety!");
-  if(planets[name]) return alert("Planeta już istnieje!");
-  planets[name] = { texture: null };
-  currentPlanet = name;
-  refreshPlanetList();
-  updateGlobe();
+// Funkcja do ustawiania tekstury
+function setTexture(url){
+  const material = globe.globeMaterial();
+  new THREE.TextureLoader().load(
+    url,
+    texture => {
+      material.map = texture;
+      material.color.set('#ffffff'); // reset koloru
+      material.needsUpdate = true;
+      console.log('Tekstura załadowana!');
+    },
+    undefined,
+    err => console.error('Błąd ładowania tekstury:', err)
+  );
 }
 
-function refreshPlanetList() {
-  const listDiv = document.getElementById("planetList");
-  listDiv.innerHTML = "";
-  Object.keys(planets).forEach(name => {
-    const btn = document.createElement("button");
-    btn.textContent = name;
-    btn.onclick = () => { currentPlanet = name; updateGlobe(); };
-    listDiv.appendChild(btn);
-  });
-}
-
-function setTexture() {
-  if(!currentPlanet) return alert("Najpierw wybierz planetę!");
-  const texName = document.getElementById("planetTexture").value.trim();
-  if(!texName) return alert("Podaj nazwę pliku tekstury!");
-  planets[currentPlanet].texture = texName;
-  updateGlobe();
-}
-
-function updateGlobe() {
-  if(!currentPlanet) return;
-  const tex = planets[currentPlanet].texture;
-  if(tex) {
-    const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${tex}`;
-    new THREE.TextureLoader().load(
-      url,
-      texture => globe.globeMaterial().map = texture,
-      undefined,
-      err => { alert("Nie udało się załadować tekstury"); console.error(err); }
-    );
-  } else {
-    globe.globeMaterial().map = null;
-  }
-}
-</script>
-
-</body>
-</html>
+// Ustawienie testowej tekstury z GitHub
