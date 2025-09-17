@@ -1,77 +1,81 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<title>Prosty Atlas Planet</title>
+<meta charset="UTF-8" />
+<title>Atlas Planetarny</title>
+<script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <style>
-  html, body { margin:0; padding:0; width:100%; height:100%; font-family: Arial; overflow:hidden; }
-  #hud { position:absolute; top:0; left:0; width:300px; height:100%; background:#0a1e3a; color:white; padding:1rem; box-sizing:border-box; overflow:auto; }
-  #globeViz { position:absolute; top:0; left:300px; right:0; bottom:0; background:black; }
-  input, button { width:100%; margin-top:0.5rem; padding:0.4rem; box-sizing:border-box; }
+  body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
+  #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
+  #globeViz { flex: 1; background: black; position: relative; }
+  #globeViz canvas { width: 100% !important; height: 100% !important; display: block; background: transparent; }
+  input, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
+  button { cursor: pointer; }
+  .texture-input { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .texture-input input[type="text"] { flex: 1; }
 </style>
 </head>
 <body>
-
-<div id="hud">
-  <h2>Planety</h2>
-  <input type="text" id="planetName" placeholder="Nazwa planety">
+<div id="form">
+  <h2>Tworzenie planety</h2>
+  <input type="text" id="planetName" placeholder="Nazwa planety"/>
   <button onclick="addPlanet()">Dodaj planetę</button>
 
-  <h3>Lista planet</h3>
+  <h2>Lista planet</h2>
   <div id="planetList"></div>
 
-  <h3>Tekstura planety</h3>
-  <input type="text" id="planetTexture" placeholder="URL tekstury">
+  <h2>Tekstura planety</h2>
+  <input type="text" id="textureUrl" placeholder="Wpisz URL tekstury"/>
   <button onclick="setTexture()">Ustaw teksturę</button>
 </div>
 
 <div id="globeViz"></div>
 
 <script>
-const atlas = {};
-const planetTextures = {};
+let globe = Globe()(document.getElementById('globeViz')).globeImageUrl(null);
+let planets = [];
 let currentPlanet = null;
+let planetTextures = {};
 
-const globe = Globe()(document.getElementById('globeViz'))
-  .globeImageUrl(null); // początkowo brak tekstury
+function addPlanet() {
+  const name = document.getElementById('planetName').value.trim();
+  if(!name) return alert('Podaj nazwę planety!');
+  if(planets.includes(name)) return alert('Planeta już istnieje!');
+  planets.push(name);
+  currentPlanet = name;
+  updatePlanetList();
+  applyTexture();
+  document.getElementById('planetName').value = '';
+}
 
-function updatePlanetList(){
+function updatePlanetList() {
   const list = document.getElementById('planetList');
   list.innerHTML = '';
-  Object.keys(atlas).forEach(p=>{
+  planets.forEach(p => {
     const btn = document.createElement('button');
     btn.textContent = p;
-    btn.style.marginTop = "0.3rem";
-    btn.onclick = () => { currentPlanet = p; applyTexture(); };
+    btn.onclick = () => {
+      currentPlanet = p;
+      applyTexture();
+    };
     list.appendChild(btn);
   });
 }
 
-function addPlanet(){
-  const name = document.getElementById('planetName').value.trim();
-  if(!name) return alert("Wpisz nazwę planety!");
-  if(atlas[name]) return alert("Planeta już istnieje!");
-  atlas[name] = {};
-  currentPlanet = name;
-  updatePlanetList();
-  applyTexture();
-}
-
-function setTexture(){
-  if(!currentPlanet) return alert("Wybierz planetę!");
-  const url = document.getElementById('planetTexture').value.trim();
-  if(!url) return alert("Wpisz URL tekstury!");
+function setTexture() {
+  if(!currentPlanet) return alert('Wybierz planetę!');
+  const url = document.getElementById('textureUrl').value.trim();
+  if(!url) return alert('Podaj URL tekstury!');
   planetTextures[currentPlanet] = url;
   applyTexture();
 }
 
-function applyTexture(){
+function applyTexture() {
   if(!currentPlanet) return;
-  const url = planetTextures[currentPlanet];
-  globe.globeImageUrl(url || null); // klucz: używamy globImageUrl() bez TextureLoader
+  const url = planetTextures[currentPlanet] || null;
+  globe.globeImageUrl(url);
 }
 </script>
-
 </body>
 </html>
