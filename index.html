@@ -2,104 +2,86 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Minimalny Atlas Planet</title>
+<title>Proste planety z teksturą</title>
 <script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <style>
-  body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; }
-  #form { width: 300px; padding: 1rem; background: #0a1e3a; color: white; }
-  input, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
-  button { cursor: pointer; }
-  #planetList button { width: 100%; margin: 0.2rem 0; }
-  #globeViz { flex: 1; background: black; }
+  body { margin:0; display:flex; height:100vh; font-family:Arial; color:white; }
+  #control { width:300px; padding:1rem; background:#222; }
+  #globeViz { flex:1; }
+  input, button { width:100%; margin:0.3rem 0; padding:0.3rem; }
+  button { cursor:pointer; }
 </style>
 </head>
 <body>
 
-<div id="form">
-  <h2>Tworzenie Planety</h2>
-  <input type="text" id="newPlanetName" placeholder="Nazwa planety">
-  <button onclick="addPlanet()">Dodaj Planetę</button>
+<div id="control">
+  <h2>Tworzenie planety</h2>
+  <label>Nazwa planety:</label>
+  <input type="text" id="planetName">
+  <button onclick="addPlanet()">Dodaj planetę</button>
 
-  <h2>Lista Planet</h2>
+  <label>Tekstura (np. Planeta1.png):</label>
+  <input type="text" id="planetTexture">
+  <button onclick="setTexture()">Ustaw teksturę</button>
+
+  <h3>Lista planet:</h3>
   <div id="planetList"></div>
-
-  <h2>Tekstura Planety</h2>
-  <input type="text" id="textureName" placeholder="Nazwa pliku tekstury">
-  <button onclick="setPlanetTexture()">Ustaw Teksturę</button>
 </div>
 
 <div id="globeViz"></div>
 
 <script>
-let planets = {}; // { nazwa: {texture: ''} }
+let planets = {};
 let currentPlanet = null;
 
-// Inicjalizacja globu
 const globe = Globe()(document.getElementById("globeViz"))
-  .globeImageUrl(null)
-  .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png');
+  .globeImageUrl(null);
 
 function addPlanet() {
-  const name = document.getElementById("newPlanetName").value.trim();
+  const name = document.getElementById("planetName").value.trim();
   if(!name) return alert("Podaj nazwę planety!");
   if(planets[name]) return alert("Planeta już istnieje!");
-  
   planets[name] = { texture: null };
   currentPlanet = name;
-  document.getElementById("newPlanetName").value = "";
   refreshPlanetList();
-  applyTexture();
+  updateGlobe();
 }
 
 function refreshPlanetList() {
-  const list = document.getElementById("planetList");
-  list.innerHTML = "";
+  const listDiv = document.getElementById("planetList");
+  listDiv.innerHTML = "";
   Object.keys(planets).forEach(name => {
     const btn = document.createElement("button");
     btn.textContent = name;
-    btn.onclick = () => {
-      currentPlanet = name;
-      applyTexture();
-    };
-    list.appendChild(btn);
+    btn.onclick = () => { currentPlanet = name; updateGlobe(); };
+    listDiv.appendChild(btn);
   });
 }
 
-function setPlanetTexture() {
+function setTexture() {
   if(!currentPlanet) return alert("Najpierw wybierz planetę!");
-  const texName = document.getElementById("textureName").value.trim();
+  const texName = document.getElementById("planetTexture").value.trim();
   if(!texName) return alert("Podaj nazwę pliku tekstury!");
-  
   planets[currentPlanet].texture = texName;
-  applyTexture();
+  updateGlobe();
 }
 
-function applyTexture() {
+function updateGlobe() {
   if(!currentPlanet) return;
-  const material = globe.globeMaterial();
-  material.map = null;
-  material.color.set("#000000");
-  material.needsUpdate = true;
-
   const tex = planets[currentPlanet].texture;
   if(tex) {
-    // upewniamy się, że ścieżka jest poprawna
     const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${tex}`;
-    console.log("Ładuję teksturę:", url); // 🔹 debug
-    new THREE.TextureLoader().load(url,
-      texture => {
-        material.map = texture;
-        material.color.set("#ffffff");
-        material.needsUpdate = true;
-        globe.pointOfView({ lat:0, lng:0, altitude:2 }); // kamera patrzy na planetę
-      },
+    new THREE.TextureLoader().load(
+      url,
+      texture => globe.globeMaterial().map = texture,
       undefined,
-      err => { console.error("Błąd ładowania tekstury:", err); }
+      err => { alert("Nie udało się załadować tekstury"); console.error(err); }
     );
+  } else {
+    globe.globeMaterial().map = null;
   }
 }
-
 </script>
 
 </body>
