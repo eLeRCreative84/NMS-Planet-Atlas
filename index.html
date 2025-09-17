@@ -449,7 +449,15 @@ function refreshPlanetList(){
       addPoles(p);
       refreshGlobePoints();
       globe.htmlElementsData(p.points.filter(pt => pt.type==="Pole"));
-      applyPlanetTexture(p);
+
+      // resetujemy glob przed zastosowaniem nowej planety
+      const mat = globe.globeMaterial();
+      mat.map = null;
+      mat.color.set("#000000");
+      mat.needsUpdate = true;
+      globe.globeImageUrl(null);
+
+      applyPlanetTexture(p);  // teraz na pewno zastosuje się poprawnie kolor lub tekstura
       refreshPointsList();
       loadPlanetDetails();
       updateCurrentPlanetHeader();
