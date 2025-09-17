@@ -750,44 +750,33 @@ function removePlanetColor() {
 
 function applyPlanetTexture(planet) {
   if (!planet) return;
-
   const material = globe.globeMaterial();
 
-  // 🔵 priorytet: tekstura
-  if (planetTextures[planet]) {
-    const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${planetTextures[planet]}`;
+  // reset materiału
+  material.map = null;
+  material.color.set("#000000");
+  material.needsUpdate = true;
 
-    // Załaduj teksturę od nowa i przypisz do materiału
+  // priorytet: tekstura
+  if (planetTextures[planet]) {
     new THREE.TextureLoader().load(
-      url,
+      planetTextures[planet],
       texture => {
         material.map = texture;
-        material.color.set("#ffffff"); // reset koloru, żeby nie przyciemniało
+        material.color.set("#ffffff");
         material.needsUpdate = true;
       },
       undefined,
-      err => {
-        console.error("Błąd ładowania tekstury:", err);
-        material.map = null;
-        material.color.set("#000000");
-        material.needsUpdate = true;
-      }
+      err => console.error("Błąd ładowania tekstury:", err)
     );
     return;
   }
 
-  // 🟢 kolor
+  // kolor
   if (planetColors[planet]) {
-    material.map = null;
     material.color.set(planetColors[planet]);
     material.needsUpdate = true;
-    return;
   }
-
-  // ⚫ domyślnie czarny
-  material.map = null;
-  material.color.set("#000000");
-  material.needsUpdate = true;
 }
 
 ////////////////////////////////////////////////////////////////////
