@@ -551,38 +551,95 @@ function addPoles(planet){
 
 function setPlanetColor() {
   if (!currentPlanet) return;
+  // usuwamy mapę tekstury i ustawiamy kolor
   currentPlanet.color = document.getElementById("planetColorInput").value;
   currentPlanet.texture = null;
-  applyPlanetTexture(currentPlanet);
+  // usuń ewentualną mapę z globu
+  globe.globeImageUrl(null);
+  const mat = globe.globeMaterial();
+  mat.map = null;
+  mat.color.set(currentPlanet.color || "#000000");
+  mat.needsUpdate = true;
 }
 
 function setPlanetTextureFromInput() {
   if (!currentPlanet) return;
+
+  // jeśli jest kolor, nie pozwalamy na nakładanie tekstury
+  if (currentPlanet.color) {
+    alert("Najpierw usuń kolor planety, zanim nałożysz teksturę!");
+    return;
+  }
+
   const input = document.getElementById("planetTextureInput");
   if (!input.files[0]) return;
-  currentPlanet.texture = input.files[0].name;
+
+  const file = input.files[0];
+
+  // zapisujemy tylko nazwę pliku (zakładasz że plik na GitHub ma taką nazwę)
+  currentPlanet.texture = file.name;
   currentPlanet.color = null;
-  applyPlanetTexture(currentPlanet);
+
+  // zbuduj pełny URL do GitHub Pages i ustaw glob.globImageUrl zamiast TextureLoader
+  const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${currentPlanet.texture}`;
+  console.log("Ustawiam teksturę (globeImageUrl):", url);
+  globe.globeImageUrl(url);
+  // jeśli chcesz upewnić się, że materiał jest zresetowany:
+  const mat = globe.globeMaterial();
+  mat.color.set("#ffffff");
+  mat.needsUpdate = true;
+}
+
+function removePlanetTexture() {
+  if (!currentPlanet) return;
+  delete currentPlanet.texture;
+  // usuń teksturę z globu
+  globe.globeImageUrl(null);
+  const mat = globe.globeMaterial();
+  mat.map = null;
+  mat.color.set(currentPlanet.color || "#000000");
+  mat.needsUpdate = true;
+}
+
+function removePlanetColor() {
+  if (!currentPlanet) return;
+  delete currentPlanet.color;
+  // jeśli nie ma tekstury, ustaw czarny (domyślny)
+  if(!currentPlanet.texture){
+    globe.globeImageUrl(null);
+    const mat = globe.globeMaterial();
+    mat.map = null;
+    mat.color.set("#000000");
+    mat.needsUpdate = true;
+  }
 }
 
 function applyPlanetTexture(planet) {
   if (!planet) return;
-  const material = globe.globeMaterial();
-  material.map = null;
-  material.color.set("#000000");
-  material.needsUpdate = true;
 
+  // jeśli planeta ma teksturę — ustawiamy ją przez globe.globeImageUrl (to prostsze i stabilniejsze)
   if (planet.texture) {
     const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${planet.texture}`;
-    new THREE.TextureLoader().load(url, tex=>{
-      material.map = tex;
-      material.color.set("#ffffff");
-      material.needsUpdate = true;
-    });
-  } else if (planet.color) {
-    material.color.set(planet.color);
-    material.needsUpdate = true;
+    console.log("applyPlanetTexture -> używam globeImageUrl:", url);
+    globe.globeImageUrl(url);
+    // upewnij się, że materiał nie przyciemnia tekstury
+    const mat = globe.globeMaterial();
+    mat.color.set("#ffffff");
+    mat.needsUpdate = true;
+    return;
   }
+
+  // brak tekstury — usuń mapę i ustaw kolor jeśli jest
+  globe.globeImageUrl(null);
+  const mat = globe.globeMaterial();
+  mat.map = null;
+
+  if (planet.color) {
+    mat.color.set(planet.color);
+  } else {
+    mat.color.set("#000000");
+  }
+  mat.needsUpdate = true;
 }
 
 ////////////////////////////////////////////////////////////////////
