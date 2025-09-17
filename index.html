@@ -84,18 +84,22 @@ function applyTexture() {
 
   const tex = planets[currentPlanet].texture;
   if(tex) {
+    // upewniamy się, że ścieżka jest poprawna
     const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${tex}`;
+    console.log("Ładuję teksturę:", url); // 🔹 debug
     new THREE.TextureLoader().load(url,
       texture => {
         material.map = texture;
         material.color.set("#ffffff");
         material.needsUpdate = true;
+        globe.pointOfView({ lat:0, lng:0, altitude:2 }); // kamera patrzy na planetę
       },
       undefined,
       err => { console.error("Błąd ładowania tekstury:", err); }
     );
   }
 }
+
 </script>
 
 </body>
