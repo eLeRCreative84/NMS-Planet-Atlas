@@ -406,6 +406,7 @@ function addNewPlanet() {
     name: name,
     extraInfo: {}, // miejsce na dodatkowe, niestandardowe dane planety
     createdAt: Date.now() //automatycznie zapisany czas dodania planety
+    texture: null, // tekstura
     
   });
   currentPlanet = name;
@@ -452,16 +453,11 @@ btn.style.cursor = "pointer";
       refreshPointsList();
       loadPlanetDetails();
      
-      // ustaw teksturę globu jeśli istnieje w planetData
-      const pd = planetData.find(pd => pd.name === p);
-      if(pd && pd.extraInfo && pd.extraInfo.texture){
-      globe.globeImageUrl(pd.extraInfo.texture);
-      document.getElementById("planetTextureUrl").value = pd.extraInfo.texture;  // ← pokaż w input
-      } else {
-      globe.globeImageUrl(null);
-      document.getElementById("planetTextureUrl").value = "";  // ← wyczyść input
-      }
-    };
+      const pd = planetData.find(p => p.name === currentPlanet);
+  if(!pd) return;
+
+  pd.texture = url;  // zapis do szufladki texture
+  globe.globeImageUrl(url);
 
     // 🔴 przycisk usuń planetę
     const delBtn = document.createElement("button");
@@ -711,10 +707,10 @@ function setPlanetTexture(){
     return;
   }
 
-  // zapis do planetData
-  updatePlanetData(currentPlanet, { texture: url });
+  const pd = planetData.find(p => p.name === currentPlanet);
+  if(!pd) return;
 
-  // ustaw teksturę globu
+  pd.texture = url;  // zapis do szufladki texture
   globe.globeImageUrl(url);
 
   alert(`Tekstura ustawiona dla planety: ${currentPlanet}`);
