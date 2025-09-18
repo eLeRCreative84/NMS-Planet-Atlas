@@ -328,6 +328,7 @@ function openTab(tabId) {
   document.querySelectorAll("#tabs button").forEach(btn=>{
     if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
   });
+  updateCurrentPlanetHeader();
 }
   
 //zmiana nagłówka z nazwą planety
@@ -472,14 +473,14 @@ btn.style.cursor = "pointer";
 
     btn.onclick = () => {
       currentPlanet = p;
+      updateCurrentPlanetHeader();
       addPoles(p);
       refreshGlobePoints();
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
       applyPlanetTexture(p);
       refreshPointsList();
       loadPlanetDetails();
-      updateCurrentPlanetHeader();
-    };
+          };
 
     // 🔴 przycisk usuń planetę
     const delBtn = document.createElement("button");
