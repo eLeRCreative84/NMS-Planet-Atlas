@@ -696,7 +696,6 @@ function editPoint(timestamp){
   if(index === -1) return;
 
   const p = atlas[currentPlanet][index];
-  document.getElementById("planet").value = currentPlanet;
   document.getElementById("lat").value = p.lat;
   document.getElementById("lng").value = p.lng;
   document.getElementById("name").value = p.name;
