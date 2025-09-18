@@ -135,13 +135,6 @@
   <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
 </div>
 
-<div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-<h3>Tekstura planety</h3>
-<input type="text" id="planetTextureUrl" placeholder="URL do tekstury (np. https://raw.githubusercontent.com/user/repo/main/textures/planet.jpg)" />
-<button onclick="setPlanetTexture()">Ustaw teksturę</button>
-
-<div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-    
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Lista planet</h2>
     <div id="planetList"></div>
@@ -406,7 +399,6 @@ function addNewPlanet() {
     name: name,
     extraInfo: {}, // miejsce na dodatkowe, niestandardowe dane planety
     createdAt: Date.now() //automatycznie zapisany czas dodania planety
-    texture: null, // tekstura
     
   });
   currentPlanet = name;
@@ -452,12 +444,8 @@ btn.style.cursor = "pointer";
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
       refreshPointsList();
       loadPlanetDetails();
-     
-      const pd = planetData.find(p => p.name === currentPlanet);
-  if(!pd) return;
-
-  pd.texture = url;  // zapis do szufladki texture
-  globe.globeImageUrl(url);
+      
+    };
 
     // 🔴 przycisk usuń planetę
     const delBtn = document.createElement("button");
@@ -696,25 +684,7 @@ function addPoles(planet){
 //------------------- Tekstury i kolory planet -------------------//
 ////////////////////////////////////////////////////////////////////  
 
-function setPlanetTexture(){
-  if(!currentPlanet){
-    alert("Najpierw wybierz planetę!");
-    return;
-  }
-  const url = document.getElementById("planetTextureUrl").value.trim();
-  if(!url){
-    alert("Podaj poprawny URL tekstury!");
-    return;
-  }
 
-  const pd = planetData.find(p => p.name === currentPlanet);
-  if(!pd) return;
-
-  pd.texture = url;  // zapis do szufladki texture
-  globe.globeImageUrl(url);
-
-  alert(`Tekstura ustawiona dla planety: ${currentPlanet}`);
-}
 
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import Atlasu ---------------//
