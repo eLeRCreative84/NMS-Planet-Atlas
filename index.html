@@ -135,6 +135,13 @@
   <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
 </div>
 
+<div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+<h3>Tekstura planety</h3>
+<input type="text" id="planetTextureUrl" placeholder="URL do tekstury (np. https://raw.githubusercontent.com/user/repo/main/textures/planet.jpg)" />
+<button onclick="setPlanetTexture()">Ustaw teksturę</button>
+
+<div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+    
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Lista planet</h2>
     <div id="planetList"></div>
@@ -444,7 +451,14 @@ btn.style.cursor = "pointer";
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
       refreshPointsList();
       loadPlanetDetails();
-      
+     
+      // ustaw teksturę globu jeśli istnieje w planetData
+      const pd = planetData.find(pd => pd.name === p);
+      if(pd && pd.extraInfo && pd.extraInfo.texture){
+      globe.globeImageUrl(pd.extraInfo.texture);
+      } else {
+      globe.globeImageUrl(null);
+      }
     };
 
     // 🔴 przycisk usuń planetę
@@ -684,7 +698,25 @@ function addPoles(planet){
 //------------------- Tekstury i kolory planet -------------------//
 ////////////////////////////////////////////////////////////////////  
 
+function setPlanetTexture(){
+  if(!currentPlanet){
+    alert("Najpierw wybierz planetę!");
+    return;
+  }
+  const url = document.getElementById("planetTextureUrl").value.trim();
+  if(!url){
+    alert("Podaj poprawny URL tekstury!");
+    return;
+  }
 
+  // zapis do planetData
+  updatePlanetData(currentPlanet, { texture: url });
+
+  // ustaw teksturę globu
+  globe.globeImageUrl(url);
+
+  alert(`Tekstura ustawiona dla planety: ${currentPlanet}`);
+}
 
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import Atlasu ---------------//
