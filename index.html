@@ -306,45 +306,55 @@
 <div id="globeViz">
  </div>
 
-
-  <script>
-let planets = []; // główna tablica wszystkich planet
+<script>
+let atlas = {};
+let planetTextures = {};
+let planetColors = {};
+let planetDetails = {};
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 let editIndex = null;
 
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
-////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////// 
 
+// Zakładki
 function openTab(tabId) {
   document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
   document.querySelectorAll("#tabs button").forEach(el => el.classList.remove("active"));
   const tab = document.getElementById(tabId);
   if(tab) tab.classList.add("active");
+  // oznacz odpowiedni przycisk jako active (przybliżone dopasowanie)
   document.querySelectorAll("#tabs button").forEach(btn=>{
-    if (btn.getAttribute("onclick")?.includes('${tabId}')) btn.classList.add("active");
+    if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
   });
 }
-
+  
+//zmiana nagłówka z nazwą planety
 function updateCurrentPlanetHeader() {
-  document.querySelectorAll(".currentPlanetHeader").forEach(h => {
-    h.textContent = currentPlanet ? currentPlanet.name : "Brak wybranej planety";
+  const headers = document.querySelectorAll(".currentPlanetHeader");
+  headers.forEach(h => {
+    h.textContent = currentPlanet
+      ? `${currentPlanet}`
+      : "Brak wybranej planety";
   });
 }
 
 function updateNoPlanetsMessage() {
   const msg = document.getElementById("noPlanetsMessage");
-  msg.style.display = planets.length === 0 ? "block" : "none";
+  const planets = Object.keys(atlas);
+  if (planets.length === 0) {
+    msg.style.display = "block";
+  } else {
+    msg.style.display = "none";
+  }
 }
 
-////////////////////////////////////////////////////////////////////
-//------------------ Detale planety ------------------------------//
-////////////////////////////////////////////////////////////////////
-
+// Detale planety (założyłeś te funkcje wcześniej — zostawiamy je działające)
 function loadPlanetDetails(){
   if(!currentPlanet) return;
-  const details=currentPlanet.details;
+  const details=planetDetails[currentPlanet]||{};
   document.getElementById("detailGalaxy").value=details.galaxy||"";
   document.getElementById("detailRegion").value=details.region||"";
   document.getElementById("detailSystem").value=details.system||"";
@@ -359,10 +369,9 @@ function loadPlanetDetails(){
   document.getElementById("detailCoords").value=details.coords||"";
   document.getElementById("detailNotes").value=details.notes||"";
 }
-
 function savePlanetDetails(){
   if(!currentPlanet) return;
-  currentPlanet.details = {
+  planetDetails[currentPlanet]={
     galaxy:document.getElementById("detailGalaxy").value,
     region:document.getElementById("detailRegion").value,
     system:document.getElementById("detailSystem").value,
@@ -382,95 +391,131 @@ function savePlanetDetails(){
 
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
-////////////////////////////////////////////////////////////////////
-
-function checkNewPlanetInput() {
+//////////////////////////////////////////////////////////////////// 
+  
+// Dodawanie nowych planet
+  function checkNewPlanetInput() {
   const input = document.getElementById("newPlanetName");
-  document.getElementById("addPlanetBtn").disabled = input.value.trim() === "";
+  const button = document.getElementById("addPlanetBtn");
+  button.disabled = input.value.trim() === "";
 }
 
 function addNewPlanet() {
   const input = document.getElementById("newPlanetName");
   const name = input.value.trim();
   if (!name) return;
-  if (planets.some(p=>p.name===name)) {
+
+  if (atlas[name]) {
     alert("Planeta już istnieje!");
     return;
   }
-  const newPlanet = {
-    name,
-    points: [],
-    texture: null,
-    color: null,
-    details: { galaxy:"",region:"",system:"",biome:"",weather:"", sentinels:"",flora:"",fauna:"",discovered:"", mode:"",updated:"",coords:"",notes:"" }
+
+  atlas[name] = [];
+  addPoles(name);
+  
+  // Dodaj pustą strukturę detali od razu:
+  planetDetails[name] = {
+    galaxy: "",
+    region: "",
+    system: "",
+    biome: "",
+    weather: "",
+    sentinels: "",
+    flora: "",
+    fauna: "",
+    discovered: "",
+    mode: "",
+    updated: "",
+    coords: "",
+    notes: ""
   };
-  addPoles(newPlanet);
-  planets.push(newPlanet);
-  currentPlanet = newPlanet;
+
+  currentPlanet = name;
   updateCurrentPlanetHeader();
-  applyPlanetTexture(currentPlanet);
+  delete planetColors[name];
+  delete planetTextures[name];
+  applyPlanetTexture(name);
   refreshPlanetList();
   refreshPointsList();
   refreshGlobePoints();
-  input.value = "";
+    input.value = "";
   checkNewPlanetInput();
-  alert(Dodano nową planetę: ${name});
-  updateNoPlanetsMessage();
+  alert(`Dodano nową planetę: ${name}`);
+  updateNoPlanetsMessage()
 }
-
+  
+// Lista planet
 function refreshPlanetList(){
   const list = document.getElementById("planetList");
   list.innerHTML = "";
-  planets.forEach(p => {
+
+  Object.keys(atlas).forEach(p => {
+    // kontener na przycisk planety i przycisk usuń
     const container = document.createElement("div");
     container.style.display = "flex";
     container.style.alignItems = "center";
     container.style.margin = "0.2rem 0";
+
+    // 🔵 przycisk planety
     const btn = document.createElement("button");
-    btn.textContent = p.name;
-    btn.style.flex = "1";
-    btn.style.marginRight = "0.5rem";
-    btn.style.background = "#e5e5e5";
-    btn.style.color = "black";
-    btn.style.border = "none";
-    btn.style.padding = "0.3rem";
-    btn.style.borderRadius = "4px";
-    btn.style.cursor = "pointer";
+    btn.textContent = p;
+btn.style.flex = "1"; // zajmuje całą pozostałą szerokość
+btn.style.marginRight = "0.5rem";
+btn.style.background = "#e5e5e5"; // jasnoszary
+btn.style.color = "black";
+btn.style.border = "none";
+btn.style.padding = "0.3rem";
+btn.style.borderRadius = "4px";
+btn.style.cursor = "pointer";
+
     btn.onclick = () => {
       currentPlanet = p;
       addPoles(p);
       refreshGlobePoints();
-      globe.htmlElementsData(p.points.filter(pt => pt.type==="Pole"));
+      globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
       applyPlanetTexture(p);
       refreshPointsList();
       loadPlanetDetails();
       updateCurrentPlanetHeader();
     };
+
+    // 🔴 przycisk usuń planetę
     const delBtn = document.createElement("button");
-    delBtn.textContent = "Usuń";
-    delBtn.style.background = "#c62828";
-    delBtn.style.color = "white";
-    delBtn.style.border = "none";
-    delBtn.style.padding = "0.2rem 0.5rem";
-    delBtn.style.borderRadius = "4px";
-    delBtn.style.cursor = "pointer";
-    delBtn.onclick = e => {
-      e.stopPropagation();
-      if(confirm(Na pewno usunąć planetę "${p.name}"?)){
-        planets = planets.filter(pl=>pl!==p);
-        currentPlanet = planets[0] || null;
-        if (currentPlanet) {
-          applyPlanetTexture(currentPlanet);
-          refreshGlobePoints();
-        } else {
-          globe.globeImageUrl(null);
-          globe.pointsData([]);
-        }
-        updateCurrentPlanetHeader();
-        refreshPlanetList();
-        refreshPointsList();
-      }
-    };
+delBtn.textContent = "Usuń";
+delBtn.style.flex = "0"; // tylko tyle, ile napis
+delBtn.style.background = "#c62828";
+delBtn.style.color = "white";
+delBtn.style.border = "none";
+delBtn.style.padding = "0.2rem 0.5rem"; // dopasowane do napisu
+delBtn.style.borderRadius = "4px";
+delBtn.style.cursor = "pointer";
+delBtn.style.marginLeft = "auto"; // wyrównanie do prawej
+delBtn.title = `Usuń planetę ${p}`;
+
+    delBtn.onclick = (e) => {
+  e.stopPropagation();
+  if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
+    delete atlas[p];
+    delete planetTextures[p];
+    delete planetColors[p];
+    delete planetDetails[p];
+
+    const planets = Object.keys(atlas);
+    currentPlanet = planets.length ? planets[0] : null; // 🔥 poprawne ustawienie
+
+    if (currentPlanet) {
+      applyPlanetTexture(currentPlanet);
+      refreshGlobePoints();
+    } else {
+      globe.globeImageUrl(null);
+      globe.pointsData([]);
+    }
+
+    updateCurrentPlanetHeader(); // 🔥 dopiero na końcu
+    refreshPlanetList();
+    refreshPointsList();
+  }
+};
     container.appendChild(btn);
     container.appendChild(delBtn);
     list.appendChild(container);
@@ -479,141 +524,285 @@ function refreshPlanetList(){
 }
 
 ////////////////////////////////////////////////////////////////////
-//------------------- Punkty, lista, tworzenie -------------------//
-////////////////////////////////////////////////////////////////////
-
+//--------------- Punkty, lista, tworzenie, edycja ---------------//
+//////////////////////////////////////////////////////////////////// 
+  
+// Lista punktow
 function refreshPointsList(){
   const list = document.getElementById("pointsList");
   list.innerHTML = "";
-  if(!currentPlanet) return;
-  let points = currentPlanet.points.filter(p => p.type !== "Pole");
+  if(!currentPlanet || !atlas[currentPlanet]) return;
+
+  let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
   const sort = document.getElementById("sortPoints").value;
   if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
   if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
   if(sort==="type") points.sort((a,b)=> (a.type||"").localeCompare(b.type||""));
   if(sort==="newest") points.sort((a,b)=> (b.timestamp||0)-(a.timestamp||0));
   if(sort==="oldest") points.sort((a,b)=> (a.timestamp||0)-(b.timestamp||0));
+
   points.forEach((point,index)=>{
     const li = document.createElement("li");
-    li.innerHTML = ${point.name||"Bez nazwy"} (${point.type}) X:${point.lat}, Y:${point.lng};
+    li.style.display = "flex";
+    li.style.flexDirection = "column";
+    li.style.alignItems = "flex-start";
+
+    const info = document.createElement("span");
+    info.innerHTML = `${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
+    li.appendChild(info);
+
+    const btnDiv = document.createElement("div");
+    btnDiv.style.display = "flex";
+    btnDiv.style.gap = "0.5rem";
+
+    // Przycisk "Pokaż punk na globie"
+    const showBtn = document.createElement("button");
+    showBtn.textContent = "Pokaż";
+    showBtn.className = "show";
+    showBtn.style.background = "#388e3c";
+    showBtn.style.color = "white";
+    showBtn.onclick = () => {
+      globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1000);
+
+      // podświetlenie punktu
+      point.__highlight = true;
+      globe.pointColor(d=>{
+        if(d.__highlight) return "orange";
+        switch(d.type){
+          case "Zasób": return d.extracted?"gray":"gold";
+          case "Obelisk": return d.visited?"green":"orange";
+          case "Baza": return "blue";
+          case "Ruiny": return "brown";
+          case "Duża struktura": return "purple";
+          case "Inne": return "pink";
+          case "Pole": return "red";
+          default: return "red";
+        }
+      });
+      globe.pointsData(atlas[currentPlanet]);
+      setTimeout(()=>{
+        delete point.__highlight;
+        globe.pointsData(atlas[currentPlanet]);
+      },2000);
+    };
+    btnDiv.appendChild(showBtn);
+
+    if(point.type==="Zasób" || point.type==="Obelisk"){
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = point.type==="Zasób"?point.extracted:point.visited;
+      checkbox.onchange = ()=>{
+        if(point.type==="Zasób") point.extracted = checkbox.checked;
+        if(point.type==="Obelisk") point.visited = checkbox.checked;
+        refreshGlobePoints();
+        refreshPointsList();
+      };
+      btnDiv.appendChild(checkbox);
+    }
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edytuj";
+    editBtn.className = "edit";
+    editBtn.onclick = ()=>editPoint(point.timestamp);  // Musimy jednoznacznie wskazać który punkt w atlasie edytujemy. Najprościej przekazywać nie indeks, tylko unikalny identyfikator (timestamp, który już dodajemy do każdego punktu).
+    btnDiv.appendChild(editBtn);
+
+   const delBtn = document.createElement("button");
+delBtn.textContent = "Usuń";
+delBtn.className = "del";
+delBtn.onclick = ()=>{
+  if(confirm(`Czy na pewno usunąć punkt "${point.name || "Bez nazwy"}" typu "${point.type}" o współrzędnych X:${point.lat}, Y:${point.lng}?`)){
+  const idx = atlas[currentPlanet].findIndex(p => p.timestamp === point.timestamp);
+  if(idx !== -1){
+    atlas[currentPlanet].splice(idx,1);
+    refreshPointsList();
+    refreshGlobePoints();
+    }
+  }
+};
+btnDiv.appendChild(delBtn);
+
+    li.appendChild(btnDiv);
     list.appendChild(li);
   });
 }
 
+// Kliknięcie Edytuj nie usuwa punktu od razu.
+//Punkt jest tymczasowo przygotowany do edycji (ładuje się do formularza).
+//Dopiero kliknięcie Nadpisz punkt faktycznie zmienia dane.
+//Jak klikniesz „Punkty” bez zapisania → lista zostaje nietknięta.
+//Przycisk zmienia podpis w zależności od trybu.
+  
 function addPoint(){
   if (!currentPlanet) {
-    alert("Najpierw wybierz planetę!");
+    alert("Najpierw wybierz planetę w zakładce 'Planety'!");
     return;
   }
+
   const lat = parseFloat(document.getElementById("lat").value);
   const lng = parseFloat(document.getElementById("lng").value);
   const name = document.getElementById("name").value.trim();
   const type = document.getElementById("type").value;
   const notes = document.getElementById("notes").value.trim();
+
   if (isNaN(lat) || isNaN(lng)) {
-    alert("Podaj współrzędne!");
+    alert("Podaj współrzędne X i Y!");
     return;
   }
-  const point = {lat,lng,name,type,notes,timestamp:Date.now()};
+
+  const point = {planet: currentPlanet, lat, lng, name, type, notes, timestamp: Date.now()};
   if(type==="Zasób") point.extracted=false;
   if(type==="Obelisk") point.visited=false;
-  currentPlanet.points.push(point);
+
+  if(editIndex !== null && atlas[currentPlanet][editIndex]) {
+    atlas[currentPlanet][editIndex] = point;
+    editIndex = null;
+    document.querySelector("button[onclick='addPoint()']").textContent = "Dodaj punkt";
+  } else {
+    atlas[currentPlanet].push(point);
+  }
   refreshPlanetList();
   refreshGlobePoints();
   refreshPointsList();
 }
 
-function addPoles(planet){
-  if(!planet.points.some(p=>p.type==="Pole")){
-    planet.points.push({lat:90,lng:0,name:"Biegun Północny",type:"Pole"});
-    planet.points.push({lat:-90,lng:0,name:"Biegun Południowy",type:"Pole"});
-  }
+function editPoint(timestamp){   
+  if(!currentPlanet || !atlas[currentPlanet]) return;
+  
+  const index = atlas[currentPlanet].findIndex(p => p.timestamp === timestamp);
+  if(index === -1) return;
+
+  const p = atlas[currentPlanet][index];
+  document.getElementById("planet").value = currentPlanet;
+  document.getElementById("lat").value = p.lat;
+  document.getElementById("lng").value = p.lng;
+  document.getElementById("name").value = p.name;
+  document.getElementById("type").value = p.type;
+  document.getElementById("notes").value = p.notes;
+
+  editIndex = index; // zapamiętaj indeks prawidłowego punktu w atlasie
+  document.querySelector("button[onclick='addPoint()']").textContent = "Nadpisz punkt";
+
+  // 🔥 przełączenie na zakładkę START
+  openTab('start');
 }
 
+// Utomatyczne tworzenie biegunów
+function addPoles(planet){
+  if(!atlas[planet]) atlas[planet] = [];
+  if(!atlas[planet].some(p => p.type==="Pole")){
+    atlas[planet].push({lat:90,lng:0,name:"Biegun Północny",type:"Pole"});
+    atlas[planet].push({lat:-90,lng:0,name:"Biegun Południowy",type:"Pole"});
+  }
+}
+  
 ////////////////////////////////////////////////////////////////////
-//---------------- Tekstury i kolory -----------------------------//
-////////////////////////////////////////////////////////////////////
+//------------------- Tekstury i kolory planet -------------------//
+////////////////////////////////////////////////////////////////////  
+
+function updateColorTextureButtons() {
+  if (!currentPlanet) return;
+  const hasTexture = !!planetTextures[currentPlanet];
+  const hasColor = !!planetColors[currentPlanet];
+
+  document.getElementById("setColorBtn").disabled = hasTexture;
+  document.getElementById("setTextureBtn").disabled = hasColor;
+}
 
 function setPlanetColor() {
   if (!currentPlanet) return;
-  currentPlanet.color = document.getElementById("planetColorInput").value;
-  currentPlanet.texture = null;
-  globe.globeImageUrl(null);
-  const mat = globe.globeMaterial();
-  mat.map = null;
-  mat.color.set(currentPlanet.color || "#000000");
-  mat.needsUpdate = true;
+  if (planetTextures[currentPlanet]) {
+    alert("Najpierw usuń teksturę!");
+    return;
+  }
+  const color = document.getElementById("planetColorInput").value;
+  planetColors[currentPlanet] = color;
+  applyPlanetTexture(currentPlanet);
+  updateColorTextureButtons();
 }
 
 function setPlanetTextureFromInput() {
   if (!currentPlanet) return;
-  if (currentPlanet.color) {
+
+  // jeśli jest kolor, nie pozwalamy na nakładanie tekstury
+  if (planetColors[currentPlanet]) {
     alert("Najpierw usuń kolor planety, zanim nałożysz teksturę!");
     return;
   }
+
   const input = document.getElementById("planetTextureInput");
   if (!input.files[0]) return;
+
   const file = input.files[0];
-  currentPlanet.texture = file.name;
-  currentPlanet.color = null;
-  const url = https://elercreative84.github.io/NMS-Planet-Atlas/textures/${currentPlanet.texture};
-  console.log("Ustawiam teksturę (globeImageUrl):", url);
-  globe.globeImageUrl(url);
-  const mat = globe.globeMaterial();
-  mat.color.set("#ffffff");
-  mat.needsUpdate = true;
+
+  // zapisujemy tylko nazwę pliku
+  planetTextures[currentPlanet] = file.name;
+
+  // od razu nakładamy teksturę
+  applyPlanetTexture(currentPlanet);
+
+  // aktualizacja przycisków (kolor vs tekstura)
+  updateColorTextureButtons();
 }
+
 
 function removePlanetTexture() {
   if (!currentPlanet) return;
-  delete currentPlanet.texture;
-  globe.globeImageUrl(null);
-  const mat = globe.globeMaterial();
-  mat.map = null;
-  mat.color.set(currentPlanet.color || "#000000");
-  mat.needsUpdate = true;
+  delete planetTextures[currentPlanet];
+  applyPlanetTexture(currentPlanet);
 }
 
 function removePlanetColor() {
   if (!currentPlanet) return;
-  delete currentPlanet.color;
-  if(!currentPlanet.texture){
-    globe.globeImageUrl(null);
-    const mat = globe.globeMaterial();
-    mat.map = null;
-    mat.color.set("#000000");
-    mat.needsUpdate = true;
-  }
+  delete planetColors[currentPlanet];
+  applyPlanetTexture(currentPlanet);
 }
 
 function applyPlanetTexture(planet) {
   if (!planet) return;
-  if (planet.texture) {
-    const url = https://elercreative84.github.io/NMS-Planet-Atlas/textures/${planet.texture};
-    console.log("applyPlanetTexture -> używam globeImageUrl:", url);
-    globe.globeImageUrl(url);
-    const mat = globe.globeMaterial();
-    mat.color.set("#ffffff");
-    mat.needsUpdate = true;
+
+  const material = globe.globeMaterial();
+
+  // 🔹 Reset materiału przed każdą zmianą
+  material.map = null;
+  material.color.set("#000000");
+  material.needsUpdate = true;
+
+  // 🔵 Priorytet: tekstura
+  if (planetTextures[planet]) {
+    const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${planetTextures[planet]}`;
+    new THREE.TextureLoader().load(
+      url,
+      texture => {
+        material.map = texture;
+        material.color.set("#ffffff"); // reset koloru, żeby nie przyciemniało
+        material.needsUpdate = true;
+      },
+      undefined,
+      err => {
+        console.error("Błąd ładowania tekstury:", err);
+        material.map = null;
+        material.color.set("#000000");
+        material.needsUpdate = true;
+      }
+    );
     return;
   }
-  globe.globeImageUrl(null);
-  const mat = globe.globeMaterial();
-  mat.map = null;
-  if (planet.color) {
-    mat.color.set(planet.color);
-  } else {
-    mat.color.set("#000000");
+
+  // 🟢 Kolor
+  if (planetColors[planet]) {
+    material.map = null;
+    material.color.set(planetColors[planet]);
+    material.needsUpdate = true;
   }
-  mat.needsUpdate = true;
 }
 
+
 ////////////////////////////////////////////////////////////////////
-//---------------- Eksport / Import -------------------------------//
-////////////////////////////////////////////////////////////////////
+//---------------- Eksport / Import Atlasu ---------------//
+////////////////////////////////////////////////////////////////////  
 
 function exportAtlas(){
-  const blob = new Blob([JSON.stringify({planets},null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetDetails},null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -629,58 +818,101 @@ function importAtlas(event){
   reader.onload = e => {
     try{
       const data = JSON.parse(e.target.result);
-      if(data.planets) planets = data.planets;
+      if(data.atlas) atlas = data.atlas;
+      if(data.planetTextures) planetTextures = data.planetTextures;
+      if(data.planetColors) planetColors = data.planetColors;
+      if(data.planetDetails) planetDetails = data.planetDetails;
+
+      // ustaw pierwszą planetę jako currentPlanet
+      const planets = Object.keys(atlas);
       currentPlanet = planets[0] || null;
-      if(currentPlanet) applyPlanetTexture(currentPlanet);
+       updateCurrentPlanetHeader(); // aby nagłówek był poprawny nawet jeśli currentPlanet jest null
+     
+      // ustaw glob na planetę (tekstura lub kolor) jeśli istnieje
+        if(currentPlanet) applyPlanetTexture(currentPlanet);
+     
       refreshPlanetList();
       refreshPointsList();
       refreshGlobePoints();
-      updateCurrentPlanetHeader();
+      updateNoPlanetsMessage()
+
       alert("Import zakończony!");
-    }catch(err){alert("Błąd importu JSON");}
+    } catch(err){ alert("Błąd importu JSON"); }
   };
   reader.readAsText(file);
 }
 
 ////////////////////////////////////////////////////////////////////
-//---------------- Skalowanie / przesuwanie ----------------------//
-////////////////////////////////////////////////////////////////////
-
+//---------------- Skalowanie / Przesuwanie Globu ----------------//
+////////////////////////////////////////////////////////////////////  
+  
+// Skalowanie globu
 function updateGlobeScale(){
   const scale = parseFloat(document.getElementById("globeScale").value);
   globe.scene().scale.set(scale, scale, scale);
 }
 
+// Skalowanie punktów
 function updatePointScale(){
   pointScale = parseFloat(document.getElementById("pointScale").value);
   refreshGlobePoints();
 }
 
+// Przesuwanie globu w lewo/prawo
 function updateGlobeOffset(){
-  globe.scene().position.x = parseFloat(document.getElementById("globeOffset").value);
+  const offset = parseFloat(document.getElementById("globeOffset").value);
+  globe.scene().position.x = offset;
 }
 
 function resetGlobePosition(){
   document.getElementById("globeOffset").value = 0;
   globe.scene().position.x = 0;
+  // reset suwaka oddalenia globu
   document.getElementById("globeScale").value = 1;
   globe.scene().scale.set(1,1,1);
 }
 
+// Odświeżenie punktów na globie
 function refreshGlobePoints(){
   if(!currentPlanet) return;
-  globe.pointsData(currentPlanet.points);
+  globe.pointsData(atlas[currentPlanet]);
 }
 
 ////////////////////////////////////////////////////////////////////
-//---------------- Inicjalizacja globu ---------------------------//
-////////////////////////////////////////////////////////////////////
+//---------------------- Inicjalizacja globu ---------------------//
+//////////////////////////////////////////////////////////////////// 
 
+  // Inicjalizacja globu — używamy https aby tło zawsze się załadowało
 const globe = Globe()(document.getElementById("globeViz"))
-  .globeImageUrl(null)
-  .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-  .pointLat("lat").pointLng("lng")
-  .pointLabel(d => ${d.name||""} (${d.type}))
+  .globeImageUrl(null) // brak domyślnej mapy (pusta/ciemna kula)
+  .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png') // 🌌 gwiazdy w tle
+  .pointLat("lat")
+  .pointLng("lng")
+  .pointLabel(d => {
+    // zabezpieczenie: gdy nie ma currentPlanet, zwracamy opis punktu pojedynczo
+    if (!currentPlanet || !atlas[currentPlanet]) {
+      let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
+      if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+      if (d.type === "Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+      return label;
+    }
+
+    // grupowanie punktów w tym samym miejscu dla aktualnej planety
+    const sameLocation = atlas[currentPlanet].filter(p => p.lat === d.lat && p.lng === d.lng);
+    if (sameLocation.length > 1) {
+      return sameLocation.map(p => {
+        let label = `${p.name || "Bez nazwy"} (${p.type})`;
+        if (p.type === "Zasób") label += p.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+        if (p.type === "Obelisk") label += p.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+        return label;
+      }).join("<br>");
+    }
+
+    let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
+    if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
+    if (d.type === "Obelisk") label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+    return label;
+  })
   .pointColor(d=>{
     switch(d.type){
       case "Zasób": return d.extracted?"gray":"gold";
@@ -693,16 +925,36 @@ const globe = Globe()(document.getElementById("globeViz"))
       default: return "red";
     }
   })
-  .pointRadius(()=>pointScale);
+  .pointRadius(() => pointScale)
+  .htmlElementsData([])
+  .htmlElement(d=>{
+    if(d.type==="Pole"){
+      const el=document.createElement("div");
+      el.style.color="white";
+      el.style.fontSize="20px";
+      el.style.fontWeight="bold";
+      el.style.textShadow="0 0 4px black";
+      el.textContent=d.name==="Biegun Północny"?"N":"S";
+      return el;
+    }
+  });
+
+// ustawienie punktów dla aktualnej planety
+if (currentPlanet && atlas[currentPlanet]) {
+  globe.pointsData(atlas[currentPlanet]);
+  globe.htmlElementsData(atlas[currentPlanet].filter(p => p.type === "Pole"));
+}
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
+// start
 window.onload = () => {
-  openTab("start");
+  openTab("start"); // aktywuj pierwszą zakładkę
   refreshPlanetList();
   refreshPointsList();
   updateNoPlanetsMessage();
 };
+
 </script>
 </body>
 </html>
