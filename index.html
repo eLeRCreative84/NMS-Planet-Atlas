@@ -157,29 +157,27 @@
 </div>
 
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-<h2>Kolor / tekstura planety</h2>
+ <h2>Kolor / tekstura planety</h2>
 
-<!-- Sekcja Koloru -->
-<div class="texture-input">
-  <input type="color" id="planetColorInput" value="#4caf50" />
-  <button id="setColorBtn" onclick="setPlanetColor()">Ustaw kolor</button>
-  <button id="removeColorBtn" onclick="removePlanetColor()">Usuń kolor</button>
-</div>
-
-    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-    
-<!-- Sekcja Tekstury -->
-<div class="texture-input">
-  <input type="file" id="planetTextureInput" accept="image/*" hidden />
-  <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
-  <button id="setTextureBtn" onclick="setPlanetTextureFromInput()">Ustaw teksturę</button>
-  <button id="removeTextureBtn" onclick="removePlanetTexture()">Usuń teksturę</button>
-</div>
-    
-      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-    <h2>Lista planet</h2>
-    <div id="planetList"></div>
+  <div class="texture-input">
+    <input type="color" id="planetColorInput" value="#4caf50" />
+    <button id="applyColorBtn" onclick="applyPlanetColor()">Ustaw kolor</button>
+    <button id="clearColorBtn" onclick="clearPlanetColor()">Usuń kolor</button>
   </div>
+
+  <div class="texture-input">
+    <input type="file" id="planetTextureInput" accept="image/*" hidden onchange="handleTextureFile(event)" />
+    <button onclick="document.getElementById('planetTextureInput').click()" class="textureBtn">Wybierz teksturę</button>
+    <button id="clearTextureBtn" onclick="clearPlanetTexture()">Usuń teksturę</button>
+  </div>
+
+  <!-- Lista planet -->
+  <h2>Lista planet</h2>
+  <ul id="planetList"></ul>
+</div>
+
+<!-- Kontener na glob -->
+<div id="globeViz" style="flex:1; background:black;"></div>
 
   <!-- Zakładka PUNKTY -->
   <div id="punkty" class="tab-content">
@@ -895,10 +893,8 @@ function onPlanetSelect(name) {
 // Funkcja onPlanetSelect(name) → wołasz ją, gdy użytkownik kliknie planetę z listy (tam, gdzie wcześniej ustawiałeś currentPlanet).
   
 //////////////////////////////////////////////////////////////////////
-//----------------- Tekstury i kolory planet ----------- -----------//
+//---- Funkcje obsługi kolorów i tekstur dla aktualnej planety------//
 //////////////////////////////////////////////////////////////////////
-
-// Funkcje obsługi kolorów i tekstur dla aktualnej planety
 
 function updatePlanetAppearance() {
   if (!currentPlanet) return;
@@ -1003,6 +999,212 @@ function applyPlanetTexture(pname) {
 //Dynamicznie aktualizuje model planety przy przełączaniu na liście planet.
 //Nie używa base64, zakłada katalog /textures/.
 //Przycisk wyboru pliku jest jeden i uniwersalny.
+
+
+//////////////////////////////////////////////////////////////////////
+//----------- Integracja z planetami i przyciskami -----------------//
+//////////////////////////////////////////////////////////////////////
+
+// Przechowujemy aktualny kolor i teksturę każdej planety
+// Dodajemy do planetData pola color i texturePath
+function getPlanetDataObj(name) {
+  let pd = planetData.find(p => p.name === name);
+  if (!pd) {
+    pd = { name: name, extraInfo: {}, createdAt: Date.now(), color: null, texturePath: null };
+    planetData.push(pd);
+  } else {
+    if (pd.color === undefined) pd.color = null;
+    if (pd.texturePath === undefined) pd.texturePath = null;
+  }
+  return pd;
+}
+
+// Zastosowanie koloru
+function setPlanetColor() {
+  if (!currentPlanet) return;
+  const colorInput = document.getElementById("planetColorInput");
+  if (!colorInput) return;
+  const color = colorInput.value;
+  const pd = getPlanetDataObj(currentPlanet);
+  pd.color = color;
+  pd.texturePath = null; // usuwamy teksturę
+  applyPlanetVisual(pd);
+  toggleButtons();
+}
+
+// Usunięcie koloru
+function removePlanetColor() {
+  if (!currentPlanet) return;
+  const pd = getPlanetDataObj(currentPlanet);
+  pd.color = null;
+  applyPlanetVisual(pd);
+  toggleButtons();
+}
+
+// Zastosowanie tekstury z input
+function setPlanetTextureFromInput() {
+  if (!currentPlanet) return;
+  const input = document.getElementById("planetTextureInput");
+  if (!input || !input.files || !input.files[0]) return;
+  const file = input.files[0];
+
+  // Zakładamy, że plik jest na dysku lub w /textures/
+  const url = URL.createObjectURL(file);
+
+  const pd = getPlanetDataObj(currentPlanet);
+  pd.texturePath = url;
+  pd.color = null; // usuwamy kolor
+  applyPlanetVisual(pd);
+  toggleButtons();
+}
+
+// Usunięcie tekstury
+function removePlanetTexture() {
+  if (!currentPlanet) return;
+  const pd = getPlanetDataObj(currentPlanet);
+  pd.texturePath = null;
+  applyPlanetVisual(pd);
+  toggleButtons();
+}
+
+// Zastosowanie koloru lub tekstury do globu
+function applyPlanetVisual(pd) {
+  if (!pd) return;
+  if (pd.texturePath) {
+    globe.globeImageUrl(pd.texturePath);
+  } else if (pd.color) {
+    // tworzymy jednolity kolor
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 64;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = pd.color;
+    ctx.fillRect(0, 0, 64, 64);
+    globe.globeImageUrl(canvas.toDataURL()); // tylko w tym miejscu tworzymy tymczasowy canvas
+  } else {
+    globe.globeImageUrl(null); // brak koloru/tekstury
+  }
+}
+
+// Blokowanie przycisków w zależności od stanu
+function toggleButtons() {
+  const pd = getPlanetDataObj(currentPlanet);
+  const colorInput = document.getElementById("planetColorInput");
+  const setColorBtn = document.getElementById("setColorBtn");
+  const removeColorBtn = document.getElementById("removeColorBtn");
+
+  const setTextureBtn = document.getElementById("setTextureBtn");
+  const textureInput = document.getElementById("planetTextureInput");
+  const removeTextureBtn = document.getElementById("removeTextureBtn");
+
+  if (!pd) return;
+
+  if (pd.texturePath) {
+    // tekstura aktywna -> blokujemy kolor
+    if (colorInput) colorInput.disabled = true;
+    if (setColorBtn) setColorBtn.disabled = true;
+    if (removeColorBtn) removeColorBtn.disabled = true;
+
+    if (setTextureBtn) setTextureBtn.disabled = false;
+    if (textureInput) textureInput.disabled = false;
+    if (removeTextureBtn) removeTextureBtn.disabled = false;
+  } else if (pd.color) {
+    // kolor aktywny -> blokujemy teksturę
+    if (colorInput) colorInput.disabled = false;
+    if (setColorBtn) setColorBtn.disabled = false;
+    if (removeColorBtn) removeColorBtn.disabled = false;
+
+    if (setTextureBtn) setTextureBtn.disabled = true;
+    if (textureInput) textureInput.disabled = true;
+    if (removeTextureBtn) removeTextureBtn.disabled = true;
+  } else {
+    // brak -> wszystko aktywne
+    if (colorInput) colorInput.disabled = false;
+    if (setColorBtn) setColorBtn.disabled = false;
+    if (removeColorBtn) removeColorBtn.disabled = true;
+
+    if (setTextureBtn) setTextureBtn.disabled = false;
+    if (textureInput) textureInput.disabled = false;
+    if (removeTextureBtn) removeTextureBtn.disabled = true;
+  }
+}
+
+// Przy przełączeniu planet w liście, od razu stosujemy wizualizację i blokady
+function applyPlanetTexture(planetName) {
+  currentPlanet = planetName;
+  const pd = getPlanetDataObj(currentPlanet);
+  applyPlanetVisual(pd);
+  toggleButtons();
+  updateCurrentPlanetHeader();
+}
+
+// Dynamiczna zmiana koloru/tekstury podczas przełączania planet – funkcja applyPlanetTexture(planetName) nakłada wizualizację i blokuje/odblokowuje przyciski.
+// Blokowanie wzajemne – kolor blokuje teksturę i odwrotnie.
+// Usuwanie koloru lub tekstury przywraca możliwość wyboru drugiej opcji.
+// Bez użycia base64 dla plików tekstur – można wybrać plik lokalny lub URL /textures/....
+
+//////////////////////////////////////////////////////////////////////
+//----------------- Integracja z listą planet ---------------------//
+//////////////////////////////////////////////////////////////////////
+
+let currentPlanet = null; // aktualnie wybrana planeta
+
+// Funkcja wywoływana przy kliknięciu na planetę w liście
+function selectPlanet(planetName) {
+  currentPlanet = planetName;
+  const pd = getPlanetDataObj(planetName);
+
+  // Zmieniamy wizualizację globu
+  applyPlanetVisual(pd);
+
+  // Ustawiamy przyciski (blokady)
+  toggleButtons();
+
+  // Opcjonalnie: aktualizujemy nagłówek lub info o planecie
+  updateCurrentPlanetHeader();
+}
+
+// Aktualizacja nagłówka/wyświetlanie nazwy aktualnej planety
+function updateCurrentPlanetHeader() {
+  const header = document.getElementById("currentPlanetName");
+  if (header && currentPlanet) {
+    header.textContent = `Wybrana planeta: ${currentPlanet}`;
+  }
+}
+
+// Funkcja inicjalizacyjna dla listy planet
+function initPlanetList() {
+  const listContainer = document.getElementById("planetList");
+  if (!listContainer) return;
+
+  planetData.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = p.name;
+    li.style.cursor = "pointer";
+    li.onclick = () => selectPlanet(p.name);
+    listContainer.appendChild(li);
+  });
+}
+
+// Przykład dynamicznej zmiany wizualizacji przy przewijaniu lub wyborze
+function refreshCurrentPlanetVisual() {
+  if (!currentPlanet) return;
+  const pd = getPlanetDataObj(currentPlanet);
+  applyPlanetVisual(pd);
+  toggleButtons();
+}
+
+// Inicjalizacja przy uruchomieniu strony
+window.addEventListener("DOMContentLoaded", () => {
+  initPlanetList();
+  if (planetData.length > 0) {
+    selectPlanet(planetData[0].name); // domyślnie pierwsza planeta
+  }
+});
+  
+//Dynamiczna zmiana planety – przy kliknięciu w liście planet automatycznie nakłada kolor/teksturę zapisane dla tej planety.
+//Blokowanie przycisków – jeśli planeta ma kolor, przyciski tekstury są zablokowane; jeśli ma teksturę, przyciski koloru są zablokowane.
+//Łatwe dodawanie nowych planet – wystarczy, że planetę dodamy do planetData, a lista i mechanizm będą działały automatycznie.
+//Integracja z poprzednim rozdziałem – funkcje applyPlanetVisual() i toggleButtons() są w pełni kompatybilne z mechanizmem kolorów i tekstur.
   
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import Atlasu ---------------//
