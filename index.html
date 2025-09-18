@@ -1,335 +1,311 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <title>Atlas Planetarny</title>
-  <script src="https://unpkg.com/three"></script>
-  <script src="https://unpkg.com/globe.gl"></script>
-  <style>
-    body {
-      margin: 0;
-      display: flex;
-      height: 100vh;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-      font-size: 14px;
-    }
+<meta charset="UTF-8" />
+<title>Atlas Planetarny</title>
+<script src="https://unpkg.com/three"></script>
+<script src="https://unpkg.com/globe.gl"></script>
+<style>
+  body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
+  #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
+  #globeViz { flex: 1; background: black; position: relative; }
+  /* upewniamy się że canvas zajmuje cały obszar kontenera */
+  #globeViz canvas { width: 100% !important; height: 100% !important; display: block; background: transparent; }
 
-    #form {
-      flex: 0 0 25%;
-      min-width: 280px;
-      max-width: 450px;
-      padding: 1rem;
-      background: #0a1e3a;
-      color: white;
-      overflow-y: auto;
-      box-sizing: border-box;
-    }
+  h2 { margin-top: 1rem; margin-bottom: 0.5rem; }
+  input, select, textarea, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
+  button { cursor: pointer; }
+  .texture-input { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .texture-input button { flex: 1; padding: 0.5rem; border: none; background: #1976d2; color: white; border-radius: 4px; }
+  .texture-input button:hover { background: #1565c0; }
 
-    #globeViz {
-      flex: 1;
-      background: black;
-      position: relative;
-    }
+.texture-input {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.3rem 0;
+}
 
-    /* upewniamy się że canvas zajmuje cały obszar kontenera */
-    #globeViz canvas {
-      width: 100% !important;
-      height: 100% !important;
-      display: block;
-      background: transparent;
-    }
+.texture-input input[type="file"],
+.texture-input input[type="color"] {
+  flex: 1;              /* obie zajmują równą szerokość */
+  max-width: 200px;     /* ograniczenie szerokości */
+}
 
-    h2 {
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-    }
+.texture-input button {
+  flex: 1;
+  max-width: 200px;
+}
 
-    input,
-    select,
-    textarea,
-    button {
-      width: 100%;
-      margin: 0.3rem 0;
-      padding: 0.4rem;
-      box-sizing: border-box;
-    }
+  
+  ul { padding: 0; list-style: none; }
+  li { margin: 0.3rem 0; background: #1a2b4d; padding: 0.3rem; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+  li div { display: flex; gap: 0.5rem; align-items: center; }
+  li button { padding: 0.2rem 0.5rem; border: none; border-radius: 4px; cursor: pointer; }
+  li button.edit { background: #0277bd; color: white; }
+  li button.del { background: #c62828; color: white; }
+  label { display: block; margin-top: 0.5rem; font-weight: bold; }
+  .xy-inputs { display: flex; gap: 0.3rem; }
+  .xy-inputs input { width: 50%; }
 
-    button {
-      cursor: pointer;
-    }
+  #tabs { display: flex; background: #102b56; margin-bottom: 0.5rem; }
+  #tabs button { flex: 1; padding: 0.5rem; border: none; background: #102b56; color: white; cursor: pointer; font-weight: bold; }
+  #tabs button.active { background: #1976d2; }
+  .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
+  .tab-content.active { display: block; }
 
-    .texture-input {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
+/* Nagłówek aktualnej planety */
+.currentPlanetHeader {
+  margin: 0.2rem 0 0.5rem 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  background-color: #1a3a6a; /* jasny granat, pasuje do zakładek */
+  padding: 0.3rem 0;
+  border-radius: 4px;
+  color: white;
+}
 
-    .texture-input button {
-      flex: 1;
-      padding: 0.5rem;
-      border: none;
-      background: #1976d2;
-      color: white;
-      border-radius: 4px;
-    }
+/* Pola współrzędnych X i Y */
+.xy-inputs {
+  display: flex;
+  gap: 1cm; /* większy odstęp między polami */
+}
+.xy-inputs div {
+  display: flex;
+  flex-direction: column;
+  width: max-content; /* szerokość dopasowana do napisu */
+}
 
-    .texture-input button:hover {
-      background: #1565c0;
-    }
+.xy-inputs input {
+  width: 100%; /* dopasowuje się do szerokości rodzica */
+}
 
-    .texture-input {
-      display: flex;
-      gap: 0.5rem;
-      margin: 0.3rem 0;
-    }
-
-    .texture-input input[type="file"],
-    .texture-input input[type="color"] {
-      flex: 1;
-      /* obie zajmują równą szerokość */
-      max-width: 200px;
-      /* ograniczenie szerokości */
-    }
-
-    .texture-input button {
-      flex: 1;
-      max-width: 200px;
-    }
-
-    ul {
-      padding: 0;
-      list-style: none;
-    }
-
-    li {
-      margin: 0.3rem 0;
-      background: #1a2b4d;
-      padding: 0.3rem;
-      border-radius: 5px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    li div {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    li button {
-      padding: 0.2rem 0.5rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    li button.edit {
-      background: #0277bd;
-      color: white;
-    }
-
-    li button.del {
-      background: #c62828;
-      color: white;
-    }
-
-    label {
-      display: block;
-      margin-top: 0.5rem;
-      font-weight: bold;
-    }
-
-    .xy-inputs {
-      display: flex;
-      gap: 0.3rem;
-    }
-
-    .xy-inputs input {
-      width: 50%;
-    }
-
-    #tabs {
-      display: flex;
-      background: #102b56;
-      margin-bottom: 0.5rem;
-    }
-
-    #tabs button {
-      flex: 1;
-      padding: 0.5rem;
-      border: none;
-      background: #102b56;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    #tabs button.active {
-      background: #1976d2;
-    }
-
-    .tab-content {
-      display: none;
-      padding: 1rem 0 0 0;
-      overflow-y: auto;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Nagłówek aktualnej planety */
-    .currentPlanetHeader {
-      margin: 0.2rem 0 0.5rem 0;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-align: center;
-      background-color: #1a3a6a;
-      /* jasny granat, pasuje do zakładek */
-      padding: 0.3rem 0;
-      border-radius: 4px;
-      color: white;
-    }
-
-    /* Pola współrzędnych X i Y */
-    .xy-inputs {
-      display: flex;
-      gap: 1cm;
-      /* większy odstęp między polami */
-    }
-
-    .xy-inputs div {
-      display: flex;
-      flex-direction: column;
-      width: max-content;
-      /* szerokość dopasowana do napisu */
-    }
-
-    .xy-inputs input {
-      width: 100%;
-      /* dopasowuje się do szerokości rodzica */
-    }
-
-    .tab-content h2 {
-      text-align: center;
-    }
-  </style>
+.tab-content h2 {
+  text-align: center;
+}
+ 
+</style>
 </head>
 <body>
-
-    <div id="form">
-    <div id="tabs">
-      <button class="active" data-tab="planets">Planety</button>
-      <button data-tab="points">Punkty</button>
-      <button data-tab="labels">Etykiety</button>
-      <button data-tab="orbits">Orbity</button>
-    </div>
-
-    <!-- Zakładka: Planety -->
-    <div id="planets" class="tab-content active">
-      <h2>Planety</h2>
-      <form id="planetForm">
-        <label>Nazwa</label>
-        <input id="planetName" placeholder="np. Mars" required />
-
-        <label>Kolor / Tekstura</label>
-        <div class="texture-input">
-          <input type="file" id="planetTexture" accept="image/*" />
-          <input type="color" id="planetColor" value="#888888" />
-        </div>
-
-        <label>Rozmiar (km)</label>
-        <input id="planetSize" type="number" value="6371" />
-
-        <label>Odległość od centrum (AU)</label>
-        <input id="planetDistance" type="number" value="1" />
-
-        <label>Prędkość obrotu (deg/s)</label>
-        <input id="planetRotationSpeed" type="number" value="0.1" step="0.01" />
-
-        <button type="submit">Dodaj planetę</button>
-      </form>
-      <ul id="planetList"></ul>
-    </div>
-
-    <!-- Zakładka: Punkty -->
-    <div id="points" class="tab-content">
-      <h2>Punkty</h2>
-      <div class="currentPlanetHeader">Brak wybranej planety</div>
-      <form id="pointForm">
-        <label>Nazwa</label>
-        <input id="pointName" placeholder="np. Krater Gale" required />
-
-        <label>Współrzędne (X, Y)</label>
-        <div class="xy-inputs">
-          <div>
-            <span>X:</span>
-            <input id="pointX" type="number" step="0.01" />
-          </div>
-          <div>
-            <span>Y:</span>
-            <input id="pointY" type="number" step="0.01" />
-          </div>
-        </div>
-
-        <label>Opis</label>
-        <textarea id="pointDesc"></textarea>
-
-        <button type="submit">Dodaj punkt</button>
-      </form>
-      <ul id="pointList"></ul>
-    </div>
-
-    <!-- Zakładka: Etykiety -->
-    <div id="labels" class="tab-content">
-      <h2>Etykiety</h2>
-      <div class="currentPlanetHeader">Brak wybranej planety</div>
-      <form id="labelForm">
-        <label>Treść etykiety</label>
-        <input id="labelText" required />
-
-        <label>Pozycja (X, Y)</label>
-        <div class="xy-inputs">
-          <div>
-            <span>X:</span>
-            <input id="labelX" type="number" step="0.01" />
-          </div>
-          <div>
-            <span>Y:</span>
-            <input id="labelY" type="number" step="0.01" />
-          </div>
-        </div>
-
-        <button type="submit">Dodaj etykietę</button>
-      </form>
-      <ul id="labelList"></ul>
-    </div>
-
-    <!-- Zakładka: Orbity -->
-    <div id="orbits" class="tab-content">
-      <h2>Orbity</h2>
-      <form id="orbitForm">
-        <label>Obiekt centralny</label>
-        <select id="orbitCenter"></select>
-
-        <label>Obiekt orbitujący</label>
-        <select id="orbitTarget"></select>
-
-        <label>Promień orbity (AU)</label>
-        <input id="orbitRadius" type="number" value="1" step="0.1" />
-
-        <label>Prędkość orbitalna (deg/s)</label>
-        <input id="orbitSpeed" type="number" value="0.1" step="0.01" />
-
-        <button type="submit">Dodaj orbitę</button>
-      </form>
-      <ul id="orbitList"></ul>
-    </div>
+<div id="form">
+  <div id="tabs">
+    <button class="active" onclick="openTab('start')">Start</button>
+    <button onclick="openTab('planety')">Planety</button>
+    <button onclick="openTab('punkty')">Punkty</button>
+    <button onclick="openTab('detale')">Detale planety</button>
   </div>
 
-  <div id="globeViz"></div>
+  <!-- Zakładka START -->
+  <div id="start" class="tab-content active">
+   
+    <div id="noPlanetsMessage" style="color: #ffcc00; font-weight: bold; text-align: center; margin: 0.5rem 0;">
+  Stwórz nową planetę lub importuj dane JSON
+</div>
+
+    <h2 class="currentPlanetHeader"></h2>
+    <h2>Dodaj punkt</h2>
+      <div class="xy-inputs">
+  <div>
+    <label>X (−90 do 90)</label>
+    <input type="number" id="lat" step="1" min="-90" max="90" />
+  </div>
+  <div>
+    <label>Y (−180 do 180)</label>
+    <input type="number" id="lng" step="1" min="-180" max="180" />
+  </div>
+</div>
+
+    <label>Nazwa punktu</label>
+    <input type="text" id="name" />
+    <label>Typ</label>
+    <select id="type">
+      <option>Zasób</option>
+      <option>Obelisk</option>
+      <option>Baza</option>
+      <option>Ruiny</option>
+      <option>Struktura</option>
+      <option>Inne</option>
+    </select>
+    <label>Notatki</label>
+    <textarea id="notes"></textarea>
+
+    <button onclick="addPoint()">Dodaj punkt</button>
+      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+    <h2>Skalowanie i pozycja globu</h2>
+    <label>Skala punktów</label>
+    <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="0.4" oninput="updatePointScale()" />
+    <label>Oddal glob</label>
+    <input type="range" id="globeScale" min="0.01" max="1" step="0.01" value="1" oninput="updateGlobeScale()" />
+    <label>Przesuń glob</label>
+    <input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
+    <button onclick="resetGlobePosition()">Reset pozycji globu</button>
+    
+      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+    <h2>Import/Eksport</h2>
+    <button onclick="exportAtlas()">Eksport JSON</button>
+    <input type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
+  </div>
+
+  <!-- Zakładka PLANETY -->
+  <div id="planety" class="tab-content">
+    <h2 class="currentPlanetHeader"></h2>
+    <h3>Dodaj nową planetę</h3>
+
+    <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+  <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
+  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
+</div>
+
+    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+<h2>Kolor / tekstura planety</h2>
+<div class="texture-input">
+  <input type="color" id="planetColorInput" value="#4caf50" />
+  <button id="setColorBtn" onclick="setPlanetColor()">Ustaw kolor</button>
+  <button id="removeColorBtn" onclick="removePlanetColor()">Usuń</button>
+</div>
+<div class="texture-input">
+  <input type="file" id="planetTextureInput" accept="image/*" hidden />
+  <button onclick="document.getElementById('planetTextureInput').click()">Wybierz plik</button>
+  <button id="setTextureBtn" onclick="setPlanetTextureFromInput()">Ustaw teksturę</button>
+  <button id="removeTextureBtn" onclick="removePlanetTexture()">Usuń</button>
+</div>
+    
+      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+    <h2>Lista planet</h2>
+    <div id="planetList"></div>
+  </div>
+
+  <!-- Zakładka PUNKTY -->
+  <div id="punkty" class="tab-content">
+    <h2 class="currentPlanetHeader"></h2>
+    <label>Sortuj:</label>
+    <select id="sortPoints" onchange="refreshPointsList()">
+      <option value="nameAsc">Nazwa A–Z</option>
+      <option value="nameDesc">Nazwa Z–A</option>
+      <option value="type">Typ</option>
+      <option value="newest">Najnowsze</option>
+      <option value="oldest">Najstarsze</option>
+    </select>
+    <ul id="pointsList"></ul>
+  </div>
+
+  <!-- Zakładka DETALE PLANETY -->
+<div id="detale" class="tab-content">
+  <h2 class="currentPlanetHeader"></h2>
+  <label>Galaktyka</label><input type="text" id="detailGalaxy" />
+  <label>Region</label><input type="text" id="detailRegion" />
+  <label>Układ gwiazdowy</label><input type="text" id="detailSystem" />
+
+  <label>Biom</label>
+  <select id="detailBiome">
+    <option value="">-- wybierz --</option>
+    <option>Bujna</option>
+    <option>Jałowa</option>
+    <option>Martwa</option>
+    <option>Egzotyczna</option>
+    <option>Mega Egzotyczna</option>
+    <option>Spalona</option>
+    <option>Zamrożona</option>
+    <option>Toksyczna</option>
+    <option>Napromieniowana</option>
+    <option>Bagno</option>
+    <option>Wulkaniczna</option>
+    <option>Gazowy Gigant</option>
+  </select>
+
+  <label>Pogoda</label>
+<select id="detailWeather">
+  <option value="">-- wybierz --</option>
+<option>Brak atmosfery</option>
+    <option>Słonecznie</option>
+    <option>Chłodno</option>
+    <option>Mroźno</option>
+    <option>Ciepło</option>
+    <option>Gorąco</option>
+    <option>Wilgotno</option>
+    <option>Deszczowo</option>
+    <option>Burzowo</option>
+    <option>Radioaktywne</option>
+    <option>Toksyczne</option>
+    <option>Kwasyczne</option>
+    <option>Pyłowe</option>
+    <option>Wulkaniczne</option>
+    <option>Burze piaskowe</option>
+    <option>Tornada</option>
+    <option>Meteoryty</option>
+    <option>Burze ogniste</option>
+    <option>Wysokie ciśnienie</option>
+    <option>Niskie ciśnienie</option>
+    <option>Burze magnetyczne</option>
+    <option>Burze elektryczne</option>
+</select>
+
+  <label>Strażnicy</label>
+  <select id="detailSentinels">
+    <option value="">-- wybierz --</option>
+    <option>Pasywne</option>
+    <option>Brak</option>
+    <option>Zrelaksowane</option>
+    <option>Ograniczone</option>
+    <option>Niskie</option>
+    <option>Niskie bezpieczeństwo</option>
+    <option>Minimalne</option>
+    <option>Aktywne</option>
+    <option>Średnie</option>
+    <option>Standardowe</option>
+    <option>Typowe</option>
+    <option>Uważne</option>
+  </select>
+
+  <label>Flora</label>
+  <select id="detailFlora">
+    <option value="">-- wybierz --</option>
+    <option>Brak</option>
+    <option>Sporadyczna</option>
+    <option>Skąpa</option>
+    <option>Średnia</option>
+    <option>Obfita</option>
+    <option>Ekstremalna</option>
+  </select>
+
+  <label>Fauna</label>
+  <select id="detailFauna">
+    <option value="">-- wybierz --</option>
+    <option>Brak</option>
+    <option>Sporadyczna</option>
+    <option>Skąpa</option>
+    <option>Średnia</option>
+    <option>Obfita</option>
+    <option>Ekstremalna</option>
+  </select>
+
+  <label>Odkryty przez</label><input type="text" id="detailDiscovered" />
+
+  <label>Tryb gry</label>
+  <select id="detailMode">
+    <option value="">-- wybierz --</option>
+    <option>Normalny</option>
+    <option>Kreatywny</option>
+    <option>Survival</option>
+    <option>Permadeath</option>
+  </select>
+
+  <label>Zaktualizowano</label><input type="text" id="detailUpdated" />
+  <label>Koordynaty</label><input type="text" id="detailCoords" />
+  <!-- Przycisk przejdź do NMS Portals -->
+<button onclick="window.open('https://nmsportals.github.io', '_blank')" 
+        style="margin-top:0.5rem; background:#1976d2; color:white; padding:0.5rem; border:none; border-radius:4px; cursor:pointer;">
+  Przejdź do NMS Portals
+</button>
+  
+  <label>Notatki planety</label><textarea id="detailNotes"></textarea>
+  <button onclick="savePlanetDetails()">Zapisz opis planety</button>
+</div>
+</div>
+
+<div id="globeViz">
+ </div>
+
 
   <script>
 let planets = []; // główna tablica wszystkich planet
