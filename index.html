@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8" />
@@ -308,9 +308,8 @@
 
 <script>
 let atlas = {};
-let planetTextures = {};
-let planetColors = {};
 let planetDetails = {};
+let planetData = [];
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 let editIndex = null;
@@ -429,12 +428,15 @@ function addNewPlanet() {
     coords: "",
     notes: ""
   };
-
+  // Dodanie nowego wpisu do planetData
+  planetData.push({
+    name: name,
+    extraInfo: {}, // miejsce na dodatkowe, niestandardowe dane planety
+    createdAt: Date.now() //automatycznie zapisany czas dodania planety
+    
+  });
   currentPlanet = name;
   updateCurrentPlanetHeader();
-  delete planetColors[name];
-  delete planetTextures[name];
-  applyPlanetTexture(name);
   refreshPlanetList();
   refreshPointsList();
   refreshGlobePoints();
@@ -496,12 +498,14 @@ delBtn.title = `Usuń planetę ${p}`;
   e.stopPropagation();
   if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
     delete atlas[p];
-    delete planetTextures[p];
-    delete planetColors[p];
     delete planetDetails[p];
 
+    // Uusuwanie planety z planetData – szuka planety po nazwie w planetData i usuwa ją, jeśli istnieje.
+    const idxData = planetData.findIndex(pd => pd.name === p);
+    if(idxData !== -1) planetData.splice(idxData, 1);
+    
     const planets = Object.keys(atlas);
-    currentPlanet = planets.length ? planets[0] : null; // 🔥 poprawne ustawienie
+    currentPlanet = planets.length ? planets[0] : null; 
 
     if (currentPlanet) {
       applyPlanetTexture(currentPlanet);
@@ -511,7 +515,7 @@ delBtn.title = `Usuń planetę ${p}`;
       globe.pointsData([]);
     }
 
-    updateCurrentPlanetHeader(); // 🔥 dopiero na końcu
+    updateCurrentPlanetHeader(); // dopiero na końcu
     refreshPlanetList();
     refreshPointsList();
   }
@@ -523,6 +527,25 @@ delBtn.title = `Usuń planetę ${p}`;
   updateNoPlanetsMessage();
 }
 
+// Funkcja pomocnicza do aktualizacji planetData
+function updatePlanetData(name, extra = {}) {
+  const idx = planetData.findIndex(pd => pd.name === name);
+  if (idx !== -1) {
+    // aktualizacja istniejącego wpisu
+    planetData[idx].extraInfo = {...planetData[idx].extraInfo, ...extra};
+  } else {
+    // jeśli planeta nie istnieje, dodaj nową
+    planetData.push({
+      name: name,
+      extraInfo: extra,
+      createdAt: Date.now()
+    });
+  }
+}
+//Jest to uniwersalna funkcja updatePlanetData, która utrzymuje spójność tablicy planetData;
+//Można łatwo dodawać dodatkowe informacje do planet, bez zmieniania istniejących struktur atlas i planetDetails;
+//Nie zmienia się istniejący mechanizm dodawania, edycji ani usuwania planet – wszystko jest kompatybilne.
+  
 ////////////////////////////////////////////////////////////////////
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
 //////////////////////////////////////////////////////////////////// 
@@ -682,7 +705,7 @@ function editPoint(timestamp){
   editIndex = index; // zapamiętaj indeks prawidłowego punktu w atlasie
   document.querySelector("button[onclick='addPoint()']").textContent = "Nadpisz punkt";
 
-  // 🔥 przełączenie na zakładkę START
+  // przełączenie na zakładkę START
   openTab('start');
 }
 
@@ -699,102 +722,6 @@ function addPoles(planet){
 //------------------- Tekstury i kolory planet -------------------//
 ////////////////////////////////////////////////////////////////////  
 
-function updateColorTextureButtons() {
-  if (!currentPlanet) return;
-  const hasTexture = !!planetTextures[currentPlanet];
-  const hasColor = !!planetColors[currentPlanet];
-
-  document.getElementById("setColorBtn").disabled = hasTexture;
-  document.getElementById("setTextureBtn").disabled = hasColor;
-}
-
-function setPlanetColor() {
-  if (!currentPlanet) return;
-  if (planetTextures[currentPlanet]) {
-    alert("Najpierw usuń teksturę!");
-    return;
-  }
-  const color = document.getElementById("planetColorInput").value;
-  planetColors[currentPlanet] = color;
-  applyPlanetTexture(currentPlanet);
-  updateColorTextureButtons();
-}
-
-function setPlanetTextureFromInput() {
-  if (!currentPlanet) return;
-
-  // jeśli jest kolor, nie pozwalamy na nakładanie tekstury
-  if (planetColors[currentPlanet]) {
-    alert("Najpierw usuń kolor planety, zanim nałożysz teksturę!");
-    return;
-  }
-
-  const input = document.getElementById("planetTextureInput");
-  if (!input.files[0]) return;
-
-  const file = input.files[0];
-
-  // zapisujemy tylko nazwę pliku
-  planetTextures[currentPlanet] = file.name;
-
-  // od razu nakładamy teksturę
-  applyPlanetTexture(currentPlanet);
-
-  // aktualizacja przycisków (kolor vs tekstura)
-  updateColorTextureButtons();
-}
-
-
-function removePlanetTexture() {
-  if (!currentPlanet) return;
-  delete planetTextures[currentPlanet];
-  applyPlanetTexture(currentPlanet);
-}
-
-function removePlanetColor() {
-  if (!currentPlanet) return;
-  delete planetColors[currentPlanet];
-  applyPlanetTexture(currentPlanet);
-}
-
-function applyPlanetTexture(planet) {
-  if (!planet) return;
-
-  const material = globe.globeMaterial();
-
-  // 🔹 Reset materiału przed każdą zmianą
-  material.map = null;
-  material.color.set("#000000");
-  material.needsUpdate = true;
-
-  // 🔵 Priorytet: tekstura
-  if (planetTextures[planet]) {
-    const url = `https://elercreative84.github.io/NMS-Planet-Atlas/textures/${planetTextures[planet]}`;
-    new THREE.TextureLoader().load(
-      url,
-      texture => {
-        material.map = texture;
-        material.color.set("#ffffff"); // reset koloru, żeby nie przyciemniało
-        material.needsUpdate = true;
-      },
-      undefined,
-      err => {
-        console.error("Błąd ładowania tekstury:", err);
-        material.map = null;
-        material.color.set("#000000");
-        material.needsUpdate = true;
-      }
-    );
-    return;
-  }
-
-  // 🟢 Kolor
-  if (planetColors[planet]) {
-    material.map = null;
-    material.color.set(planetColors[planet]);
-    material.needsUpdate = true;
-  }
-}
 
 
 ////////////////////////////////////////////////////////////////////
@@ -802,7 +729,7 @@ function applyPlanetTexture(planet) {
 ////////////////////////////////////////////////////////////////////  
 
 function exportAtlas(){
-  const blob = new Blob([JSON.stringify({atlas,planetTextures,planetDetails},null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({atlas,planetDetails, planetData},null,2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -819,10 +746,8 @@ function importAtlas(event){
     try{
       const data = JSON.parse(e.target.result);
       if(data.atlas) atlas = data.atlas;
-      if(data.planetTextures) planetTextures = data.planetTextures;
-      if(data.planetColors) planetColors = data.planetColors;
       if(data.planetDetails) planetDetails = data.planetDetails;
-
+      if(data.planetData) planetData = data.planetData; // Wczytanie planetData
       // ustaw pierwszą planetę jako currentPlanet
       const planets = Object.keys(atlas);
       currentPlanet = planets[0] || null;
