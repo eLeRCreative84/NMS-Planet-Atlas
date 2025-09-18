@@ -456,8 +456,10 @@ btn.style.cursor = "pointer";
       const pd = planetData.find(pd => pd.name === p);
       if(pd && pd.extraInfo && pd.extraInfo.texture){
       globe.globeImageUrl(pd.extraInfo.texture);
+      document.getElementById("planetTextureUrl").value = pd.extraInfo.texture;  // ← pokaż w input
       } else {
       globe.globeImageUrl(null);
+      document.getElementById("planetTextureUrl").value = "";  // ← wyczyść input
       }
     };
 
