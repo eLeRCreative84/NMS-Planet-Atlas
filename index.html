@@ -502,7 +502,7 @@ delBtn.title = `Usuń planetę ${p}`;
     delete atlas[p];
     delete planetDetails[p];
 
-    // Uusuwanie planety z planetData – szuka planety po nazwie w planetData i usuwa ją, jeśli istnieje.
+    // Usuwanie planety z planetData – szuka planety po nazwie w planetData i usuwa ją, jeśli istnieje.
     const idxData = planetData.findIndex(pd => pd.name === p);
     if(idxData !== -1) planetData.splice(idxData, 1);
     
@@ -510,13 +510,10 @@ delBtn.title = `Usuń planetę ${p}`;
     currentPlanet = planets.length ? planets[0] : null; 
 
     if (currentPlanet) {
-      applyPlanetTexture(currentPlanet);
       refreshGlobePoints();
     } else {
-      globe.globeImageUrl(null);
       globe.pointsData([]);
     }
-
     updateCurrentPlanetHeader(); // dopiero na końcu
     refreshPlanetList();
     refreshPointsList();
