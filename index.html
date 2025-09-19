@@ -132,8 +132,13 @@
 
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
   <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
+
+  <!-- Przycisk wybierz kolor planety z palety Hex -->
+  <label>Kolor planety</label>
+  <input type="color" id="newPlanetColor" value="#000000" />
+      
   <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
-</div>
+  </div>
 
     <!-- Przycisk dodaj texturę -->
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
@@ -371,6 +376,20 @@ function savePlanetDetails(){
   button.disabled = input.value.trim() === "";
 }
 
+  //Tworzy teksturę o rozmairze 1 piksel x 1 piksel o zadanym kolorze i zmienia na base64
+function hexToBase64Texture(hex) {
+  // Tworzymy canvas 1x1
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = 1;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = hex;
+  ctx.fillRect(0, 0, 1, 1);
+
+  // Zamiana na base64 PNG
+  return canvas.toDataURL("image/png");
+}
+  
 function addNewPlanet() {
   const input = document.getElementById("newPlanetName");
   const name = input.value.trim();
@@ -381,6 +400,10 @@ function addNewPlanet() {
     return;
   }
 
+  // wybór koloru
+  const colorHex = document.getElementById("newPlanetColor").value || "#000000";
+  const textureBase64 = hexToBase64Texture(colorHex);
+  
   atlas[name] = [];
   addPoles(name);
   
@@ -403,7 +426,7 @@ function addNewPlanet() {
   // Dodanie nowego wpisu do planetData
   planetData.push({
     name: name,
-    texture: blackTextureURL,  // Przypisanie domyślnie czarnej tekstury
+    texture: textureBase64,  // Przypisanie koloru planety w formie tekstury
     extraInfo: {}, // miejsce na dodatkowe, niestandardowe dane planety
     createdAt: Date.now() //automatycznie zapisany czas dodania planety
     
@@ -413,6 +436,10 @@ function addNewPlanet() {
   refreshPlanetList();
   refreshPointsList();
   refreshGlobePoints();
+
+  // Ustaw od razu glob na wybraną teksturę
+  globe.globeImageUrl(textureBase64);
+  
     input.value = "";
   checkNewPlanetInput();
   alert(`Dodano nową planetę: ${name}`);
