@@ -506,7 +506,6 @@ function updatePlanetData(name, extra = {}) {
     // jeśli planeta nie istnieje, dodaj nową
     planetData.push({
       name: name,
-      texture,
       extraInfo: extra,
       createdAt: Date.now()
     });
@@ -693,17 +692,27 @@ function addPoles(planet){
 
 function addTextureUrl() {
   const texture = document.getElementById('planetTextureUrl').value.trim();
-  planetData.push({ texture });
-  document.getElementById('planetTextureUrl').value = '';
+  if (!texture) {
+  alert("Podaj URL tekstury!");
+  return;
   }
+  // Znajdź wpis planety w planetData
+  const planet = planetData.find(p => p.name === currentPlanet);
+  if (planet) {
+    planet.texture = texture; // dodaj/aktualizuj teksturę
+  } 
+  
+  // ustaw od razu na globie
+  globe.globeImageUrl(texture);
+  alert(`Dodano teksturę do planety ${currentPlanet}`);
+}
 
   function selectPlanet(name) {
   const planet = planetData.find(p => p.name === name);
   if (!planet) return;
   currentPlanet = planet.name;
-  globe.globeImageUrl(planet.texture);
+  if (planet.texture) globe.globeImageUrl(planet.texture);
 }
-
   
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import Atlasu ---------------//
