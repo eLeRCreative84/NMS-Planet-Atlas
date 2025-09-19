@@ -450,7 +450,7 @@ btn.style.cursor = "pointer";
       globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
       refreshPointsList();
       loadPlanetDetails();
-      
+      selectPlanet(p); // wyświetlaj teksturę dla danej planety przy prząłaczaniu się między nimi
     };
 
     // 🔴 przycisk usuń planetę
