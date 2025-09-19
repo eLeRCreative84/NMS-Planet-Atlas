@@ -135,6 +135,12 @@
   <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
 </div>
 
+    <!-- Przycisk dodaj texturę -->
+<div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+  <input type="text" id="planetTextureUrl" placeholder="URL tekstury" />
+  <button onclick="addTextureUrl()" disabled>Dodaj teksturę</button>
+</div>
+    
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Lista planet</h2>
     <div id="planetList"></div>
@@ -500,6 +506,7 @@ function updatePlanetData(name, extra = {}) {
     // jeśli planeta nie istnieje, dodaj nową
     planetData.push({
       name: name,
+      texture,
       extraInfo: extra,
       createdAt: Date.now()
     });
@@ -681,11 +688,23 @@ function addPoles(planet){
 }
   
 ////////////////////////////////////////////////////////////////////
-//------------------- Tekstury i kolory planet -------------------//
+//------------------- Tekstury planet -------------------//
 ////////////////////////////////////////////////////////////////////  
 
+function addTextureUrl() {
+  const texture = document.getElementById('planetTextureUrl').value.trim();
+  planetData.push({ texture });
+  document.getElementById('planetTextureUrl').value = '';
+  }
 
+  function selectPlanet(name) {
+  const planet = planetData.find(p => p.name === name);
+  if (!planet) return;
+  currentPlanet = planet.name;
+  globe.globeImageUrl(planet.texture);
+}
 
+  
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import Atlasu ---------------//
 ////////////////////////////////////////////////////////////////////  
