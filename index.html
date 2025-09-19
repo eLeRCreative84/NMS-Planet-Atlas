@@ -716,19 +716,15 @@ function addTextureUrl() {
 
   // Ustawia globalną zmienną currentPlanet na tę planetę
     currentPlanet = planet.name;
-   
-// reset globu do domyślnego stanu
-  globe.globeImageUrl(null);       // pusty glob
-  globe.pointsData([]);            // usuń wszystkie punkty
-  globe.htmlElementsData([]);      // usuń elementy HTML
-    
-  // ustaw punkty i bieguny aktualnej planety
-  if (atlas[currentPlanet]) {
-    globe.pointsData(atlas[currentPlanet]);
-    globe.htmlElementsData(atlas[currentPlanet].filter(p => p.type === "Pole"));
+       
+  // Jeśli planeta ma przypisaną teksturę → używamy jej
+  // Jeśli nie → ustawiamy pustą lub ciemną kulę
+  if (planet.texture && planet.texture.trim() !== "") {
+    globe.globeImageUrl(planet.texture);
+  } else {
+    globe.globeImageUrl(''); // Globe.gl "czyści" poprzednią teksturę
   }
-  updateCurrentPlanetHeader();
-  }
+}
   
  // Funkcja sprawdzająca, czy w polu tekstury coś wpisano 
 function checkTextureInput() {
