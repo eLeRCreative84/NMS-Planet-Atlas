@@ -142,6 +142,8 @@
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
   <input type="text" id="planetTextureUrl" placeholder="URL tekstury" oninput="checkTextureInput()" />
   <button onclick="addTextureUrl()" disabled>Dodaj teksturę</button>
+  <input type="color" id="changePlanetColor" value="#000000" />
+<button onclick="changePlanetColor()">Zmień kolor</button>
 </div>
     
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
@@ -713,7 +715,7 @@ function addPoles(planet){
 }
   
 ////////////////////////////////////////////////////////////////////
-//------------------- Tekstury planet -------------------//
+//------------------- Tekstury i kolory planet -------------------//
 ////////////////////////////////////////////////////////////////////  
 
 function addTextureUrl() {
@@ -747,10 +749,28 @@ function addTextureUrl() {
   // Używamy tekstury planety jeśli istnieje, w przeciwnym razie czarna
   const textureToUse = planet.texture ? planet.texture : blackTextureURL;
 globe.globeImageUrl(textureToUse);
-
 }
-  
- // Funkcja sprawdzająca, czy w polu tekstury coś wpisano 
+
+  // Funkcja do zmiany koloru planety
+function changePlanetColor() {
+  if (!currentPlanet) {
+    alert("Najpierw wybierz planetę!");
+    return;
+  }
+
+  const colorHex = document.getElementById("changePlanetColor").value || "#000000";
+  const textureBase64 = hexToBase64Texture(colorHex);
+
+  // znajdź wpis w planetData
+  const idx = planetData.findIndex(p => p.name === currentPlanet);
+  if (idx !== -1) {
+    planetData[idx].texture = textureBase64;
+    globe.globeImageUrl(textureBase64);
+    alert(`Kolor planety ${currentPlanet} został zmieniony na ${colorHex}`);
+  }
+}
+
+   // Funkcja sprawdzająca, czy w polu tekstury coś wpisano 
 function checkTextureInput() {
   const input = document.getElementById("planetTextureUrl");
   const button = input.nextElementSibling; // przycisk obok pola
