@@ -142,8 +142,7 @@
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
   <input type="text" id="planetTextureUrl" placeholder="URL tekstury" oninput="checkTextureInput()" />
   <button onclick="addTextureUrl()" disabled>Dodaj teksturę</button>
-  <input type="color" id="changePlanetColor" value="#000000" />
-<button onclick="changePlanetColor()">Zmień kolor</button>
+  <button onclick="changePlanetColor()">Zmień kolor</button>
 </div>
     
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
@@ -724,6 +723,13 @@ function addTextureUrl() {
   alert("Podaj URL tekstury!");
   return;
   }
+
+const texture = document.getElementById('planetTextureUrl').value.trim();
+  if (!texture) {
+    alert("Podaj URL tekstury!");
+    return;
+  }
+  
   // Znajdź wpis planety w planetData
   const planet = planetData.find(p => p.name === currentPlanet);
   if (planet) {
@@ -759,6 +765,9 @@ function changePlanetColor() {
   }
 
   const colorHex = document.getElementById("PlanetColor").value || "#000000";
+  if (!confirm(`Czy na pewno zmienić kolor planety "${currentPlanet}"?`)) {
+    return; // przerwane przez użytkownika
+  }
   const textureBase64 = hexToBase64Texture(colorHex);
 
   // znajdź wpis w planetData
