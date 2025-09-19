@@ -142,6 +142,9 @@
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
   <input type="text" id="planetTextureUrl" placeholder="URL tekstury" oninput="checkTextureInput()" />
   <button onclick="addTextureUrl()" disabled>Dodaj teksturę</button>
+
+  <input type="file" id="uploadTexture" accept="image/*" />
+  
   <button onclick="changePlanetColor()">Zmień kolor</button>
 </div>
     
@@ -736,19 +739,26 @@ function addTextureUrl() {
   alert(`Dodano teksturę do planety ${currentPlanet}`);
 }
 
-  // Przełącznik aktywnej planety
-  function selectPlanet(name) {
+  // Przełącznik aktywnej planety – hybrydowo: URL lub lokalny plik
+function selectPlanet(name) {
   // Szuka w tablicy planet obiektu, który ma taki sam 'name'
-    const planet = planetData.find(p => p.name === name);
-  // Jeśli nic nie znalazła → kończy działanie
-    if (!planet) return; 
+  const planet = planetData.find(p => p.name === name);
+  if (!planet) return; 
 
-  // Ustawia globalną zmienną currentPlanet na tę planetę
-    currentPlanet = planet.name;
-       
-  // Używamy tekstury planety jeśli istnieje, w przeciwnym razie czarna
+  currentPlanet = planet.name;
+
+  // Sprawdzamy, czy użytkownik wgrał lokalny plik
+  const localFileInput = document.getElementById("uploadTexture");
+  if(localFileInput && localFileInput.files && localFileInput.files[0]){
+    // Tworzymy obiekt URL dla lokalnego pliku
+    const fileURL = URL.createObjectURL(localFileInput.files[0]);
+    globe.globeImageUrl(fileURL);
+    return;
+  }
+
+  // W przeciwnym razie używamy tekstury zapisanej w planetData
   const textureToUse = planet.texture ? planet.texture : blackTextureURL;
-globe.globeImageUrl(textureToUse);
+  globe.globeImageUrl(textureToUse);
 }
 
   // Funkcja do zmiany koloru planety
@@ -775,6 +785,48 @@ function checkTextureInput() {
   const button = input.nextElementSibling; // przycisk obok pola
   button.disabled = input.value.trim() === "";
 }
+
+////////////////////////////////////////////////////////////////////
+//---------------------- Tekstury lokalne / online ----------------//
+////////////////////////////////////////////////////////////////////  
+
+// Funkcja do zwracania właściwego URL tekstury: lokalny offline lub GitHub online
+function getTextureURL(fileName) {
+  const onlineBase = "https://github.com/eLeRCreative84/NMS-Planet-Atlas/textures/";
+  const offlineBase = "./textures/";
+
+  // Tworzymy obraz aby sprawdzić lokalną dostępność
+  const img = new Image();
+  img.src = offlineBase + fileName;
+
+  img.onerror = () => {
+    // jeśli lokalny plik nie istnieje, używamy GitHub
+    const planet = planetData.find(p => p.name === currentPlanet);
+    if (planet) planet.texture = onlineBase + fileName;
+    globe.globeImageUrl(onlineBase + fileName);
+  };
+
+  // jeśli lokalny istnieje, zwracamy go
+  return offlineBase + fileName;
+}
+
+// Obsługa wgrywania własnej tekstury przez użytkownika
+document.getElementById("uploadTexture")?.addEventListener("change", (event) => {
+  if (!currentPlanet) return;
+
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const objectUrl = URL.createObjectURL(file); // tymczasowy URL
+  globe.globeImageUrl(objectUrl);
+
+  const planet = planetData.find(p => p.name === currentPlanet);
+  if (planet) {
+    planet.textureFile = file.name;         // np. "earth.jpg"
+    planet._tempObjectUrl = objectUrl;      // tymczasowy URL w przeglądarce
+  }
+});
+
   
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import Atlasu ---------------//
