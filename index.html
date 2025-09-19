@@ -135,7 +135,7 @@
   <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
   <!-- Przycisk wybierz kolor planety z palety Hex -->
   <label>Kolor planety</label>
-  <input type="color" id="newPlanetColor" value="#000000" />
+  <input type="color" id="PlanetColor" value="#000000" />
    </div>
 
     <!-- Przycisk dodaj texturę -->
@@ -401,7 +401,7 @@ function addNewPlanet() {
   }
 
   // wybór koloru
-  const colorHex = document.getElementById("newPlanetColor").value || "#000000";
+  const colorHex = document.getElementById("PlanetColor").value || "#000000";
   const textureBase64 = hexToBase64Texture(colorHex);
   
   atlas[name] = [];
@@ -758,7 +758,7 @@ function changePlanetColor() {
     return;
   }
 
-  const colorHex = document.getElementById("changePlanetColor").value || "#000000";
+  const colorHex = document.getElementById("PlanetColor").value || "#000000";
   const textureBase64 = hexToBase64Texture(colorHex);
 
   // znajdź wpis w planetData
@@ -766,8 +766,7 @@ function changePlanetColor() {
   if (idx !== -1) {
     planetData[idx].texture = textureBase64;
     globe.globeImageUrl(textureBase64);
-    alert(`Kolor planety ${currentPlanet} został zmieniony na ${colorHex}`);
-  }
+    }
 }
 
    // Funkcja sprawdzająca, czy w polu tekstury coś wpisano 
