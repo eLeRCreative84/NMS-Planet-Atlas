@@ -137,7 +137,7 @@
 
     <!-- Przycisk dodaj texturę -->
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
-  <input type="text" id="planetTextureUrl" placeholder="URL tekstury" />
+  <input type="text" id="planetTextureUrl" placeholder="URL tekstury" oninput="checkTextureInput()" />
   <button onclick="addTextureUrl()" disabled>Dodaj teksturę</button>
 </div>
     
@@ -707,11 +707,23 @@ function addTextureUrl() {
   alert(`Dodano teksturę do planety ${currentPlanet}`);
 }
 
+  // Przełącznik aktywnej planety
   function selectPlanet(name) {
-  const planet = planetData.find(p => p.name === name);
-  if (!planet) return;
-  currentPlanet = planet.name;
-  if (planet.texture) globe.globeImageUrl(planet.texture);
+  // Szuka w tablicy planet obiektu, który ma taki sam 'name'
+    const planet = planetData.find(p => p.name === name);
+  // Jeśli nic nie znalazła → kończy działanie
+    if (!planet) return;
+  // Ustawia globalną zmienną currentPlanet na tę planetę
+    currentPlanet = planet.name;
+  // Jeśli planeta ma przypisaną teksturę → pokaż ją na globie
+    if (planet.texture) globe.globeImageUrl(planet.texture);
+    }
+
+ // Funkcja sprawdzająca, czy w polu tekstury coś wpisano 
+function checkTextureInput() {
+  const input = document.getElementById("planetTextureUrl");
+  const button = input.nextElementSibling; // przycisk obok pola
+  button.disabled = input.value.trim() === "";
 }
   
 ////////////////////////////////////////////////////////////////////
