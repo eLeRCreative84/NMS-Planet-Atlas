@@ -759,9 +759,6 @@ function changePlanetColor() {
   }
 
   const colorHex = document.getElementById("PlanetColor").value || "#000000";
-  if (!confirm(`Czy na pewno zmienić kolor planety "${currentPlanet}"?`)) {
-    return; // przerwane przez użytkownika
-  }
   const textureBase64 = hexToBase64Texture(colorHex);
 
   // znajdź wpis w planetData
