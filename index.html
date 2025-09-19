@@ -713,15 +713,23 @@ function addTextureUrl() {
     const planet = planetData.find(p => p.name === name);
   // Jeśli nic nie znalazła → kończy działanie
     if (!planet) return; 
+
   // Ustawia globalną zmienną currentPlanet na tę planetę
     currentPlanet = planet.name;
-  // Jeśli planeta ma przypisaną teksturę → pokaż ją na globie
-    if (planet.texture) {
-      globe.globeImageUrl(planet.texture);
-    } else {
-    globe.globeImageUrl(null); // jeśli planeta nie ma przypisanej tekstury, to po przełączeniu się na nią wyświetl pusty glob
-    }
+   
+// reset globu do domyślnego stanu
+  globe.globeImageUrl(null);       // pusty glob
+  globe.pointsData([]);            // usuń wszystkie punkty
+  globe.htmlElementsData([]);      // usuń elementy HTML
+    
+  // ustaw punkty i bieguny aktualnej planety
+  if (atlas[currentPlanet]) {
+    globe.pointsData(atlas[currentPlanet]);
+    globe.htmlElementsData(atlas[currentPlanet].filter(p => p.type === "Pole"));
   }
+  updateCurrentPlanetHeader();
+  }
+  
  // Funkcja sprawdzająca, czy w polu tekstury coś wpisano 
 function checkTextureInput() {
   const input = document.getElementById("planetTextureUrl");
