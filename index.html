@@ -403,6 +403,7 @@ function addNewPlanet() {
   // Dodanie nowego wpisu do planetData
   planetData.push({
     name: name,
+    texture: blackTexture,  // Przypisanie domyślnie czarnej tekstury
     extraInfo: {}, // miejsce na dodatkowe, niestandardowe dane planety
     createdAt: Date.now() //automatycznie zapisany czas dodania planety
     
@@ -701,7 +702,8 @@ function addTextureUrl() {
   if (planet) {
     planet.texture = texture; // dodaj/aktualizuj teksturę
   } 
-  
+  // Nadpisanie tekstury (może być URL lub DataTexture)
+  planet.texture = texture;
   // ustaw od razu na globie
   globe.globeImageUrl(texture);
   alert(`Dodano teksturę do planety ${currentPlanet}`);
@@ -717,18 +719,9 @@ function addTextureUrl() {
   // Ustawia globalną zmienną currentPlanet na tę planetę
     currentPlanet = planet.name;
        
-  if (planet.texture && planet.texture.trim() !== "") {
-    // Tworzymy nową teksturę, aby Three.js na pewno ją przeładował
-    const loader = new THREE.TextureLoader();
-    loader.load(
-      planet.texture,
-      (texture) => { globe.globeImageUrl(texture); },
-      undefined,
-      (err) => { console.error("Błąd ładowania tekstury:", err); }
-    );
-  } else {
-    globe.globeImageUrl(null); // czysty glob, brak tekstury
-  }
+  // Używamy tekstury planety jeśli istnieje, w przeciwnym razie czarna
+  const textureToUse = planet.texture ? planet.texture : blackTexture;
+  globe.globeImageUrl(textureToUse);
 }
   
  // Funkcja sprawdzająca, czy w polu tekstury coś wpisano 
@@ -816,7 +809,16 @@ function refreshGlobePoints(){
 ////////////////////////////////////////////////////////////////////
 //---------------------- Inicjalizacja globu ---------------------//
 //////////////////////////////////////////////////////////////////// 
-
+  
+  // Tworzymy czarną teksturę globalnie, która zastąpi globeImageUrl(null). 
+  // Podczas tworzenia planet, jeśli od razu nie przypisywaliśmy tekstury i pozstawialiśmy pusty glob
+  // to generowało to błędy podczas przełączania się między planetami na liście planet - nie wyświetlało poprawnie globu. 
+  
+  const blackTexture = new THREE.DataTexture(
+    new Uint8Array([0,0,0]), 1, 1, THREE.RGBFormat // tworzy tablicę z jednym pikselem RGB ustawionym na (0,0,0) czyli czarny kolor. Wymiary tekstury 1×1 piksel
+  );
+  blackTexture.needsUpdate = true;
+  
   // Inicjalizacja globu — używamy https aby tło zawsze się załadowało
 const globe = Globe()(document.getElementById("globeViz"))
   .globeImageUrl(null) // brak domyślnej mapy (pusta/ciemna kula)
