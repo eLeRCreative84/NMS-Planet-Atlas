@@ -132,13 +132,11 @@
 
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
   <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
-
+  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
   <!-- Przycisk wybierz kolor planety z palety Hex -->
   <label>Kolor planety</label>
   <input type="color" id="newPlanetColor" value="#000000" />
-      
-  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
-  </div>
+   </div>
 
     <!-- Przycisk dodaj texturę -->
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
