@@ -403,7 +403,7 @@ function addNewPlanet() {
   // Dodanie nowego wpisu do planetData
   planetData.push({
     name: name,
-    texture: blackTexture,  // Przypisanie domyślnie czarnej tekstury
+    texture: blackTextureURL,  // Przypisanie domyślnie czarnej tekstury
     extraInfo: {}, // miejsce na dodatkowe, niestandardowe dane planety
     createdAt: Date.now() //automatycznie zapisany czas dodania planety
     
@@ -720,8 +720,9 @@ function addTextureUrl() {
     currentPlanet = planet.name;
        
   // Używamy tekstury planety jeśli istnieje, w przeciwnym razie czarna
-  const textureToUse = planet.texture ? planet.texture : blackTexture;
-  globe.globeImageUrl(textureToUse);
+  const textureToUse = planet.texture ? planet.texture : blackTextureURL;
+globe.globeImageUrl(textureToUse);
+
 }
   
  // Funkcja sprawdzająca, czy w polu tekstury coś wpisano 
@@ -814,10 +815,8 @@ function refreshGlobePoints(){
   // Podczas tworzenia planet, jeśli od razu nie przypisywaliśmy tekstury i pozstawialiśmy pusty glob
   // to generowało to błędy podczas przełączania się między planetami na liście planet - nie wyświetlało poprawnie globu. 
   
-  const blackTexture = new THREE.DataTexture(
-    new Uint8Array([0,0,0]), 1, 1, THREE.RGBFormat // tworzy tablicę z jednym pikselem RGB ustawionym na (0,0,0) czyli czarny kolor. Wymiary tekstury 1×1 piksel
-  );
-  blackTexture.needsUpdate = true;
+  const blackTextureURL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
+
   
   // Inicjalizacja globu — używamy https aby tło zawsze się załadowało
 const globe = Globe()(document.getElementById("globeViz"))
