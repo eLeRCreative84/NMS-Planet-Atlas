@@ -712,13 +712,16 @@ function addTextureUrl() {
   // Szuka w tablicy planet obiektu, który ma taki sam 'name'
     const planet = planetData.find(p => p.name === name);
   // Jeśli nic nie znalazła → kończy działanie
-    if (!planet) return;
+    if (!planet) return; 
   // Ustawia globalną zmienną currentPlanet na tę planetę
     currentPlanet = planet.name;
   // Jeśli planeta ma przypisaną teksturę → pokaż ją na globie
-    if (planet.texture) globe.globeImageUrl(planet.texture);
+    if (planet.texture) {
+      globe.globeImageUrl(planet.texture);
+    } else {
+    globe.globeImageUrl(null); // jeśli planeta nie ma przypisanej tekstury, to po przełączeniu się na nią wyświetl pusty glob
     }
-
+  }
  // Funkcja sprawdzająca, czy w polu tekstury coś wpisano 
 function checkTextureInput() {
   const input = document.getElementById("planetTextureUrl");
