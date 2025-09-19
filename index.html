@@ -718,11 +718,6 @@ function addPoles(planet){
 ////////////////////////////////////////////////////////////////////  
 
 function addTextureUrl() {
-  if (!currentPlanet) {
-    alert("Najpierw stwórz lub wybierz planetę");
-    return;
-  }
-  
   const texture = document.getElementById('planetTextureUrl').value.trim();
   if (!texture) {
   alert("Podaj URL tekstury!");
