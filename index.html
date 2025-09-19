@@ -717,12 +717,17 @@ function addTextureUrl() {
   // Ustawia globalną zmienną currentPlanet na tę planetę
     currentPlanet = planet.name;
        
-  // Jeśli planeta ma przypisaną teksturę → używamy jej
-  // Jeśli nie → ustawiamy pustą lub ciemną kulę
   if (planet.texture && planet.texture.trim() !== "") {
-    globe.globeImageUrl(planet.texture);
+    // Tworzymy nową teksturę, aby Three.js na pewno ją przeładował
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      planet.texture,
+      (texture) => { globe.globeImageUrl(texture); },
+      undefined,
+      (err) => { console.error("Błąd ładowania tekstury:", err); }
+    );
   } else {
-    globe.globeImageUrl(''); // Globe.gl "czyści" poprzednią teksturę
+    globe.globeImageUrl(null); // czysty glob, brak tekstury
   }
 }
   
