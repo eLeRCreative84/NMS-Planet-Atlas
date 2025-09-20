@@ -75,12 +75,6 @@
   height: 100%;
 }
 
-#globeViz canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-
   /* Nagłówek nad wizualizacją planety */
 #planetOverlayHeader {
   position: absolute;
@@ -966,6 +960,11 @@ function refreshGlobePoints(){
 const globe = Globe()(document.getElementById("globeViz"))
   .globeImageUrl(null) // brak domyślnej mapy (pusta/ciemna kula)
   .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png') // 🌌 gwiazdy w tle
+  // ustaw startową pozycję widoku globu (środek)
+  setTimeout(() => {
+  globe.pointOfView({ lat: 0, lng: 0, altitude: 2 });
+}, 500);
+  
   .pointLat("lat")
   .pointLng("lng")
   .pointLabel(d => {
@@ -1027,6 +1026,12 @@ if (currentPlanet && atlas[currentPlanet]) {
 
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
+//Reagowanie na zmianę rozmiaru okna
+window.addEventListener('resize', () => {
+  globe.width(window.innerWidth);
+  globe.height(window.innerHeight);
+});
+  
 // start
 window.onload = () => {
   openTab("start"); // aktywuj pierwszą zakładkę
