@@ -362,6 +362,7 @@ function savePlanetDetails(){
     notes:document.getElementById("detailNotes").value
   };
   alert("Opis zapisany!");
+  refreshPlanetList();
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -503,7 +504,7 @@ function refreshPlanetList() {
     const header = document.createElement("h3");
     header.textContent = "Układ planetarny: " + system.name;
     header.style.margin = "0.5rem 0";
-    header.style.color = system.name === "Nieznany układ" ? "#aaa" : "#ffcc00";
+    header.style.color = system.name === "Nieznany" ? "#aaa" : "#ffcc00";
     frag.appendChild(header);
 
     system.planets.forEach(p => {
