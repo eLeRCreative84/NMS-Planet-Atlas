@@ -244,16 +244,30 @@
     <button onclick="addPoint()">Dodaj punkt</button>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Skalowanie globu i punktów</h2>
-    <label>Skala punktów</label>
-    <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="0.4" oninput="updatePointScale()" />
 
-      <label>Mnożnik odległości punktów</label>
-        <input type="range" id="pointsDistanceMultiplier" min="0.5" max="30" step="0.5" value="1" oninput="updatePointsDistanceMultiplier()" />
+<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+  <label for="pointScale">Skala punktów:</label>
+  <input type="range" id="pointScale" min="0.1" max="2" step="0.1" value="0.4" oninput="updatePointScale()" />
+  <span id="pointScaleValue">0.40</span>
+  <button onclick="resetPointScale()">Reset</button>
+</div>
 
-    <label>Zoom globu (powiększenie wraz z punktami)</label>
-<input type="range" id="globeZoomMultiplier" min="0.5" max="3" step="0.05" value="1" oninput="updateGlobeZoomMultiplier()" />
-    
-      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+  <label for="pointsDistanceMultiplier">Wysokość słupków:</label>
+  <input type="range" id="pointsDistanceMultiplier" min="0.5" max="30" step="0.5" value="1" oninput="updatePointsDistanceMultiplier()" />
+  <span id="pointsDistanceMultiplierValue">1.00</span>
+  <button onclick="resetPointsDistanceMultiplier()">Reset</button>
+</div>
+
+<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+  <label for="globeZoomMultiplier">Zoom globu:</label>
+  <input type="range" id="globeZoomMultiplier" min="0.5" max="2" step="0.05" value="1" oninput="updateGlobeZoomMultiplier()" />
+  <span id="globeZoomMultiplierValue">1.00</span>
+  <button onclick="resetGlobeZoomMultiplier()">Reset</button>
+</div>
+
+   <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+   
     <h2>Import/Eksport</h2>
     <button onclick="exportAtlas()">Eksport JSON</button>
     <input type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
@@ -1031,23 +1045,37 @@ function importAtlas(event){
 ////////////////////////////////////////////////////////////////////  
   
 // Skalowanie punktów
-function updatePointScale(){
+function updatePointScale() {
   pointScale = parseFloat(document.getElementById("pointScale").value);
   refreshGlobePoints();
+  document.getElementById("pointScaleValue").textContent = pointScale.toFixed(2);
 }
-//Sklaowanie wysokości słupka
+function resetPointScale() {
+  document.getElementById("pointScale").value = 0.4;
+  updatePointScale();
+}
+
+// Sklaowanie wysokości słupka
 function updatePointsDistanceMultiplier() {
   pointsDistanceMultiplier = parseFloat(document.getElementById("pointsDistanceMultiplier").value);
   refreshGlobePoints();
+  document.getElementById("pointsDistanceMultiplierValue").textContent = pointsDistanceMultiplier.toFixed(2);
 }
+function resetPointsDistanceMultiplier() {
+  document.getElementById("pointsDistanceMultiplier").value = 1;
+  updatePointsDistanceMultiplier();
+}
+
 //Skalowanie wielkości planety
-  function updateGlobeZoomMultiplier() {
+function updateGlobeZoomMultiplier() {
   globeZoomMultiplier = parseFloat(document.getElementById("globeZoomMultiplier").value);
-
-  // Skalujemy cały glob razem z punktami
   globe.scene().scale.set(globeZoomMultiplier, globeZoomMultiplier, globeZoomMultiplier);
+  document.getElementById("globeZoomMultiplierValue").textContent = globeZoomMultiplier.toFixed(2);
 }
-
+function resetGlobeZoomMultiplier() {
+  document.getElementById("globeZoomMultiplier").value = 1;
+  updateGlobeZoomMultiplier();
+}
   
 // Odświeżenie punktów na globie
 function refreshGlobePoints(){
