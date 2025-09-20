@@ -450,8 +450,50 @@ function refreshPlanetList(){
   const list = document.getElementById("planetList");
   list.innerHTML = "";
 
+ // grupowanie planet po układzie gwiezdnym
+  const systems = {};
+ 
   Object.keys(atlas).forEach(p => {
-    // kontener na przycisk planety i przycisk usuń
+ 
+    const system = (planetDetails[p] && planetDetails[p].system) 
+      ? planetDetails[p].system 
+      : "Nieznany układ";
+
+    if (!systems[system]) systems[system] = [];
+    systems[system].push(p);
+  });
+
+  // znajdź "znacznik czasu" (najstarsza planeta w układzie)
+  const systemTimestamps = {};
+  Object.keys(systems).forEach(system => {
+    const times = systems[system].map(p => planetDetails[p]?.createdAt || 0);
+    systemTimestamps[system] = Math.min(...times);
+  });
+
+  // posortowane wg daty powstania układów
+  const sortedSystems = Object.keys(systems).sort((a, b) => {
+    if (a === "Nieznany układ") return 1;
+    if (b === "Nieznany układ") return -1;
+    return systemTimestamps[a] - systemTimestamps[b];
+  });
+
+  // renderowanie
+  sortedSystems.forEach(system => {
+    // nagłówek układu
+    const header = document.createElement("h3");
+    header.textContent = system;
+    header.style.margin = "0.5rem 0";
+    header.style.color = "#ffcc00";
+    list.appendChild(header);
+
+// sortowanie planet w układzie wg daty
+    systems[system].sort((p1, p2) => {
+      return (planetDetails[p1]?.createdAt || 0) - (planetDetails[p2]?.createdAt || 0);
+    });
+    
+    // planety w tym układzie
+    systems[system].forEach(p => {
+     // kontener na przycisk planety i przycisk usuń
     const container = document.createElement("div");
     container.style.display = "flex";
     container.style.alignItems = "center";
