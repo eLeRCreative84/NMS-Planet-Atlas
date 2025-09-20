@@ -898,6 +898,18 @@ function addPoint(){
   const type = document.getElementById("type").value;
   const notes = document.getElementById("notes").value.trim();
 
+  // Sprawdzenie duplikatu
+  const exists = atlas[currentPlanet].some(p =>
+    p.lat === lat &&
+    p.lng === lng &&
+    p.type === type &&
+    p.notes === notes
+  );
+  if (exists) {
+    alert(`Punkt typu "${type}" o współrzędnych X:${lat}, Y:${lng} z taką samą notatką już istnieje!`);
+    return;
+  }
+  
   if (isNaN(lat) || isNaN(lng)) {
     alert("Podaj współrzędne X i Y!");
     return;
