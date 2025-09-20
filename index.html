@@ -243,14 +243,12 @@
 
     <button onclick="addPoint()">Dodaj punkt</button>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-    <h2>Skalowanie i pozycja globu</h2>
+    <h2>Skalowanie globu i punktów</h2>
     <label>Skala punktów</label>
     <input type="range" id="pointScale" min="0.1" max="5" step="0.1" value="0.4" oninput="updatePointScale()" />
-    <label>Oddal glob</label>
-    <input type="range" id="globeScale" min="0.01" max="1" step="0.01" value="1" oninput="updateGlobeScale()" />
-    <label>Przesuń glob</label>
-    <input type="range" id="globeOffset" min="-500" max="500" step="1" value="0" oninput="updateGlobeOffset()" />
-    <button onclick="resetGlobePosition()">Reset pozycji globu</button>
+
+      <label>Mnożnik współrzędnych</label>
+      <input type="range" id="coordMultiplier" min="0.5" max="3" step="0.1" value="1" oninput="updateCoordMultiplier()" />
     
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Import/Eksport</h2>
@@ -433,6 +431,7 @@ let planetData = [];
 let currentPlanet = null;
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 let editIndex = null;
+let coordMultiplier = 1;
 
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -1024,40 +1023,34 @@ function importAtlas(event){
 }
 
 ////////////////////////////////////////////////////////////////////
-//---------------- Skalowanie / Przesuwanie Globu ----------------//
+//---------------- Skalowanie Globu i Punktów ----------------//
 ////////////////////////////////////////////////////////////////////  
   
-// Skalowanie globu
-function updateGlobeScale(){
-  const scale = parseFloat(document.getElementById("globeScale").value);
-  globe.scene().scale.set(scale, scale, scale);
-}
-
 // Skalowanie punktów
 function updatePointScale(){
   pointScale = parseFloat(document.getElementById("pointScale").value);
   refreshGlobePoints();
 }
 
-// Przesuwanie globu w lewo/prawo
-function updateGlobeOffset(){
-  const offset = parseFloat(document.getElementById("globeOffset").value);
-  globe.scene().position.x = offset;
+function updateCoordMultiplier() {
+  coordMultiplier = parseFloat(document.getElementById("coordMultiplier").value);
+  refreshGlobePoints();
 }
-
-function resetGlobePosition(){
-  document.getElementById("globeOffset").value = 0;
-  globe.scene().position.x = 0;
-  // reset suwaka oddalenia globu
-  document.getElementById("globeScale").value = 1;
-  globe.scene().scale.set(1,1,1);
-}
-
+  
 // Odświeżenie punktów na globie
 function refreshGlobePoints(){
   if(!currentPlanet) return;
-  globe.pointsData(atlas[currentPlanet]);
+
+  // Tworzymy kopię punktów z przeskalowanymi współrzędnymi
+  const scaledPoints = atlas[currentPlanet].map(p => ({
+    ...p,
+    lat: p.lat * coordMultiplier,
+    lng: p.lng * coordMultiplier
+  }));
+
+  globe.pointsData(scaledPoints);
 }
+
 
 ////////////////////////////////////////////////////////////////////
 //---------------------- Inicjalizacja globu ---------------------//
