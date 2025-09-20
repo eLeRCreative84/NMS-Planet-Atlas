@@ -456,7 +456,7 @@ function getGroupedPlanets() {
     if (pd && pd.name) createdAtMap[pd.name] = pd.createdAt || 0;
   });
 
-  const systems = { "Nieznany układ": [] };
+  const systems = { "Nieznany": [] };
 
   Object.keys(atlas).forEach(p => {
     const system = (planetDetails[p]?.system || "").trim();
@@ -464,7 +464,7 @@ function getGroupedPlanets() {
       if (!systems[system]) systems[system] = [];
       systems[system].push(p);
     } else {
-      systems["Nieznany układ"].push(p);
+      systems["Nieznany"].push(p);
     }
   });
 
@@ -477,8 +477,8 @@ function getGroupedPlanets() {
   });
 
   const sortedSystems = Object.keys(systems).sort((a, b) => {
-    if (a === "Nieznany układ") return -1;
-    if (b === "Nieznany układ") return 1;
+    if (a === "Nieznany") return -1;
+    if (b === "Nieznany") return 1;
     return systemTimestamps[a] - systemTimestamps[b];
   });
 
