@@ -269,6 +269,14 @@
   <button onclick="resetGlobeZoomMultiplier()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
 </div>
 
+    <!-- Autoobrót -->
+<div style="margin-top:0.5rem;">
+  <label style="display:flex; align-items:center; gap:0.5rem;">
+    <input type="checkbox" id="autoRotateCheckbox" onchange="toggleAutoRotate()" />
+    Włącz automatyczne obracanie globu
+  </label>
+</div>
+    
    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
    
     <h2>Import/Eksport</h2>
@@ -453,6 +461,8 @@ let pointScale = parseFloat(document.getElementById("pointScale").value);
 let editIndex = null;
 let pointsDistanceMultiplier = 1;
 let globeZoomMultiplier = 1;
+let autoRotate = false;
+let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -1088,6 +1098,22 @@ function refreshGlobePoints(){
   globe.pointsData(atlas[currentPlanet])
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
 }
+
+function toggleAutoRotate() {
+  autoRotate = document.getElementById("autoRotateCheckbox").checked;
+}
+
+// Funkcja animacyjna obracania globu
+function animateGlobeRotation() {
+  requestAnimationFrame(animateGlobeRotation);
+
+  if(autoRotate && globe && globe.scene()) {
+    globe.scene().rotation.y += rotateSpeed;
+  }
+}
+
+// Start animacji
+animateGlobeRotation();
   
 ////////////////////////////////////////////////////////////////////
 //---------------------- Inicjalizacja globu ---------------------//
