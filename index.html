@@ -150,11 +150,12 @@
   flex-direction: column; /* napis na górze, picker na dole */
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
+  padding: 0.2rem 0.3rem; /* mniejsze paddingi */
   border-radius: 6px;
   border: none;
   cursor: pointer;
   font-weight: bold;
+  font-size: 0.9rem; /* mniejsza czcionka */
 }
 
 .color-picker-btn {
@@ -163,13 +164,13 @@
 }
 
 .color-picker-btn label {
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.1rem; /* minimalny odstęp między napisem a pickerem */
   font-size: 0.9rem;
 }
 
 .color-picker-btn input[type="color"] {
-  width: 80%;  /* dopasowanie piker do przycisku */
-  height: 2rem;
+  width: 60%;  /* mniejszy picker */
+  height: 1.5rem; /* zmniejszona wysokość */
   border: none;
   cursor: pointer;
   border-radius: 4px;
@@ -178,6 +179,8 @@
 #addPlanetBtn {
   background: #1976d2;
   color: white;
+  padding: 0.25rem 0.5rem; /* zmniejszone paddingi */
+  font-size: 0.9rem;
 }
   
 </style>
