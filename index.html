@@ -152,7 +152,7 @@
 /* wspólne ustawienia obu przycisków */
 .color-picker-btn, #addPlanetBtn {
   flex: 1;
-  height: 3rem;             /* spłaszczone */
+  height: 3rem;             /* niższy, spójny wygląd */
   border-radius: 6px;
   border: none;
   cursor: pointer;
@@ -161,38 +161,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;              /* odstęp między elementami */
+  gap: 0.5rem;              /* odstęp między napisem a pickerem */
   padding: 0 0.5rem;
   box-sizing: border-box;
 }
 
 .color-picker-btn {
-  display: flex;
-  flex-direction: column; /* etykieta nad pickerem */
-  justify-content: center;
-  align-items: center;
-  padding: 0.2rem;
   background: #0288d1;
   color: white;
 }
 
 .color-picker-btn label {
-  font-size: 0.9rem;
-  margin-bottom: 0.2rem;
+  margin: 0;
   line-height: 1;
 }
 
 .color-picker-btn input[type="color"] {
-  width: 2rem;
-  height: 2rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   border: none;
+  background: none;
+  width: 2rem;    /* sam kwadrat pickera */
+  height: 2rem;
   padding: 0;
   cursor: pointer;
 }
+
 #addPlanetBtn {
   background: #1976d2;
   color: white;
 }
+
   
 </style>
 </head>
@@ -262,10 +262,10 @@
   <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
  <!-- Przycisk Dodaj planetę i wybierz kolor planety z palety Hex -->
   <div class="planet-action-row">
- <button type="button" class="color-picker-btn">
+ <div class="color-picker-btn">
   <label for="PlanetColor">Ustaw kolor</label>
   <input type="color" id="PlanetColor" value="#000000">
-</button>
+</div>
 
   <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
 </div>
