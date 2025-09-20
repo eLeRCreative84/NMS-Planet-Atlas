@@ -192,32 +192,12 @@
   color: white;
 }
 /* Wymusza wyrównanie przycisków "Wybierz kolor z pikerem" i "Stwórz nową planetę". */
-.planet-action-row { display:flex; gap:.5rem; }
-
-.planet-action-row > * {
-  flex: 1;                 /* równo dzielą szerokość rzędu */
-  min-width: 0;            /* WAŻNE — pozwala flex-itemom się kurczyć równo */
-  width: auto !important;  /* nadpisuje globalne width:100% */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: .5rem;          /* taka sama wartość jak w .planet-buttons-row */
-  box-sizing: border-box;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: .9rem;
-}
-
-/* mały kwadrat pickera, wyrównany wizualnie do przycisków */
-.color-picker-btn input[type="color"]{
-  width: 1.6rem;
-  height: 1.6rem;
-  padding: 0;
-  margin-left: .5rem;
-  border: none;
-  background: none;
-  vertical-align: middle;
-}
+/* Wymusza wyrównanie przycisków "Wybierz kolor z pikerem" i "Stwórz nową planetę". */
+.planet-action-row { display: flex; gap: .5rem; align-items: center; }
+.planet-action-row > * { display: inline-flex; align-items: center; justify-content: center; padding: 0 .5rem; box-sizing: border-box; width: auto !important; }
+.color-picker-btn label { margin: 0; line-height: 1; display: inline-block; }
+.color-picker-btn input[type="color"] { width: 2rem; height: 2rem; padding: 0; margin: 0; vertical-align: middle; display: inline-block; box-sizing: border-box; }
+#addPlanetBtn { margin: 0; padding: 0 .5rem; vertical-align: middle; }
 
 </style>
 </head>
@@ -286,7 +266,7 @@
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
         <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
  <!-- Przycisk Dodaj planetę i wybierz kolor planety z palety Hex -->
-  <div class="planet-action-row">
+  <div class="planet-action-row" style="display:flex; justify-content:center;>
  <div class="color-picker-btn">
   <label for="PlanetColor">Wybierz kolor</label>
   <input type="color" id="PlanetColor" value="#000000">
