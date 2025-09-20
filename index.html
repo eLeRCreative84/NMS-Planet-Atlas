@@ -71,12 +71,10 @@
   display: flex;           /* flexbox */
   justify-content: center; /* poziome centrowanie */
   align-items: center;     /* pionowe centrowanie */
-  overflow: hidden;        /* żeby nic nie wystawało */
-}
+ }
 
 #globeViz {
-  position: relative;
-  width: 100%;
+  flex: 1;                /* pozwala się rozciągać */
   height: 100%;
   display: flex;
   justify-content: center;
@@ -86,6 +84,8 @@
   #globeViz canvas {
   display: block;
   margin: 0 auto;
+  max-width: 100%;        /* pilnuje żeby nie wyszedł poza wrapper */
+  height: auto;
 }
   /* Nagłówek nad wizualizacją planety */
 #planetOverlayHeader {
