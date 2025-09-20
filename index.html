@@ -245,25 +245,28 @@
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Skalowanie globu i punktów</h2>
 
-<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-  <label for="pointScale">Skala punktów:</label>
-  <input type="range" id="pointScale" min="0.1" max="2" step="0.1" value="0.4" oninput="updatePointScale()" />
-  <span id="pointScaleValue">0.40</span>
-  <button onclick="resetPointScale()">Reset</button>
+<!-- Suwak 1: Skalowanie punktów -->
+<label>Skalowanie punktów</label>
+<input type="range" id="pointScale" min="0.1" max="1" step="0.1" value="0.4" oninput="updatePointScale()" />
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+  <span id="pointScaleValue">0.4</span>
+  <button onclick="resetPointScale()" style="padding:0.2rem 0.4rem; font-size:12px;">Reset</button>
 </div>
 
-<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-  <label for="pointsDistanceMultiplier">Wysokość słupków:</label>
-  <input type="range" id="pointsDistanceMultiplier" min="0.5" max="30" step="0.5" value="1" oninput="updatePointsDistanceMultiplier()" />
-  <span id="pointsDistanceMultiplierValue">1.00</span>
-  <button onclick="resetPointsDistanceMultiplier()">Reset</button>
+<!-- Suwak 2: Wysokość słupka -->
+<label>Wysokość słupka</label>
+<input type="range" id="pointsDistanceMultiplier" min="0.5" max="30" step="0.5" value="1" oninput="updatePointsDistanceMultiplier()" />
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+  <span id="pointsDistanceMultiplierValue">1</span>
+  <button onclick="resetPointsDistanceMultiplier()" style="padding:0.2rem 0.4rem; font-size:12px;">Reset</button>
 </div>
 
-<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-  <label for="globeZoomMultiplier">Zoom globu:</label>
-  <input type="range" id="globeZoomMultiplier" min="0.5" max="2" step="0.05" value="1" oninput="updateGlobeZoomMultiplier()" />
-  <span id="globeZoomMultiplierValue">1.00</span>
-  <button onclick="resetGlobeZoomMultiplier()">Reset</button>
+<!-- Suwak 3: Zoom globu -->
+<label>Zoom globu</label>
+<input type="range" id="globeZoomMultiplier" min="0.5" max="2" step="0.05" value="1" oninput="updateGlobeZoomMultiplier()" />
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+  <span id="globeZoomMultiplierValue">1</span>
+  <button onclick="resetGlobeZoomMultiplier()" style="padding:0.2rem 0.4rem; font-size:12px;">Reset</button>
 </div>
 
    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
@@ -1045,12 +1048,12 @@ function importAtlas(event){
 ////////////////////////////////////////////////////////////////////  
   
 // Skalowanie punktów
-function updatePointScale() {
+function updatePointScale(){
   pointScale = parseFloat(document.getElementById("pointScale").value);
+  document.getElementById("pointScaleValue").textContent = pointScale;
   refreshGlobePoints();
-  document.getElementById("pointScaleValue").textContent = pointScale.toFixed(2);
 }
-function resetPointScale() {
+function resetPointScale(){
   document.getElementById("pointScale").value = 0.4;
   updatePointScale();
 }
@@ -1058,10 +1061,10 @@ function resetPointScale() {
 // Sklaowanie wysokości słupka
 function updatePointsDistanceMultiplier() {
   pointsDistanceMultiplier = parseFloat(document.getElementById("pointsDistanceMultiplier").value);
+  document.getElementById("pointsDistanceMultiplierValue").textContent = pointsDistanceMultiplier;
   refreshGlobePoints();
-  document.getElementById("pointsDistanceMultiplierValue").textContent = pointsDistanceMultiplier.toFixed(2);
 }
-function resetPointsDistanceMultiplier() {
+function resetPointsDistanceMultiplier(){
   document.getElementById("pointsDistanceMultiplier").value = 1;
   updatePointsDistanceMultiplier();
 }
@@ -1069,14 +1072,14 @@ function resetPointsDistanceMultiplier() {
 //Skalowanie wielkości planety
 function updateGlobeZoomMultiplier() {
   globeZoomMultiplier = parseFloat(document.getElementById("globeZoomMultiplier").value);
+  document.getElementById("globeZoomMultiplierValue").textContent = globeZoomMultiplier;
   globe.scene().scale.set(globeZoomMultiplier, globeZoomMultiplier, globeZoomMultiplier);
-  document.getElementById("globeZoomMultiplierValue").textContent = globeZoomMultiplier.toFixed(2);
 }
-function resetGlobeZoomMultiplier() {
+function resetGlobeZoomMultiplier(){
   document.getElementById("globeZoomMultiplier").value = 1;
   updateGlobeZoomMultiplier();
 }
-  
+
 // Odświeżenie punktów na globie
 function refreshGlobePoints(){
   if(!currentPlanet) return;
@@ -1085,7 +1088,7 @@ function refreshGlobePoints(){
   globe.pointsData(atlas[currentPlanet])
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
 }
-
+  
 ////////////////////////////////////////////////////////////////////
 //---------------------- Inicjalizacja globu ---------------------//
 //////////////////////////////////////////////////////////////////// 
