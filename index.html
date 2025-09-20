@@ -173,12 +173,20 @@
 }
 
 .color-picker-btn input[type="color"] {
-  width: 100%;  /* mniejszy picker */
-  height: 3.5rem; /* zmniejszona wysokość */
-  border: none;
+  -webkit-appearance: none; /* wyłącz domyślny wygląd (Chrome/Safari) */
+  -moz-appearance: none;    /* Firefox */
+  appearance: none;
+  
+  border: none;       /* usuwa białą ramkę */
+  padding: 0;         /* usuwa marginesy wewnętrzne */
+  background: none;   /* usuwa białe tło */
+  
+  width: 100%;        /* pełna szerokość samego kwadratu */
+  height: 2rem;       /* zmniejszona wysokość */
+  border-radius: 4px; /* lekko zaokrąglone rogi */
   cursor: pointer;
-  border-radius: 4px;
 }
+
 
 #addPlanetBtn {
   background: #1976d2;
