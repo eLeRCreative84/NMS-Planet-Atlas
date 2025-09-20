@@ -198,10 +198,14 @@
 .color-picker-btn input[type="color"] { width: 2rem; height: 2rem; padding: 0; margin: 0; vertical-align: middle; display: inline-block; box-sizing: border-box; }
 #addPlanetBtn { margin: 0; padding: 0 .5rem; vertical-align: middle; }
 
-.color-picker-btn {
-  flex: 1;         /* zajmuje tyle samo miejsca co sąsiedni przycisk */
-  min-width: 0;    /* żeby flex dobrze liczył */
+.planet-action-row .color-picker-btn,
+.planet-action-row #addPlanetBtn {
+  flex: 1;              /* oba elementy równo dzielą przestrzeń */
+  min-width: 0;         /* żeby flex działał poprawnie */
+  height: 3rem;         /* spójna wysokość */
+  box-sizing: border-box;
 }
+
  
 </style>
 </head>
