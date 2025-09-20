@@ -198,15 +198,16 @@
 .color-picker-btn input[type="color"] { width: 2rem; height: 2rem; padding: 0; margin: 0; vertical-align: middle; display: inline-block; box-sizing: border-box; }
 #addPlanetBtn { margin: 0; padding: 0 .5rem; vertical-align: middle; }
 
-.planet-action-row .color-picker-btn,
-.planet-action-row #addPlanetBtn {
-  flex: 1;              /* oba elementy równo dzielą przestrzeń */
-  min-width: 0;         /* żeby flex działał poprawnie */
-  height: 3rem;         /* spójna wysokość */
-  box-sizing: border-box;
+.planet-action-row {
+  display: flex;
+  justify-content: center; /* wyśrodkowanie całego wiersza */
+  gap: 0.5rem;             /* odstęp między nimi */
 }
 
- 
+.planet-action-row > * {
+  flex: unset;             /* wyłącza wymuszanie równej szerokości */
+}
+
 </style>
 </head>
 <body>
