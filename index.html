@@ -191,8 +191,7 @@
   color: white;
 }
 /* Wymusza wyrównanie przycisków "Wybierz kolor z pikerem" i "Stwórz nową planetę". */
-/* Wymusza wyrównanie przycisków "Wybierz kolor z pikerem" i "Stwórz nową planetę". */
-.planet-action-row { display: flex; gap: .10rem; align-items: center; }
+.planet-action-row { display: flex; gap: .5rem; align-items: center; }
 .planet-action-row > * { display: inline-flex; align-items: center; justify-content: center; padding: 0 .5rem; box-sizing: border-box; width: auto !important; }
 .color-picker-btn label { margin: 0; line-height: 1; display: inline-block; }
 .color-picker-btn input[type="color"] { width: 2rem; height: 2rem; padding: 0; margin: 0; vertical-align: middle; display: inline-block; box-sizing: border-box; }
@@ -281,8 +280,9 @@
   <input type="text" id="planetTextureUrl" placeholder="URL tekstury" oninput="checkTextureInput()" />
 
   <div class="planet-buttons-row">
-  <button id="setTextureBtn">Ustaw teksturę</button>
-  <button id="setColorBtn">Ustaw kolor</button>
+    <button id="setTextureBtn" onclick="addTextureUrl()">Ustaw teksturę</button>
+    <button id="setColorBtn" onclick="changePlanetColor()">Ustaw kolor</button>
+
   </div>
 </div>
     
