@@ -944,10 +944,41 @@ function editPoint(timestamp){
   document.getElementById("notes").value = p.notes;
 
   editIndex = index; // zapamiętaj indeks prawidłowego punktu w atlasie
-  document.querySelector("button[onclick='addPoint()']").textContent = "Nadpisz punkt";
+  const addBtn = document.querySelector("button[onclick='addPoint()']");
+  addBtn.textContent = "Nadpisz punkt";
+
+  showCancelEditButton();
 
   // przełączenie na zakładkę START
   openTab('start');
+}
+
+function showCancelEditButton() {
+  let cancelBtn = document.getElementById("cancelEditBtn");
+  if(!cancelBtn) {
+    const addBtn = document.querySelector("button[onclick='addPoint()']");
+    cancelBtn = document.createElement("button");
+    cancelBtn.id = "cancelEditBtn";
+    cancelBtn.textContent = "Anuluj";
+    cancelBtn.style.marginLeft = "0.5rem";
+    cancelBtn.onclick = cancelEditPoint;
+    addBtn.parentNode.appendChild(cancelBtn);
+  }
+}
+
+function cancelEditPoint() {
+  editIndex = null;
+  const addBtn = document.querySelector("button[onclick='addPoint()']");
+  addBtn.textContent = "Dodaj punkt";
+
+  const cancelBtn = document.getElementById("cancelEditBtn");
+  if(cancelBtn) cancelBtn.remove();
+
+  document.getElementById("lat").value = "";
+  document.getElementById("lng").value = "";
+  document.getElementById("name").value = "";
+  document.getElementById("type").value = "Zasób";
+  document.getElementById("notes").value = "";
 }
 
 // Utomatyczne tworzenie biegunów
