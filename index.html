@@ -191,13 +191,18 @@
   background: #1976d2;
   color: white;
 }
-
+/* Wymusza wyrównanie przycisków "Wybierz kolor z pikerem" i "Stwórz nową planetę". */
 .planet-action-row { display: flex; gap: .5rem; align-items: center; }
 .planet-action-row > * { display: inline-flex; align-items: center; justify-content: center; padding: 0 .5rem; box-sizing: border-box; width: auto !important; }
 .color-picker-btn label { margin: 0; line-height: 1; display: inline-block; }
 .color-picker-btn input[type="color"] { width: 2rem; height: 2rem; padding: 0; margin: 0; vertical-align: middle; display: inline-block; box-sizing: border-box; }
 #addPlanetBtn { margin: 0; padding: 0 .5rem; vertical-align: middle; }
-  
+
+.color-picker-btn {
+  flex: 1;         /* zajmuje tyle samo miejsca co sąsiedni przycisk */
+  min-width: 0;    /* żeby flex dobrze liczył */
+}
+ 
 </style>
 </head>
 <body>
@@ -263,11 +268,11 @@
   <div id="planety" class="tab-content">
    
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
-  <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
+        <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
  <!-- Przycisk Dodaj planetę i wybierz kolor planety z palety Hex -->
   <div class="planet-action-row">
  <div class="color-picker-btn">
-  <label for="PlanetColor">Ustaw kolor</label>
+  <label for="PlanetColor">Wybierz kolor</label>
   <input type="color" id="PlanetColor" value="#000000">
 </div>
 
@@ -277,6 +282,7 @@
 
     <!-- Przycisk dodaj texturę -->
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+  <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
   <input type="text" id="planetTextureUrl" placeholder="URL tekstury" oninput="checkTextureInput()" />
 
   <div class="planet-buttons-row">
