@@ -446,6 +446,7 @@ function addNewPlanet() {
 }
   
 // Lista planet
+// Lista planet
 function refreshPlanetList(){
   const list = document.getElementById("planetList");
   list.innerHTML = "";
@@ -564,7 +565,6 @@ delBtn.title = `Usuń planetę ${p}`;
   });
   updateNoPlanetsMessage();
 }
-
 // Funkcja pomocnicza do aktualizacji planetData
 function updatePlanetData(name, extra = {}) {
   const idx = planetData.findIndex(pd => pd.name === name);
