@@ -169,7 +169,7 @@
   <h2 class="currentPlanetHeader"></h2>
   <label>Galaktyka</label><input type="text" id="detailGalaxy" />
   <label>Region</label><input type="text" id="detailRegion" />
-  <label>Układ gwiazdowy</label><input type="text" id="detailSystem" />
+  <label>Układ planetarny</label><input type="text" id="detailSystem" />
 
   <label>Biom</label>
   <select id="detailBiome">
@@ -446,126 +446,145 @@ function addNewPlanet() {
 }
   
 // Lista planet
-// Lista planet
-function refreshPlanetList(){
-  const list = document.getElementById("planetList");
-  list.innerHTML = "";
 
- // grupowanie planet po układzie gwiezdnym
-  const systems = {};
- 
-  Object.keys(atlas).forEach(p => {
- 
-    const system = (planetDetails[p] && planetDetails[p].system) 
-      ? planetDetails[p].system 
-      : "Nieznany układ";
-
-    if (!systems[system]) systems[system] = [];
-    systems[system].push(p);
+// Zwraca dane do renderowania – tylko sortowanie i grupowanie
+function getGroupedPlanets() {
+  const createdAtMap = {};
+  (planetData || []).forEach(pd => {
+    if (pd && pd.name) createdAtMap[pd.name] = pd.createdAt || 0;
   });
 
-  // znajdź "znacznik czasu" (najstarsza planeta w układzie)
+  const systems = { "Nieznany układ": [] };
+
+  Object.keys(atlas).forEach(p => {
+    const system = (planetDetails[p]?.system || "").trim();
+    if (system) {
+      if (!systems[system]) systems[system] = [];
+      systems[system].push(p);
+    } else {
+      systems["Nieznany układ"].push(p);
+    }
+  });
+
+  const INF = Number.MAX_SAFE_INTEGER;
+
   const systemTimestamps = {};
   Object.keys(systems).forEach(system => {
-    const times = systems[system].map(p => planetDetails[p]?.createdAt || 0);
-    systemTimestamps[system] = Math.min(...times);
+    const times = systems[system].map(name => createdAtMap[name] || INF);
+    systemTimestamps[system] = times.length ? Math.min(...times) : INF;
   });
 
-  // posortowane wg daty powstania układów
   const sortedSystems = Object.keys(systems).sort((a, b) => {
-    if (a === "Nieznany układ") return 1;
-    if (b === "Nieznany układ") return -1;
+    if (a === "Nieznany układ") return -1;
+    if (b === "Nieznany układ") return 1;
     return systemTimestamps[a] - systemTimestamps[b];
   });
 
-  // renderowanie
-  sortedSystems.forEach(system => {
-    // nagłówek układu
+  // zwracamy gotową strukturę do wyrenderowania
+  return sortedSystems.map(system => ({
+    name: system,
+    planets: systems[system].sort((p1, p2) =>
+      (createdAtMap[p1] || INF) - (createdAtMap[p2] || INF)
+    )
+  }));
+}
+// Renderuje nagłówki i planety.
+  
+function refreshPlanetList() {
+  const list = document.getElementById("planetList");
+  if (!list) return;
+
+  list.innerHTML = "";
+  const grouped = getGroupedPlanets();
+
+  const frag = document.createDocumentFragment();
+
+  grouped.forEach(system => {
     const header = document.createElement("h3");
-    header.textContent = system;
+    header.textContent = "Układ planetarny: " + system.name;
     header.style.margin = "0.5rem 0";
-    header.style.color = "#ffcc00";
-    list.appendChild(header);
+    header.style.color = system.name === "Nieznany układ" ? "#aaa" : "#ffcc00";
+    frag.appendChild(header);
 
-// sortowanie planet w układzie wg daty
-    systems[system].sort((p1, p2) => {
-      return (planetDetails[p1]?.createdAt || 0) - (planetDetails[p2]?.createdAt || 0);
+    system.planets.forEach(p => {
+      // tutaj wklejasz kod do renderowania wiersza planety (btn + Usuń)
+      frag.appendChild(renderPlanetRow(p));
     });
-    
-    // planety w tym układzie
-    systems[system].forEach(p => {
-     // kontener na przycisk planety i przycisk usuń
-    const container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.alignItems = "center";
-    container.style.margin = "0.2rem 0";
-
-    // 🔵 przycisk planety
-    const btn = document.createElement("button");
-    btn.textContent = p;
-btn.style.flex = "1"; // zajmuje całą pozostałą szerokość
-btn.style.marginRight = "0.5rem";
-btn.style.background = "#e5e5e5"; // jasnoszary
-btn.style.color = "black";
-btn.style.border = "none";
-btn.style.padding = "0.3rem";
-btn.style.borderRadius = "4px";
-btn.style.cursor = "pointer";
-
-    btn.onclick = () => {
-      currentPlanet = p;
-      updateCurrentPlanetHeader();
-      addPoles(p);
-      refreshGlobePoints();
-      globe.htmlElementsData(atlas[p].filter(pt => pt.type==="Pole"));
-      refreshPointsList();
-      loadPlanetDetails();
-      selectPlanet(p); // wyświetlaj teksturę dla danej planety przy prząłaczaniu się między nimi
-    };
-
-    // 🔴 przycisk usuń planetę
-    const delBtn = document.createElement("button");
-delBtn.textContent = "Usuń";
-delBtn.style.flex = "0"; // tylko tyle, ile napis
-delBtn.style.background = "#c62828";
-delBtn.style.color = "white";
-delBtn.style.border = "none";
-delBtn.style.padding = "0.2rem 0.5rem"; // dopasowane do napisu
-delBtn.style.borderRadius = "4px";
-delBtn.style.cursor = "pointer";
-delBtn.style.marginLeft = "auto"; // wyrównanie do prawej
-delBtn.title = `Usuń planetę ${p}`;
-
-    delBtn.onclick = (e) => {
-  e.stopPropagation();
-  if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
-    delete atlas[p];
-    delete planetDetails[p];
-
-    // Usuwanie planety z planetData – szuka planety po nazwie w planetData i usuwa ją, jeśli istnieje.
-    const idxData = planetData.findIndex(pd => pd.name === p);
-    if(idxData !== -1) planetData.splice(idxData, 1);
-    
-    const planets = Object.keys(atlas);
-    currentPlanet = planets.length ? planets[0] : null; 
-
-    if (currentPlanet) {
-      refreshGlobePoints();
-    } else {
-      globe.pointsData([]);
-    }
-    updateCurrentPlanetHeader(); // dopiero na końcu
-    refreshPlanetList();
-    refreshPointsList();
-  }
-};
-    container.appendChild(btn);
-    container.appendChild(delBtn);
-    list.appendChild(container);
   });
+
+  list.appendChild(frag);
   updateNoPlanetsMessage();
 }
-// Funkcja pomocnicza do aktualizacji planetData
+
+// Tworzy pojedynczy wiersz
+function renderPlanetRow(p) {
+  const container = document.createElement("div");
+  container.style.display = "flex";
+  container.style.alignItems = "center";
+  container.style.margin = "0.2rem 0";
+
+  const btn = document.createElement("button");
+  btn.textContent = p;
+  btn.style.flex = "1";
+  btn.style.marginRight = "0.5rem";
+  btn.style.background = "#e5e5e5";
+  btn.style.color = "black";
+  btn.style.border = "none";
+  btn.style.padding = "0.3rem";
+  btn.style.borderRadius = "4px";
+  btn.style.cursor = "pointer";
+
+  btn.onclick = () => {
+    currentPlanet = p;
+    updateCurrentPlanetHeader();
+    addPoles(p);
+    refreshGlobePoints();
+    globe.htmlElementsData(atlas[p].filter(pt => pt.type === "Pole"));
+    refreshPointsList();
+    loadPlanetDetails();
+    selectPlanet(p);
+  };
+
+  const delBtn = document.createElement("button");
+  delBtn.textContent = "Usuń";
+  delBtn.style.flex = "0";
+  delBtn.style.background = "#c62828";
+  delBtn.style.color = "white";
+  delBtn.style.border = "none";
+  delBtn.style.padding = "0.2rem 0.5rem";
+  delBtn.style.borderRadius = "4px";
+  delBtn.style.cursor = "pointer";
+  delBtn.style.marginLeft = "auto";
+  delBtn.title = `Usuń planetę ${p}`;
+
+  delBtn.onclick = (e) => {
+    e.stopPropagation();
+    if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
+      delete atlas[p];
+      delete planetDetails[p];
+      const idxData = planetData.findIndex(pd => pd.name === p);
+      if (idxData !== -1) planetData.splice(idxData, 1);
+
+      const planets = Object.keys(atlas);
+      currentPlanet = planets.length ? planets[0] : null;
+
+      if (currentPlanet) {
+        refreshGlobePoints();
+      } else {
+        globe.pointsData([]);
+      }
+      updateCurrentPlanetHeader();
+      refreshPlanetList();
+      refreshPointsList();
+    }
+  };
+
+  container.appendChild(btn);
+  container.appendChild(delBtn);
+  return container;
+}
+  
+ // Funkcja pomocnicza do aktualizacji planetData
 function updatePlanetData(name, extra = {}) {
   const idx = planetData.findIndex(pd => pd.name === name);
   if (idx !== -1) {
