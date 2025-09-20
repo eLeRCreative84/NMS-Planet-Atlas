@@ -63,18 +63,31 @@
   text-align: center;
 }
   
-/* Nagłówek nad wizualizacją planety */
+/* Ustawienia wizualizacji globu */
 #globeWrapper {
   position: relative;
   width: 100%;
   height: 100%;
+  display: flex;           /* flexbox */
+  justify-content: center; /* poziome centrowanie */
+  align-items: center;     /* pionowe centrowanie */
+  overflow: hidden;        /* żeby nic nie wystawało */
 }
 
 #globeViz {
+  position: relative;
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+  #globeViz canvas {
+  display: block;
+  margin: 0 auto;
+}
+  /* Nagłówek nad wizualizacją planety */
 #planetOverlayHeader {
   position: absolute;
   top: 10px;
