@@ -62,7 +62,25 @@
 .tab-content h2 {
   text-align: center;
 }
- 
+  
+/* Nagłówek nad wizualizacją planety */
+#planetOverlayHeader {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(26, 58, 106, 0.85);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+  
 </style>
 </head>
 <body>
@@ -81,8 +99,7 @@
   Stwórz nową planetę lub importuj dane JSON
 </div>
 
-    <h2 class="currentPlanetHeader"></h2>
-    <h2>Dodaj punkt</h2>
+      <h2>Dodaj punkt</h2>
       <div class="xy-inputs">
   <div>
     <label>X (−90 do 90)</label>
@@ -127,8 +144,7 @@
 
   <!-- Zakładka PLANETY -->
   <div id="planety" class="tab-content">
-    <h2 class="currentPlanetHeader"></h2>
-    <h3>Dodaj nową planetę</h3>
+   <h3>Dodaj nową planetę</h3>
 
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
   <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
@@ -152,7 +168,6 @@
 
   <!-- Zakładka PUNKTY -->
   <div id="punkty" class="tab-content">
-    <h2 class="currentPlanetHeader"></h2>
     <label>Sortuj:</label>
     <select id="sortPoints" onchange="refreshPointsList()">
       <option value="nameAsc">Nazwa A–Z</option>
@@ -166,7 +181,6 @@
 
   <!-- Zakładka DETALE PLANETY -->
 <div id="detale" class="tab-content">
-  <h2 class="currentPlanetHeader"></h2>
   <label>Galaktyka</label><input type="text" id="detailGalaxy" />
   <label>Region</label><input type="text" id="detailRegion" />
   <label>Układ planetarny</label><input type="text" id="detailSystem" />
@@ -279,6 +293,7 @@
 </div>
 
 <div id="globeViz">
+  <div id="planetOverlayHeader"></div>
  </div>
 
 <script>
@@ -308,12 +323,12 @@ updateCurrentPlanetHeader();
   
 //zmiana nagłówka z nazwą planety
 function updateCurrentPlanetHeader() {
-  const headers = document.querySelectorAll(".currentPlanetHeader");
-  headers.forEach(h => {
-    h.textContent = currentPlanet
+  const overlay = document.getElementById("planetOverlayHeader");
+  if (overlay) {
+    overlay.textContent = currentPlanet
       ? `${currentPlanet}`
       : "Brak wybranej planety";
-  });
+  }
 }
 
 function updateNoPlanetsMessage() {
