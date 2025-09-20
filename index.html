@@ -247,26 +247,26 @@
 
 <!-- Suwak 1: Skalowanie punktów -->
 <label>Skalowanie punktów</label>
-<input type="range" id="pointScale" min="0.1" max="1" step="0.1" value="0.4" oninput="updatePointScale()" />
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-  <span id="pointScaleValue">0.4</span>
-  <button onclick="resetPointScale()" style="padding:0.2rem 0.4rem; font-size:12px;">Reset</button>
+<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+  <input type="range" id="pointScale" min="0.1" max="1" step="0.1" value="0.4" oninput="updatePointScale()" style="flex:1;" />
+  <span id="pointScaleValue" style="width:2rem; text-align:center;">0.4</span>
+  <button onclick="resetPointScale()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
 </div>
 
 <!-- Suwak 2: Wysokość słupka -->
 <label>Wysokość słupka</label>
-<input type="range" id="pointsDistanceMultiplier" min="0.5" max="30" step="0.5" value="1" oninput="updatePointsDistanceMultiplier()" />
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-  <span id="pointsDistanceMultiplierValue">1</span>
-  <button onclick="resetPointsDistanceMultiplier()" style="padding:0.2rem 0.4rem; font-size:12px;">Reset</button>
+<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+  <input type="range" id="pointsDistanceMultiplier" min="0.5" max="30" step="0.5" value="1" oninput="updatePointsDistanceMultiplier()" style="flex:1;" />
+  <span id="pointsDistanceMultiplierValue" style="width:2rem; text-align:center;">1</span>
+  <button onclick="resetPointsDistanceMultiplier()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
 </div>
 
 <!-- Suwak 3: Zoom globu -->
 <label>Zoom globu</label>
-<input type="range" id="globeZoomMultiplier" min="0.5" max="2" step="0.05" value="1" oninput="updateGlobeZoomMultiplier()" />
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-  <span id="globeZoomMultiplierValue">1</span>
-  <button onclick="resetGlobeZoomMultiplier()" style="padding:0.2rem 0.4rem; font-size:12px;">Reset</button>
+<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+  <input type="range" id="globeZoomMultiplier" min="0.5" max="2" step="0.05" value="1" oninput="updateGlobeZoomMultiplier()" style="flex:1;" />
+  <span id="globeZoomMultiplierValue" style="width:2rem; text-align:center;">1</span>
+  <button onclick="resetGlobeZoomMultiplier()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
 </div>
 
    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
