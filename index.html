@@ -146,20 +146,24 @@
 .planet-action-row {
   display: flex;
   gap: 0.5rem;
+  max-width: 400px;
 }
 
+/* wspólne ustawienia obu przycisków */
 .color-picker-btn, #addPlanetBtn {
-  flex: 1; /* równomierna szerokość obu elementów */
-  display: flex;
-  flex-direction: column; /* napis na górze, picker na dole */
-  align-items: center;
-  justify-content: center;
-  padding: 0.2rem 0.3rem; /* mniejsze paddingi */
+  flex: 1;
+  height: 3rem;             /* spłaszczone */
   border-radius: 6px;
   border: none;
   cursor: pointer;
   font-weight: bold;
-  font-size: 0.9rem; /* mniejsza czcionka */
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;              /* odstęp między elementami */
+  padding: 0 0.5rem;
+  box-sizing: border-box;
 }
 
 .color-picker-btn {
@@ -168,31 +172,25 @@
 }
 
 .color-picker-btn label {
-  margin-bottom: 0.1rem; /* minimalny odstęp między napisem a pickerem */
-  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1;
 }
 
 .color-picker-btn input[type="color"] {
-  -webkit-appearance: none; /* wyłącz domyślny wygląd (Chrome/Safari) */
-  -moz-appearance: none;    /* Firefox */
+  -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
-  
-  border: none;       /* usuwa białą ramkę */
-  padding: 0;         /* usuwa marginesy wewnętrzne */
-  background: none;   /* usuwa białe tło */
-  
-  width: 100%;        /* pełna szerokość samego kwadratu */
-  height: 2rem;       /* zmniejszona wysokość */
-  border-radius: 4px; /* lekko zaokrąglone rogi */
+  border: none;
+  background: none;
+  width: 2rem;   /* kwadrat pickera */
+  height: 2rem;
+  padding: 0;
   cursor: pointer;
 }
-
 
 #addPlanetBtn {
   background: #1976d2;
   color: white;
-  padding: 0.25rem 0.5rem; /* zmniejszone paddingi */
-  font-size: 0.9rem;
 }
   
 </style>
