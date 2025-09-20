@@ -192,17 +192,11 @@
   color: white;
 }
 
-.planet-action-row {
-  display: flex;
-  align-items: stretch; /* równa wysokość */
-}
-
-.color-picker-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-  
+.planet-action-row { display: flex; gap: .5rem; align-items: center; }
+.planet-action-row > * { display: inline-flex; align-items: center; justify-content: center; padding: 0 .5rem; box-sizing: border-box; width: auto !important; }
+.color-picker-btn label { margin: 0; line-height: 1; display: inline-block; }
+.color-picker-btn input[type="color"] { width: 2rem; height: 2rem; padding: 0; margin: 0; vertical-align: middle; display: inline-block; box-sizing: border-box; }
+#addPlanetBtn { margin: 0; padding: 0 .5rem; vertical-align: middle; }
   
 </style>
 </head>
