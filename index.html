@@ -200,12 +200,19 @@
 
 .planet-action-row {
   display: flex;
-  justify-content: center; /* wyśrodkowanie całego wiersza */
-  gap: 0.5rem;             /* odstęp między nimi */
+  gap: 0.5rem;
+  align-items: stretch;   /* wyrównuje wysokość */
 }
 
-.planet-action-row > * {
-  flex: unset;             /* wyłącza wymuszanie równej szerokości */
+.color-picker-btn {
+  display: flex;
+  align-items: center;    /* wyśrodkowanie label + picker */
+  justify-content: center;
+  flex: 1;                /* zajmuje tyle samo miejsca co przycisk obok */
+}
+
+#addPlanetBtn {
+  flex: 1;                /* ta sama szerokość co color-picker-btn */
 }
 
 </style>
