@@ -232,7 +232,6 @@
     <label>Typ</label>
     <select id="type">
       <option>Zasób</option>
-      <option>Obelisk</option>
       <option>Baza</option>
       <option>Ruiny</option>
       <option>Struktura</option>
@@ -824,14 +823,13 @@ function refreshPointsList(){
       globe.pointColor(d=>{
         if(d.__highlight) return "orange";
         switch(d.type){
-          case "Zasób": return d.extracted?"gray":"gold";
-          case "Obelisk": return d.visited?"green":"orange";
-          case "Baza": return "blue";
-          case "Ruiny": return "brown";
-          case "Duża struktura": return "purple";
-          case "Inne": return "pink";
-          case "Pole": return "red";
-          default: return "red";
+        case "Zasób": return d.extracted ? "gray" : "gold";
+        case "Baza": return "blue";
+        case "Ruiny": return d.visited ? "lime" : "orange";
+        case "Struktura": return d.visited ? "cyan" : "magenta";
+        case "Inne": return d.visited ? "purple" : "brown";
+        case "Pole": return "red";
+        default: return "red";
         }
       });
       globe.pointsData(atlas[currentPlanet]);
@@ -842,18 +840,19 @@ function refreshPointsList(){
     };
     btnDiv.appendChild(showBtn);
 
-    if(point.type==="Zasób" || point.type==="Obelisk"){
+      if(point.type==="Zasób" || ["Inne","Ruiny","Struktura"].includes(point.type)){
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.checked = point.type==="Zasób"?point.extracted:point.visited;
+      checkbox.checked = point.type==="Zasób" ? point.extracted : point.visited;
       checkbox.onchange = ()=>{
         if(point.type==="Zasób") point.extracted = checkbox.checked;
-        if(point.type==="Obelisk") point.visited = checkbox.checked;
-        refreshGlobePoints();
-        refreshPointsList();
+          else point.visited = checkbox.checked;  // dla nowych typów
+          refreshGlobePoints();
+          refreshPointsList();
       };
       btnDiv.appendChild(checkbox);
     }
+
 
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edytuj";
@@ -906,8 +905,7 @@ function addPoint(){
 
   const point = {planet: currentPlanet, lat, lng, name, type, notes, timestamp: Date.now()};
   if(type==="Zasób") point.extracted=false;
-  if(type==="Obelisk") point.visited=false;
-
+  if(["Inne", "Ruiny", "Struktura"].includes(type)) point.visited = false;
   if(editIndex !== null && atlas[currentPlanet][editIndex]) {
     atlas[currentPlanet][editIndex] = point;
     editIndex = null;
