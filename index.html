@@ -310,6 +310,13 @@
 </div>
     
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+
+<div class="planet-action-row" style="margin-bottom:1rem;">
+  <button id="editSelectedPlanetBtn" onclick="editSelectedPlanet()" disabled>Edytuj zaznaczoną</button>
+  <button id="deleteSelectedPlanetBtn" onclick="deleteSelectedPlanet()" disabled>Usuń zaznaczoną</button>
+</div>
+    
+    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Lista planet</h2>
     <div id="planetList"></div>
   </div>
@@ -727,42 +734,7 @@ function renderPlanetRow(p) {
     selectPlanet(p);
   };
 
-  const delBtn = document.createElement("button");
-  delBtn.textContent = "Usuń";
-  delBtn.style.flex = "0";
-  delBtn.style.background = "#c62828";
-  delBtn.style.color = "white";
-  delBtn.style.border = "none";
-  delBtn.style.padding = "0.2rem 0.5rem";
-  delBtn.style.borderRadius = "4px";
-  delBtn.style.cursor = "pointer";
-  delBtn.style.marginLeft = "auto";
-  delBtn.title = `Usuń planetę ${p}`;
-
-  delBtn.onclick = (e) => {
-    e.stopPropagation();
-    if (confirm(`Na pewno usunąć planetę "${p}" wraz ze wszystkimi punktami?`)) {
-      delete atlas[p];
-      delete planetDetails[p];
-      const idxData = planetData.findIndex(pd => pd.name === p);
-      if (idxData !== -1) planetData.splice(idxData, 1);
-
-      const planets = Object.keys(atlas);
-      currentPlanet = planets.length ? planets[0] : null;
-
-      if (currentPlanet) {
-        refreshGlobePoints();
-      } else {
-        globe.pointsData([]);
-      }
-      updateCurrentPlanetHeader();
-      refreshPlanetList();
-      refreshPointsList();
-    }
-  };
-
   container.appendChild(btn);
-  container.appendChild(delBtn);
   return container;
 }
   
@@ -784,6 +756,57 @@ function updatePlanetData(name, extra = {}) {
 //Jest to uniwersalna funkcja updatePlanetData, która utrzymuje spójność tablicy planetData;
 //Można łatwo dodawać dodatkowe informacje do planet, bez zmieniania istniejących struktur atlas i planetDetails;
 //Nie zmienia się istniejący mechanizm dodawania, edycji ani usuwania planet – wszystko jest kompatybilne.
+
+// Funkcja aktualizująca stan przycisków w zależności od tego, czy planeta jest zaznaczona
+function updateSelectedPlanetButtons() {
+  const editBtn = document.getElementById("editSelectedPlanetBtn");
+  const delBtn  = document.getElementById("deleteSelectedPlanetBtn");
+  const enabled = !!currentPlanet;
+  editBtn.disabled = !enabled;
+  delBtn.disabled = !enabled;
+}
+
+// Wywołujemy po każdej zmianie zaznaczenia planety
+function selectPlanet(name) {
+  const planet = planetData.find(p => p.name === name);
+  if (!planet) return;
+  currentPlanet = planet.name;
+  updateCurrentPlanetHeader();
+  globe.globeImageUrl(planet.texture || blackTextureURL);
+  updateSelectedPlanetButtons();
+}
+
+// Edycja zaznaczonej planety
+function editSelectedPlanet() {
+  if (!currentPlanet) return;
+  document.getElementById("newPlanetName").value = currentPlanet;
+  // Przełączenie na zakładkę PLANETY (opcjonalnie START, jeśli chcesz edycję w formularzu)
+  openTab('planety');
+  alert(`Możesz teraz zmienić nazwę lub kolor planety "${currentPlanet}" w formularzu powyżej.`);
+}
+
+// Usunięcie zaznaczonej planety z potwierdzeniem
+function deleteSelectedPlanet() {
+  if (!currentPlanet) return;
+  if (!confirm(`Czy na pewno usunąć planetę "${currentPlanet}" wraz ze wszystkimi punktami?`)) return;
+
+  delete atlas[currentPlanet];
+  delete planetDetails[currentPlanet];
+  const idx = planetData.findIndex(p => p.name === currentPlanet);
+  if (idx !== -1) planetData.splice(idx, 1);
+
+  const planets = Object.keys(atlas);
+  currentPlanet = planets.length ? planets[0] : null;
+  
+  updateCurrentPlanetHeader();
+  refreshPlanetList();
+  refreshPointsList();
+  refreshGlobePoints();
+  updateSelectedPlanetButtons();
+}
+
+// Wywołanie przy starcie, żeby przyciski były poprawnie wyszarzone jeśli brak planet
+updateSelectedPlanetButtons();
   
 ////////////////////////////////////////////////////////////////////
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
