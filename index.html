@@ -293,7 +293,7 @@
   <input type="color" id="PlanetColor" value="#000000">
 </div>
 
-  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
+  <button class="hud-button" id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
 </div>
    </div>
 
@@ -303,8 +303,8 @@
   <input type="text" id="planetTextureUrl" placeholder="URL tekstury" oninput="checkTextureInput()" />
 
   <div class="planet-buttons-row">
-    <button id="setTextureBtn" onclick="addTextureUrl()">Ustaw teksturę</button>
-    <button id="setColorBtn" onclick="changePlanetColor()">Ustaw kolor</button>
+    <button class="hud-button" id="setTextureBtn" onclick="addTextureUrl()">Ustaw teksturę</button>
+    <button class="hud-button" id="setColorBtn" onclick="changePlanetColor()">Ustaw kolor</button>
 
   </div>
 </div>
@@ -313,7 +313,7 @@
 
 <div class="planet-buttons-row" style="margin-bottom:1rem;">
   <button id="editSelectedPlanetBtn" onclick="editSelectedPlanet()" disabled>Edytuj zaznaczoną</button>
-  <button id="deleteSelectedPlanetBtn" onclick="deleteSelectedPlanet()" disabled>Usuń zaznaczoną</button>
+  <button class="hud-button" id="deleteSelectedPlanetBtn" onclick="deleteSelectedPlanet()" disabled>Usuń zaznaczoną</button>
 </div>
 
 <!-- Ukryty kontener na edycję -->
@@ -482,7 +482,7 @@ let globeZoomMultiplier = 1;
 let autoRotate = false;
 let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
-let isEditingPlanet = false; // globalna flaga trybu edycji
+let buttonsVisible = true;
 
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -560,6 +560,17 @@ function savePlanetDetails(){
   refreshPlanetList();
   updateCurrentPlanetHeader();
 }
+
+  // Funkcja do aktualizacji widoczności przycisków HUD
+function updateHudButtonsVisibility() {
+  // zakładamy, że wszystkie przyciski HUD mają klasę 'hud-button'
+  document.querySelectorAll('.hud-button').forEach(btn => {
+    btn.style.display = buttonsVisible ? 'inline-block' : 'none';
+  });
+}
+
+// Wywołanie po starcie, żeby przyciski były widoczne
+updateHudButtonsVisibility();
 
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
@@ -799,11 +810,25 @@ function editSelectedPlanet() {
     alert("Najpierw zaznacz planetę.");
     return;
   }
+  startPlanetEdit();
+}
 
   document.getElementById("editPlanetBox").style.display = "block";
   document.getElementById("editPlanetName").value = currentPlanet;
 }
 
+  // Funkcje sterujące trybem edycji planety
+function startPlanetEdit() {
+  buttonsVisible = false;
+  updateHudButtonsVisibility();
+
+  // wyświetlamy box edycji planety
+  if(currentPlanet) {
+    document.getElementById("editPlanetBox").style.display = "block";
+    document.getElementById("editPlanetName").value = currentPlanet;
+  }
+  
+}
 function acceptEditPlanet() {
   const newName = document.getElementById("editPlanetName").value.trim();
   if (!newName) {
@@ -829,14 +854,23 @@ function acceptEditPlanet() {
   updateSelectedPlanetButtons();
 
   document.getElementById("editPlanetBox").style.display = "none";
+  finishPlanetEdit();
 }
-
 
 function cancelEditPlanet() {
   // po prostu chowamy formularz
   document.getElementById("editPlanetBox").style.display = "none";
 }
 
+function finishPlanetEdit() {
+  buttonsVisible = true;
+  updateHudButtonsVisibility();
+
+  // chowamy box edycji planety
+  document.getElementById("editPlanetBox").style.display = "none";
+  finishPlanetEdit();
+}
+  
 // Usunięcie zaznaczonej planety z potwierdzeniem
 function deleteSelectedPlanet() {
   if (!currentPlanet) return;
