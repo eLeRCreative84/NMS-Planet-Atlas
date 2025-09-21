@@ -445,6 +445,13 @@
   <!-- nagłówek overlay -->
   <div id="planetOverlayHeader"></div>
 
+<!-- nagłówek moja lokalizacja -->
+<div id="myLocationBox" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:white; padding:0.5rem; border-radius:8px; z-index:10;">
+  <div style="font-weight:bold; margin-bottom:0.5rem;">Moja lokalizacja</div>
+  <label>X: <input type="number" id="myLat" step="0.01" style="width:70px;"></label>
+  <label>Y: <input type="number" id="myLng" step="0.01" style="width:70px; margin-left:0.5rem;"></label>
+</div>
+
   <!-- glob -->
   <div id="globeViz"></div>
 </div>
@@ -460,6 +467,7 @@ let pointsDistanceMultiplier = 1;
 let globeZoomMultiplier = 1;
 let autoRotate = false;
 let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
+let myLocationPoint = null;  
 
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -853,7 +861,6 @@ function refreshPointsList(){
       btnDiv.appendChild(checkbox);
     }
 
-
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edytuj";
     editBtn.className = "edit";
@@ -988,7 +995,6 @@ function showCancelEditButton() {
   }
 }
 
-
 function cancelEditPoint() {
   editIndex = null;
   const addBtn = document.querySelector("button[onclick='addPoint()']");
@@ -1012,6 +1018,24 @@ function addPoles(planet){
     atlas[planet].push({lat:-90,lng:0,name:"Biegun Południowy",type:"Pole"});
   }
 }
+
+// Moja lokalizacja
+function updateMyLocation() {
+  const lat = parseFloat(document.getElementById("myLat").value);
+  const lng = parseFloat(document.getElementById("myLng").value);
+  if (isNaN(lat) || isNaN(lng)) return;
+
+  myLocationPoint = { 
+    lat: lat, 
+    lng: lng, 
+    name: "Moja lokalizacja", 
+    type: "Specjalny", 
+    notes: "" 
+  };
+
+  refreshGlobePoints();
+}
+
   
 ////////////////////////////////////////////////////////////////////
 //------------------- Tekstury i kolory planet -------------------//
@@ -1152,15 +1176,26 @@ function resetGlobeZoomMultiplier(){
   updateGlobeZoomMultiplier();
 }
 
-// Odświeżenie punktów na globie
 function refreshGlobePoints(){
   if(!currentPlanet) return;
 
-  // Ustawiamy wysokość punktów w zależności od mnożnika
-  globe.pointsData(atlas[currentPlanet])
+  // kopiujemy punkty z atlasu
+  let allPoints = atlas[currentPlanet] ? [...atlas[currentPlanet]] : [];
+
+  // dodajemy "Moja lokalizacja" jeśli istnieje
+  if (myLocationPoint) {
+    allPoints.push(myLocationPoint);
+  }
+
+  // odświeżamy glob z uwzględnieniem mnożnika wysokości
+  globe.pointsData(allPoints)
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
 }
 
+ // Obsługa wpisywania mojej lokalizacji
+document.getElementById("myLat").addEventListener("input", updateMyLocation);
+document.getElementById("myLng").addEventListener("input", updateMyLocation);
+  
 function toggleAutoRotate() {
   const controls = globe.controls();
   if (document.getElementById("autoRotateCheckbox").checked) {
