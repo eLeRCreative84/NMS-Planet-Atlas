@@ -1036,39 +1036,7 @@ function createStarTexture() {
     return texture;
 }
 
-// Dodanie punktu z gwiazdką na globie
-function addMyLocation(x, y) {
-    const myLocData = [{
-        lat: y,   // szerokość
-        lng: x,   // długość
-        altitude: 0.02, // wysokość nad powierzchnią
-        color: null,   // kolor niepotrzebny, bo użyjemy tekstury
-        iconTexture: createStarTexture()
-    }];
-    globe.pointsData(myLocData, { img: d => d.iconTexture, size: 0.05 });
-}
-  
-// Moja lokalizacja - zapisz współrzędne i zainicjuj odświeżenie
-function updateMyLocation() {
-  const lat = parseFloat(document.getElementById("myLat").value);
-  const lng = parseFloat(document.getElementById("myLng").value);
-  if (isNaN(lat) || isNaN(lng)) return;
-
-  myLocationPoint = { 
-    lat: lat, 
-    lng: lng, 
-    name: "Moja lokalizacja", 
-    type: "Specjalny", 
-    notes: "" 
-  };
-
-  refreshGlobePoints();
-}
-
- // Obsługa wpisywania mojej lokalizacji - To sprawia, że kiedy wpisujesz współrzędne w inputach, odpala się updateMyLocation()
-document.getElementById("myLat").addEventListener("input", updateMyLocation);
-document.getElementById("myLng").addEventListener("input", updateMyLocation);
-  
+ 
  // Funkcja dodająca gwiazdkę jako sprite - narysuj lub usuń gwiazdkę na globie.
 function refreshMyLocation() {
   if (!myLocationPoint) {
@@ -1085,10 +1053,12 @@ function refreshMyLocation() {
     .customThreeObject(() => sprite)
     .customThreeObjectUpdate((obj, d) => {
       const { lat, lng } = d;
-      const { x, y, z } = globe.getCoords(lat, lng, 1.02); 
-      obj.position.set(x, y, z);
+      if (globe.getCoords) {
+        const { x, y, z } = globe.getCoords(lat, lng, 1.02);
+        obj.position.set(x, y, z);
+      }
     });
-} 
+}
 
 // odświeżamy glob z uwzględnieniem mnożnika wysokości
   function refreshGlobePoints(){
@@ -1103,11 +1073,10 @@ function refreshMyLocation() {
           if (d.type === "Baza") return "blue";
           if (d.type === "Ruiny") return "orange";
           if (d.type === "Struktura") return "magenta";
-          if (d.type === "Pole") return "red";
           return "gray";
        });
-// osobno odświeżamy gwiazdkę
-  refreshMyLocation();
+if (myLocationPoint) refreshMyLocation();
+  else globe.customLayerData([]); // usuń gwiazdkę jeśli brak lokalizacji
 }
   
 ////////////////////////////////////////////////////////////////////
