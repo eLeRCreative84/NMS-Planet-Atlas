@@ -1070,7 +1070,7 @@ function updateMyLocation() {
       lng, 
       altitude: 0.02, 
       type: "Moja", 
-      name: "⭐"   // <-- tu dajemy gwiazdkę jako etykietę
+      name: "Twoja lokalizacja"   
     };
   }
 
@@ -1305,6 +1305,15 @@ const globe = Globe()(document.getElementById("globeViz"))
       el.style.fontWeight="bold";
       el.style.textShadow="0 0 4px black";
       el.textContent=d.name==="Biegun Północny"?"N":"S";
+      return el;
+    }
+    if (d.type === "Moja") {
+      const el = document.createElement("div");
+      el.style.color = "yellow";
+      el.style.fontSize = "22px";
+      el.style.fontWeight = "bold";
+      el.style.textShadow = "0 0 6px black";
+      el.textContent = "⭐";
       return el;
     }
   });
