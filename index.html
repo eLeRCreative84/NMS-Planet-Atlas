@@ -1065,10 +1065,16 @@ function updateMyLocation() {
   if (isNaN(lat) || isNaN(lng)) {
     myLocationPoint = null;
   } else {
-    myLocationPoint = { lat, lng, name: "Moja lokalizacja" };
+    myLocationPoint = { 
+      lat, 
+      lng, 
+      altitude: 0.02, 
+      type: "Moja", 
+      name: "⭐"   // <-- tu dajemy gwiazdkę jako etykietę
+    };
   }
 
-  refreshMyLocation(); // rysujemy lub usuwamy gwiazdkę
+  refreshGlobePoints();
 }
   
 // odświeżamy glob z uwzględnieniem mnożnika wysokości
