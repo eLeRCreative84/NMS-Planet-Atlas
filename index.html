@@ -315,6 +315,13 @@
   <button id="editSelectedPlanetBtn" onclick="editSelectedPlanet()" disabled>Edytuj zaznaczoną</button>
   <button id="deleteSelectedPlanetBtn" onclick="deleteSelectedPlanet()" disabled>Usuń zaznaczoną</button>
 </div>
+
+<!-- Ukryty kontener na edycję -->
+<div id="editPlanetBox" style="display:none; margin-bottom:1rem;">
+  <input type="text" id="editPlanetName" placeholder="Nowa nazwa planety" style="width:70%; margin-right:0.5rem;">
+  <button onclick="acceptEditPlanet()">Akceptuj</button>
+  <button onclick="cancelEditPlanet()">Anuluj</button>
+</div>
     
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Lista planet</h2>
@@ -779,11 +786,40 @@ function selectPlanet(name) {
 
 // Edycja zaznaczonej planety
 function editSelectedPlanet() {
-  if (!currentPlanet) return;
-  document.getElementById("newPlanetName").value = currentPlanet;
-  // Przełączenie na zakładkę PLANETY (opcjonalnie START, jeśli chcesz edycję w formularzu)
-  openTab('planety');
-  alert(`Możesz teraz zmienić nazwę lub kolor planety "${currentPlanet}" w formularzu powyżej.`);
+  if (!selectedPlanet) {
+    alert("Najpierw zaznacz planetę.");
+    return;
+  }
+
+  // pokaż box edycji
+  document.getElementById("editPlanetBox").style.display = "block";
+
+  // ustaw starą nazwę w input
+  document.getElementById("editPlanetName").value = selectedPlanet;
+}
+
+function acceptEditPlanet() {
+  const newName = document.getElementById("editPlanetName").value.trim();
+  if (!newName) {
+    alert("Podaj nową nazwę planety.");
+    return;
+  }
+
+  // przenieś dane planety pod nową nazwę
+  atlas[newName] = atlas[selectedPlanet];
+  delete atlas[selectedPlanet];
+
+  // zaktualizuj wybór
+  selectedPlanet = newName;
+  refreshPlanetList();
+
+  // ukryj box edycji
+  document.getElementById("editPlanetBox").style.display = "none";
+}
+
+function cancelEditPlanet() {
+  // po prostu chowamy formularz
+  document.getElementById("editPlanetBox").style.display = "none";
 }
 
 // Usunięcie zaznaczonej planety z potwierdzeniem
