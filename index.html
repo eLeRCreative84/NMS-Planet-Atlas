@@ -730,6 +730,13 @@ function renderPlanetRow(p) {
   btn.style.borderRadius = "4px";
   btn.style.cursor = "pointer";
 
+// 🔥 Podświetlanie wybranej planety
+  if (p === currentPlanet) {
+    btn.style.background = "#1976d2";  // niebieski
+    btn.style.color = "white";
+    btn.style.fontWeight = "bold";
+  }
+  
   btn.onclick = () => {
     currentPlanet = p;
     updateCurrentPlanetHeader();
@@ -740,6 +747,7 @@ function renderPlanetRow(p) {
     loadPlanetDetails();
     selectPlanet(p);
     updateSelectedPlanetButtons();
+    refreshPlanetList(); // <-- odśwież listę, żeby przełączyć podświetlenie
   };
 
   container.appendChild(btn);
