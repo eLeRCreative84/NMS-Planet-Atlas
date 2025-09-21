@@ -860,6 +860,7 @@ function acceptEditPlanet() {
 function cancelEditPlanet() {
   // po prostu chowamy formularz
   document.getElementById("editPlanetBox").style.display = "none";
+  finishPlanetEdit();
 }
 
 function finishPlanetEdit() {
@@ -868,8 +869,7 @@ function finishPlanetEdit() {
 
   // chowamy box edycji planety
   document.getElementById("editPlanetBox").style.display = "none";
-  finishPlanetEdit();
-}
+  }
   
 // Usunięcie zaznaczonej planety z potwierdzeniem
 function deleteSelectedPlanet() {
@@ -1166,25 +1166,6 @@ function createStarTexture() {
 document.getElementById("myLat").addEventListener("input", updateMyLocation);
 document.getElementById("myLng").addEventListener("input", updateMyLocation);
 
-function updateMyLocation() {
-  const lat = parseFloat(document.getElementById("myLat").value);
-  const lng = parseFloat(document.getElementById("myLng").value);
-
-  if (isNaN(lat) || isNaN(lng)) {
-    myLocationPoint = null;
-  } else {
-    myLocationPoint = { 
-      lat, 
-      lng, 
-      altitude: 0.02, 
-      type: "Moja", 
-      name: "Twoja lokalizacja"   
-    };
-  }
-
-  refreshGlobePoints();
-}
-  
 // odświeżamy glob z uwzględnieniem mnożnika wysokości
   function refreshGlobePoints(){
   if (!currentPlanet) return;
@@ -1196,9 +1177,9 @@ function updateMyLocation() {
   }
 
   globe.pointsData(allPoints)
-       .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier)
-       globe.htmlElementsData(allPoints.filter(d => d.type === "Pole" || d.type === "Moja")); 
-}
+     .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
+  globe.htmlElementsData(allPoints.filter(d => d.type === "Pole" || d.type === "Moja"));
+  }
   
 ////////////////////////////////////////////////////////////////////
 //------------------- Tekstury i kolory planet -------------------//
