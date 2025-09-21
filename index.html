@@ -1089,7 +1089,7 @@ function updateMyLocation() {
 
   globe.pointsData(allPoints)
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier)
-       .pointColor(d => d.type === "Moja" ? "yellow" : "#00aaff"); // gwiazdka zawsze żółta
+       globe.htmlElementsData(allPoints.filter(d => d.type === "Pole" || d.type === "Moja")); 
 }
   
 ////////////////////////////////////////////////////////////////////
