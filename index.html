@@ -1036,28 +1036,23 @@ function createStarTexture() {
     return texture;
 }
 
- 
- // Funkcja dodająca gwiazdkę jako sprite - narysuj lub usuń gwiazdkę na globie.
-function refreshMyLocation() {
-  if (!myLocationPoint) {
-    globe.customLayerData([]); // brak lokalizacji
-    return;
+ function updateMyLocation() {
+  const lat = parseFloat(document.getElementById("myLat").value);
+  const lng = parseFloat(document.getElementById("myLng").value);
+
+  if (isNaN(lat) || isNaN(lng)) {
+    myLocationPoint = null;
+  } else {
+    myLocationPoint = { 
+      lat, 
+      lng, 
+      altitude: 0.02, 
+      type: "Moja", 
+      name: "⭐ Moja lokalizacja ⭐"
+    };
   }
 
-  const texture = createStarTexture();
-  const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
-  const sprite = new THREE.Sprite(material);
-  sprite.scale.set(0.3, 0.3, 1); // wielkość gwiazdki
-
-  globe.customLayerData([myLocationPoint])
-    .customThreeObject(() => sprite)
-    .customThreeObjectUpdate((obj, d) => {
-      const { lat, lng } = d;
-      if (globe.getCoords) {
-        const { x, y, z } = globe.getCoords(lat, lng, 1.02);
-        obj.position.set(x, y, z);
-      }
-    });
+  refreshGlobePoints(); // rysujemy razem z resztą
 }
 
 document.getElementById("myLat").addEventListener("input", updateMyLocation);
@@ -1082,17 +1077,13 @@ function updateMyLocation() {
 // kopiujemy punkty z atlasu
   let allPoints = atlas[currentPlanet] ? [...atlas[currentPlanet]] : [];
 
+  if (myLocationPoint) {
+    allPoints.push(myLocationPoint); // tu dodajemy gwiazdkę
+  }
+
   globe.pointsData(allPoints)
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier)
-       .pointColor(d => {
-          if (d.type === "Zasób") return "gold";
-          if (d.type === "Baza") return "blue";
-          if (d.type === "Ruiny") return "orange";
-          if (d.type === "Struktura") return "magenta";
-          return "gray";
-       });
-if (myLocationPoint) refreshMyLocation();
-  else globe.customLayerData([]); // usuń gwiazdkę jeśli brak lokalizacji
+       .pointColor(d => d.type === "Moja" ? "yellow" : "#00aaff"); // gwiazdka zawsze żółta
 }
   
 ////////////////////////////////////////////////////////////////////
