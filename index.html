@@ -909,6 +909,7 @@ function addPoint(){
   const exists = atlas[currentPlanet].some(p =>
     p.lat === lat &&
     p.lng === lng &&
+    p.name === name &&
     p.type === type &&
     p.notes === notes
   );
@@ -1047,7 +1048,7 @@ function addMyLocation(x, y) {
     globe.pointsData(myLocData, { img: d => d.iconTexture, size: 0.05 });
 }
   
-// Moja lokalizacja
+// Moja lokalizacja - zapisz współrzędne i zainicjuj odświeżenie
 function updateMyLocation() {
   const lat = parseFloat(document.getElementById("myLat").value);
   const lng = parseFloat(document.getElementById("myLng").value);
@@ -1064,6 +1065,50 @@ function updateMyLocation() {
   refreshGlobePoints();
 }
 
+ // Obsługa wpisywania mojej lokalizacji - To sprawia, że kiedy wpisujesz współrzędne w inputach, odpala się updateMyLocation()
+document.getElementById("myLat").addEventListener("input", updateMyLocation);
+document.getElementById("myLng").addEventListener("input", updateMyLocation);
+  
+ // Funkcja dodająca gwiazdkę jako sprite - narysuj lub usuń gwiazdkę na globie.
+function refreshMyLocation() {
+  if (!myLocationPoint) {
+    globe.customLayerData([]); // brak lokalizacji
+    return;
+  }
+
+  const texture = createStarTexture();
+  const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(0.3, 0.3, 1); // wielkość gwiazdki
+
+  globe.customLayerData([myLocationPoint])
+    .customThreeObject(() => sprite)
+    .customThreeObjectUpdate((obj, d) => {
+      const { lat, lng } = d;
+      const { x, y, z } = globe.getCoords(lat, lng, 1.02); 
+      obj.position.set(x, y, z);
+    });
+} 
+
+// odświeżamy glob z uwzględnieniem mnożnika wysokości
+  function refreshGlobePoints(){
+  if (!currentPlanet) return;
+// kopiujemy punkty z atlasu
+  let allPoints = atlas[currentPlanet] ? [...atlas[currentPlanet]] : [];
+
+  globe.pointsData(allPoints)
+       .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier)
+       .pointColor(d => {
+          if (d.type === "Zasób") return "gold";
+          if (d.type === "Baza") return "blue";
+          if (d.type === "Ruiny") return "orange";
+          if (d.type === "Struktura") return "magenta";
+          if (d.type === "Pole") return "red";
+          return "gray";
+       });
+// osobno odświeżamy gwiazdkę
+  refreshMyLocation();
+}
   
 ////////////////////////////////////////////////////////////////////
 //------------------- Tekstury i kolory planet -------------------//
@@ -1204,26 +1249,6 @@ function resetGlobeZoomMultiplier(){
   updateGlobeZoomMultiplier();
 }
 
-function refreshGlobePoints(){
-  if(!currentPlanet) return;
-
-  // kopiujemy punkty z atlasu
-  let allPoints = atlas[currentPlanet] ? [...atlas[currentPlanet]] : [];
-
-  // dodajemy "Moja lokalizacja" jeśli istnieje
-  if (myLocationPoint) {
-    allPoints.push(myLocationPoint);
-  }
-
-  // odświeżamy glob z uwzględnieniem mnożnika wysokości
-  globe.pointsData(allPoints)
-       .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
-}
-
- // Obsługa wpisywania mojej lokalizacji
-document.getElementById("myLat").addEventListener("input", updateMyLocation);
-document.getElementById("myLng").addEventListener("input", updateMyLocation);
-  
 function toggleAutoRotate() {
   const controls = globe.controls();
   if (document.getElementById("autoRotateCheckbox").checked) {
@@ -1280,7 +1305,6 @@ const globe = Globe()(document.getElementById("globeViz"))
   .pointColor(d=>{
     switch(d.type){
       case "Zasób": return d.extracted?"gray":"gold";
-      case "Obelisk": return d.visited?"green":"orange";
       case "Baza": return "blue";
       case "Ruiny": return "brown";
       case "Struktura": return "purple";
