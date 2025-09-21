@@ -311,7 +311,7 @@
     
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
 
-<div class="planet-action-row" style="margin-bottom:1rem;">
+<div class="planet-buttons-row" style="margin-bottom:1rem;">
   <button id="editSelectedPlanetBtn" onclick="editSelectedPlanet()" disabled>Edytuj zaznaczoną</button>
   <button id="deleteSelectedPlanetBtn" onclick="deleteSelectedPlanet()" disabled>Usuń zaznaczoną</button>
 </div>
@@ -732,6 +732,7 @@ function renderPlanetRow(p) {
     refreshPointsList();
     loadPlanetDetails();
     selectPlanet(p);
+    updateSelectedPlanetButtons();
   };
 
   container.appendChild(btn);
