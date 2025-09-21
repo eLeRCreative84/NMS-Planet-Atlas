@@ -1060,6 +1060,22 @@ function refreshMyLocation() {
     });
 }
 
+document.getElementById("myLat").addEventListener("input", updateMyLocation);
+document.getElementById("myLng").addEventListener("input", updateMyLocation);
+
+function updateMyLocation() {
+  const lat = parseFloat(document.getElementById("myLat").value);
+  const lng = parseFloat(document.getElementById("myLng").value);
+
+  if (isNaN(lat) || isNaN(lng)) {
+    myLocationPoint = null;
+  } else {
+    myLocationPoint = { lat, lng, name: "Moja lokalizacja" };
+  }
+
+  refreshMyLocation(); // rysujemy lub usuwamy gwiazdkę
+}
+  
 // odświeżamy glob z uwzględnieniem mnożnika wysokości
   function refreshGlobePoints(){
   if (!currentPlanet) return;
