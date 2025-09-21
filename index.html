@@ -1019,6 +1019,34 @@ function addPoles(planet){
   }
 }
 
+// Funkcja tworząca teksturę z gwiazdką
+function createStarTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '48px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'yellow'; // kolor gwiazdki
+    ctx.fillText('⭐', canvas.width/2, canvas.height/2);
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+}
+
+// Dodanie punktu z gwiazdką na globie
+function addMyLocation(x, y) {
+    const myLocData = [{
+        lat: y,   // szerokość
+        lng: x,   // długość
+        altitude: 0.02, // wysokość nad powierzchnią
+        color: null,   // kolor niepotrzebny, bo użyjemy tekstury
+        iconTexture: createStarTexture()
+    }];
+    globe.pointsData(myLocData, { img: d => d.iconTexture, size: 0.05 });
+}
+  
 // Moja lokalizacja
 function updateMyLocation() {
   const lat = parseFloat(document.getElementById("myLat").value);
@@ -1030,7 +1058,6 @@ function updateMyLocation() {
     lng: lng, 
     name: "Moja lokalizacja", 
     type: "Specjalny", 
-    icon: "⭐", // tu wstaw wybrane emoji
     notes: "" 
   };
 
