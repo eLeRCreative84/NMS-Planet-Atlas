@@ -955,16 +955,39 @@ function editPoint(timestamp){
 
 function showCancelEditButton() {
   let cancelBtn = document.getElementById("cancelEditBtn");
-  if(!cancelBtn) {
+  if (!cancelBtn) {
     const addBtn = document.querySelector("button[onclick='addPoint()']");
+    
+    // kontener na przyciski, jeśli jeszcze nie istnieje
+    let btnWrapper = document.getElementById("editBtnWrapper");
+    if (!btnWrapper) {
+      btnWrapper = document.createElement("div");
+      btnWrapper.id = "editBtnWrapper";
+      btnWrapper.style.display = "flex";
+      btnWrapper.style.flexDirection = "column";
+      btnWrapper.style.gap = "0.5rem";
+      addBtn.parentNode.insertBefore(btnWrapper, addBtn);
+      btnWrapper.appendChild(addBtn);
+    }
+
     cancelBtn = document.createElement("button");
     cancelBtn.id = "cancelEditBtn";
     cancelBtn.textContent = "Anuluj";
-    cancelBtn.style.marginLeft = "0.5rem";
+    cancelBtn.style.backgroundColor = "#d32f2f"; // czerwony
+    cancelBtn.style.color = "white";
+    cancelBtn.style.border = "none";
+    cancelBtn.style.padding = "0.5rem";
+    cancelBtn.style.borderRadius = "6px";
+    cancelBtn.style.cursor = "pointer";
+    cancelBtn.onmouseover = () => cancelBtn.style.backgroundColor = "#b71c1c";
+    cancelBtn.onmouseout = () => cancelBtn.style.backgroundColor = "#d32f2f";
+
     cancelBtn.onclick = cancelEditPoint;
-    addBtn.parentNode.appendChild(cancelBtn);
+
+    btnWrapper.appendChild(cancelBtn);
   }
 }
+
 
 function cancelEditPoint() {
   editIndex = null;
@@ -1139,20 +1162,14 @@ function refreshGlobePoints(){
 }
 
 function toggleAutoRotate() {
-  autoRotate = document.getElementById("autoRotateCheckbox").checked;
-}
-
-// Funkcja animacyjna obracania globu
-function animateGlobeRotation() {
-  requestAnimationFrame(animateGlobeRotation);
-
-  if(autoRotate && globe && globe.scene()) {
-    globe.scene().rotation.y += rotateSpeed;
+  const controls = globe.controls();
+  if (document.getElementById("autoRotateCheckbox").checked) {
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.7; // prędkość obrotu, możesz zmieniać
+  } else {
+    controls.autoRotate = false;
   }
 }
-
-// Start animacji
-animateGlobeRotation();
   
 ////////////////////////////////////////////////////////////////////
 //---------------------- Inicjalizacja globu ---------------------//
