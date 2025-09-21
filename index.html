@@ -1078,18 +1078,43 @@ function updateMyLocation() {
 }
   
 // odświeżamy glob z uwzględnieniem mnożnika wysokości
-  function refreshGlobePoints(){
-  if (!currentPlanet) return;
-// kopiujemy punkty z atlasu
+function refreshGlobePoints(){
+  if(!currentPlanet) return;
+
   let allPoints = atlas[currentPlanet] ? [...atlas[currentPlanet]] : [];
 
   if (myLocationPoint) {
-    allPoints.push(myLocationPoint); // tu dodajemy gwiazdkę
+    // ważne: wysokość liczymy tak samo jak dla słupka
+    myLocationPoint.altitude = 0.02 * pointsDistanceMultiplier;
+    allPoints.push(myLocationPoint);
   }
 
   globe.pointsData(allPoints)
-       .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier)
-       globe.htmlElementsData(allPoints.filter(d => d.type === "Pole" || d.type === "Moja")); 
+       .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
+
+  globe.htmlElementsData(
+      allPoints.filter(d => d.type === "Pole" || d.type === "Moja")
+    )
+    .htmlElement(d => {
+      if (d.type === "Pole") {
+        const el = document.createElement("div");
+        el.style.color = "white";
+        el.style.fontSize = "20px";
+        el.style.fontWeight = "bold";
+        el.style.textShadow = "0 0 4px black";
+        el.textContent = d.name === "Biegun Północny" ? "N" : "S";
+        return el;
+      }
+      if (d.type === "Moja") {
+        const el = document.createElement("div");
+        el.style.color = "yellow";
+        el.style.fontSize = "22px";
+        el.style.fontWeight = "bold";
+        el.style.textShadow = "0 0 6px black";
+        el.textContent = "⭐";
+        return el;
+      }
+    });
 }
   
 ////////////////////////////////////////////////////////////////////
