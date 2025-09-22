@@ -769,52 +769,41 @@ const box = document.getElementById("editPlanetBox");
 // Zatwierdzenie edycji
 function acceptEditPlanet() {
   const newName = document.getElementById("editPlanetName").value.trim();
-  // Sprawdza czy nazwa już istnieje
-  
+
   if (!newName) {
     alert("Podaj nową nazwę planety.");
     return;
   }
 
-  if (atlas[newName] && newName !== currentPlanet) {
+  // Jeśli nazwa się zmieniła i już istnieje, blokujemy
+  if (newName !== currentPlanet && atlas[newName]) {
     alert("Planeta o tej nazwie już istnieje!");
     return;
   }
 
-  // przenieś dane planety pod nową nazwę
-  atlas[newName] = atlas[currentPlanet];
-  delete atlas[currentPlanet];
-  
-  planetDetails[newName] = planetDetails[currentPlanet] || {};
-  delete planetDetails[currentPlanet];
+  // Tylko jeśli zmieniamy nazwę faktycznie
+  if (newName !== currentPlanet) {
+    atlas[newName] = atlas[currentPlanet];
+    delete atlas[currentPlanet];
 
-  const idx = planetData.findIndex(p => p.name === currentPlanet);
-  if (idx !== -1) planetData[idx].name = newName;
+    planetDetails[newName] = planetDetails[currentPlanet] || {};
+    delete planetDetails[currentPlanet];
 
-  // ustaw nową nazwę jako aktywną
-  currentPlanet = newName;
+    const idx = planetData.findIndex(p => p.name === currentPlanet);
+    if (idx !== -1) planetData[idx].name = newName;
+
+    currentPlanet = newName; // ustawiamy nową nazwę jako aktywną
+  }
 
   refreshPlanetList();
   updateCurrentPlanetHeader();
   updateSelectedPlanetButtons();
   document.getElementById("editPlanetBox").style.display = "none";
-  
-  // przywracamy stan przycisków + sprawdzamy input nowej planety
-  setButtonsDisabled(false); // ✅ odblokowanie
+  setButtonsDisabled(false);
   isEditing = false;
   setButtonsDisabled(false);
   checkNewPlanetInput();
-  }
-
-  // Anulowanie edycji
-function cancelEditPlanet() {
-  // po prostu chowamy formularz
-  document.getElementById("editPlanetBox").style.display = "none";
-  setButtonsDisabled(false); // ✅ odblokowanie
-  isEditing = false;
-  setButtonsDisabled(false);
-  checkNewPlanetInput();
-  }
+}
   
 // Usunięcie zaznaczonej planety z potwierdzeniem
 function deleteSelectedPlanet() {
