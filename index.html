@@ -211,6 +211,12 @@ button:disabled {
   .lock-while-edit:disabled {
   cursor: not-allowed !important;
   }
+
+#color-picker .pcr-app {
+  position: relative !important; /* 🚀 usuwa „chmurkowe” pozycjonowanie */
+  box-shadow: none !important;
+  margin-top: 8px;
+}
   
 </style>
 </head>
@@ -587,6 +593,7 @@ function savePlanetDetails(){
 document.addEventListener("DOMContentLoaded", () => {
   const pickr = Pickr.create({
     el: '#color-picker',
+    container: '#color-picker',
     theme: 'classic', // classic / monolith / nano
     default: '#000000',
     inline: true,
