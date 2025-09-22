@@ -293,7 +293,7 @@
   <input type="color" id="PlanetColor" value="#000000">
 </div>
 
-  <button id="addPlanetBtn" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
+  <button id="addPlanetBtn" class="lock-while-edit" onclick="addNewPlanet()" disabled>Dodaj nową planetę</button>
 </div>
    </div>
 
@@ -303,8 +303,8 @@
   <input type="text" id="planetTextureUrl" placeholder="URL tekstury" oninput="checkTextureInput()" />
 
   <div class="planet-buttons-row">
-    <button id="setTextureBtn" onclick="addTextureUrl()">Ustaw teksturę</button>
-    <button id="setColorBtn" onclick="changePlanetColor()">Ustaw kolor</button>
+    <button id="setTextureBtn" class="lock-while-edit" onclick="addTextureUrl()">Ustaw teksturę</button>
+    <button id="setColorBtn" class="lock-while-edit" onclick="changePlanetColor()">Ustaw kolor</button>
 
   </div>
 </div>
@@ -313,7 +313,7 @@
 
 <div class="planet-buttons-row" style="margin-bottom:1rem;">
   <button id="editSelectedPlanetBtn" onclick="editSelectedPlanet()" disabled>Edytuj zaznaczoną</button>
-  <button id="deleteSelectedPlanetBtn" onclick="deleteSelectedPlanet()" disabled>Usuń zaznaczoną</button>
+  <button id="deleteSelectedPlanetBtn" class="lock-while-edit" onclick="deleteSelectedPlanet()" disabled>Usuń zaznaczoną</button>
 </div>
 
 <!-- Ukryty kontener na edycję -->
@@ -808,7 +808,10 @@ const box = document.getElementById("editPlanetBox");
   box.style.display = "flex";
   box.style.gap = "0.5rem"; // żeby input i przyciski były ładnie obok siebie
   input.focus();
-}
+
+  // 🚫 wyłącz inne przyciski
+  setButtonsDisabled(true);
+  }
   
 // Zatwierdzenie edycji
 function acceptEditPlanet() {
@@ -840,14 +843,15 @@ function acceptEditPlanet() {
   refreshPlanetList();
   updateCurrentPlanetHeader();
   updateSelectedPlanetButtons();
-
   document.getElementById("editPlanetBox").style.display = "none";
+  setButtonsDisabled(false); // ✅ odblokowanie
   }
 
   // Anulowanie edycji
 function cancelEditPlanet() {
   // po prostu chowamy formularz
   document.getElementById("editPlanetBox").style.display = "none";
+  setButtonsDisabled(false); // ✅ odblokowanie
   }
   
 // Usunięcie zaznaczonej planety z potwierdzeniem
@@ -872,6 +876,13 @@ function deleteSelectedPlanet() {
 
 // Wywołanie przy starcie, żeby przyciski były poprawnie wyszarzone jeśli brak planet
 updateSelectedPlanetButtons();
+
+// Funkcja pomocnicza (włącz/wyłącz przycisk
+function setButtonsDisabled(disabled) {
+  document.querySelectorAll(".lock-while-edit").forEach(btn => {
+    btn.disabled = disabled;
+  });
+}
   
 ////////////////////////////////////////////////////////////////////
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
