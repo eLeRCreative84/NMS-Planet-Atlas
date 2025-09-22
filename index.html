@@ -832,6 +832,12 @@ function deleteSelectedPlanet() {
 
   const planets = Object.keys(atlas);
   currentPlanet = planets.length ? planets[0] : null;
+
+   if (currentPlanet) {
+    selectPlanet(currentPlanet); // ustawia od razu poprawną teksturę globu
+  } else {
+    globe.globeImageUrl(blackTextureURL); // brak planet → czarny glob
+  }
   
   updateCurrentPlanetHeader();
   refreshPlanetList();
@@ -1144,19 +1150,23 @@ document.getElementById("myLng").addEventListener("input", updateMyLocation);
 function addTextureUrl() {
   const texture = document.getElementById('planetTextureUrl').value.trim();
   if (!texture) {
-  alert("Podaj URL tekstury!");
-  return;
+    alert("Podaj URL tekstury!");
+    return;
   }
-
+  
   // Znajdź wpis planety w planetData
   const planet = planetData.find(p => p.name === currentPlanet);
-  if (planet) {
-    planet.texture = texture; // dodaj/aktualizuj teksturę
-  } 
-  // Nadpisanie tekstury (może być URL lub DataTexture)
+  if (!planet) {
+    alert("Najpierw wybierz planetę!");
+    return;
+  }
+
+  // zapisz nową teksturę w danych planety
   planet.texture = texture;
-  // ustaw od razu na globie
+
+  // ustaw teksturę na globie
   globe.globeImageUrl(texture);
+
   alert(`Dodano teksturę do planety ${currentPlanet}`);
 }
 
@@ -1227,6 +1237,11 @@ function importAtlas(event){
       // ustaw pierwszą planetę jako currentPlanet
       const planets = Object.keys(atlas);
      currentPlanet = planets[0] || null;
+      if (currentPlanet) {
+        selectPlanet(currentPlanet);   // od razu ustawia teksturę globu
+      } else {
+        globe.globeImageUrl(blackTextureURL); // brak planet → czarny glob
+      }
       updateCurrentPlanetHeader(); // aby nagłówek był poprawny nawet jeśli currentPlanet jest null
       refreshPlanetList();
       refreshPointsList();
