@@ -205,10 +205,7 @@ button:disabled {
   /* Wymuś kursor (przekreślone kółko) dla przycisków z klasą lock-while-edit */
   .lock-while-edit:disabled {
   cursor: not-allowed !important;
-  color: #aaa;
-  pointer-events: none; /* blokuje kliknięcia */
-  opacity: 0.6;         /* wizualna informacja o blokadzie */
-}
+  }
   
 </style>
 </head>
@@ -575,16 +572,6 @@ function savePlanetDetails(){
   updateCurrentPlanetHeader();
 }
 
-// uniwersalna funkcja blokowania przycisków, inputów i labeli
-function setButtonsDisabled(disabled) {
-  document.querySelectorAll(".lock-while-edit").forEach(el => {
-    if ("disabled" in el) {
-      el.disabled = disabled; // działa na button, input, select, textarea
-    } else {
-      el.classList.toggle("disabled", disabled); // działa na label i inne
-    }
-  });
-}
   
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
