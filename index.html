@@ -804,6 +804,20 @@ function acceptEditPlanet() {
   setButtonsDisabled(false);
   checkNewPlanetInput();
 }
+
+  function cancelEditPlanet() {
+  // Ukryj box edycji
+  document.getElementById("editPlanetBox").style.display = "none";
+
+  // Odblokuj przyciski
+  setButtonsDisabled(false);
+
+  // Zakończ tryb edycji
+  isEditing = false;
+
+  // Sprawdź input nowej planety, żeby przycisk "Dodaj nową planetę" miał poprawny stan
+  checkNewPlanetInput();
+}
   
 // Usunięcie zaznaczonej planety z potwierdzeniem
 function deleteSelectedPlanet() {
