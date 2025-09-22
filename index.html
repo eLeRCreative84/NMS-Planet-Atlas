@@ -215,8 +215,8 @@ button:disabled {
    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
    
     <h2>Import/Eksport</h2>
-    <button onclick="exportAtlas()">Eksport JSON</button>
-    <input type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
+    <button class="lock-while-edit" onclick="exportAtlas()">Eksport JSON</button>
+    <input class="lock-while-edit" type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
   </div>
 
   <!-- Zakładka PLANETY -->
@@ -1011,6 +1011,9 @@ function addPoint(){
 
 function editPoint(timestamp){   
   if(!currentPlanet || !atlas[currentPlanet]) return;
+   
+  isEditing = true;
+  setButtonsDisabled(true);
   
   const index = atlas[currentPlanet].findIndex(p => p.timestamp === timestamp);
   if(index === -1) return;
@@ -1080,6 +1083,9 @@ function cancelEditPoint() {
   document.getElementById("name").value = "";
   document.getElementById("type").value = "Zasób";
   document.getElementById("notes").value = "";
+
+  isEditing = false;
+  setButtonsDisabled(false);
 }
 
 // Utomatyczne tworzenie biegunów
