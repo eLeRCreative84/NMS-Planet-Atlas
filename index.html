@@ -810,9 +810,13 @@ const box = document.getElementById("editPlanetBox");
   input.focus();
 }
   
- }
 // Zatwierdzenie edycji
 function acceptEditPlanet() {
+  // Sprawdza czy nazwa już istnieje
+  if (atlas[newName] && newName !== currentPlanet) {
+  alert("Planeta o tej nazwie już istnieje!");
+  return;
+}
   const newName = document.getElementById("editPlanetName").value.trim();
   if (!newName) {
     alert("Podaj nową nazwę planety.");
