@@ -205,6 +205,9 @@ button:disabled {
   /* Wymuś kursor (przekreślone kółko) dla przycisków z klasą lock-while-edit */
   .lock-while-edit:disabled {
   cursor: not-allowed !important;
+  color: #aaa;
+  pointer-events: none; /* blokuje kliknięcia */
+  opacity: 0.6;         /* wizualna informacja o blokadzie */
 }
   
 </style>
@@ -328,7 +331,8 @@ button:disabled {
 
 <!-- Ukryty kontener na edycję -->
 <div id="editPlanetBox" style="display:none; margin-bottom:1rem;">
-  <input type="text" id="editPlanetName" placeholder="Nowa nazwa planety" style="width:70%; margin-right:0.5rem;">
+  <input type="text" id="editPlanetName" placeholder="Nowa nazwa planety" style="width:100%; margin-bottom:0.5rem;">
+  <div style="display:flex; gap:0.5rem;">
   <button onclick="acceptEditPlanet()">Akceptuj</button>
   <button onclick="cancelEditPlanet()">Anuluj</button>
 </div>
@@ -569,6 +573,17 @@ function savePlanetDetails(){
   alert("Opis zapisany!");
   refreshPlanetList();
   updateCurrentPlanetHeader();
+}
+
+// uniwersalna funkcja blokowania przycisków, inputów i labeli
+function setButtonsDisabled(disabled) {
+  document.querySelectorAll(".lock-while-edit").forEach(el => {
+    if ("disabled" in el) {
+      el.disabled = disabled; // działa na button, input, select, textarea
+    } else {
+      el.classList.toggle("disabled", disabled); // działa na label i inne
+    }
+  });
 }
   
 ////////////////////////////////////////////////////////////////////
