@@ -798,8 +798,20 @@ function editSelectedPlanet() {
     alert("Najpierw zaznacz planetę.");
     return;
   }
- }
+const box = document.getElementById("editPlanetBox");
+  const input = document.getElementById("editPlanetName");
 
+  // wstawiamy aktualną nazwę planety
+  input.value = currentPlanet;
+
+  // pokazujemy placeholder z edycją
+  box.style.display = "flex";
+  box.style.gap = "0.5rem"; // żeby input i przyciski były ładnie obok siebie
+  input.focus();
+}
+  
+ }
+// Zatwierdzenie edycji
 function acceptEditPlanet() {
   const newName = document.getElementById("editPlanetName").value.trim();
   if (!newName) {
@@ -810,6 +822,7 @@ function acceptEditPlanet() {
   // przenieś dane planety pod nową nazwę
   atlas[newName] = atlas[currentPlanet];
   delete atlas[currentPlanet];
+  
 
   planetDetails[newName] = planetDetails[currentPlanet] || {};
   delete planetDetails[currentPlanet];
@@ -827,6 +840,7 @@ function acceptEditPlanet() {
   document.getElementById("editPlanetBox").style.display = "none";
   }
 
+  // Anulowanie edycji
 function cancelEditPlanet() {
   // po prostu chowamy formularz
   document.getElementById("editPlanetBox").style.display = "none";
