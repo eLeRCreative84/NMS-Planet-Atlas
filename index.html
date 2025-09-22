@@ -309,26 +309,6 @@ button:disabled {
 </div>
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
 
-
-<!-- Panel z listą planet po prawej stronie -->
-<div id="planetSidebar">
-  <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
-  <div id="planetListSidebar"></div>
-</div>
-</div>
-  <!-- Zakładka PUNKTY -->
-  <div id="punkty" class="tab-content">
-    <label>Sortuj:</label>
-    <select id="sortPoints" onchange="refreshPointsList()">
-      <option value="nameAsc">Nazwa A–Z</option>
-      <option value="nameDesc">Nazwa Z–A</option>
-      <option value="type">Typ</option>
-      <option value="newest">Najnowsze</option>
-      <option value="oldest">Najstarsze</option>
-    </select>
-    <ul id="pointsList"></ul>
-  </div>
-
   <!-- Zakładka DETALE PLANETY -->
 <div id="detale" class="tab-content">
   <label>Galaktyka</label><input type="text" id="detailGalaxy" />
@@ -440,6 +420,26 @@ button:disabled {
   <label>Notatki planety</label><textarea id="detailNotes"></textarea>
   <button onclick="savePlanetDetails()">Zapisz opis planety</button>
 </div>
+
+<!-- Panel z listą planet po prawej stronie -->
+<div id="planetSidebar">
+  <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
+  <div id="planetListSidebar"></div>
+</div>
+</div>
+  <!-- Zakładka PUNKTY -->
+  <div id="punkty" class="tab-content">
+    <label>Sortuj:</label>
+    <select id="sortPoints" onchange="refreshPointsList()">
+      <option value="nameAsc">Nazwa A–Z</option>
+      <option value="nameDesc">Nazwa Z–A</option>
+      <option value="type">Typ</option>
+      <option value="newest">Najnowsze</option>
+      <option value="oldest">Najstarsze</option>
+    </select>
+    <ul id="pointsList"></ul>
+  </div>
+    
 </div>
 
 <div id="globeWrapper" style="position: relative;">
