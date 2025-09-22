@@ -555,17 +555,46 @@ function savePlanetDetails(){
 
   if (!atlas) return;
 
-  Object.keys(atlas).forEach(planetName => {
-    const li = document.createElement("li");
-    li.textContent = planetName;
-    li.onclick = () => {
-      currentPlanet = planetName;
-      document.getElementById("planetOverlayHeader").textContent = planetName;
-      refreshGlobePoints();
-    };
-    sidebar.appendChild(li);
+  const grouped = getGroupedPlanets(); // zachowuje systemy
+
+  grouped.forEach(system => {
+    // nagłówek systemu
+    const header = document.createElement("h4");
+    header.textContent = system.name === "Nieznany" ? "Nieznany układ" : "Układ: " + system.name;
+    header.style.margin = "0.5rem 0";
+    header.style.color = system.name === "Nieznany" ? "#aaa" : "#ffcc00";
+    sidebar.appendChild(header);
+
+    // planety w systemie
+    system.planets.forEach(planetName => {
+      const li = document.createElement("li");
+      li.style.cursor = "pointer";
+      li.style.padding = "2px 0";
+      li.textContent = planetName;
+
+      // podświetlenie wybranej planety
+      if (planetName === currentPlanet) {
+        li.style.fontWeight = "bold";
+        li.style.color = "#1976d2";
+      }
+
+      li.onclick = () => {
+        currentPlanet = planetName;
+        updateCurrentPlanetHeader();
+        addPoles(planetName);
+        refreshGlobePoints();
+        globe.htmlElementsData(atlas[planetName].filter(pt => pt.type === "Pole"));
+        refreshPointsList();
+        selectPlanet(planetName);
+        updateSelectedPlanetButtons();
+        refreshPlanetSidebar(); // odświeżamy sidebar, żeby podświetlenie działało
+      };
+
+      sidebar.appendChild(li);
+    });
   });
 }
+
   
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
