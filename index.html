@@ -589,6 +589,8 @@ document.addEventListener("DOMContentLoaded", () => {
     el: '#color-picker',
     theme: 'classic', // classic / monolith / nano
     default: '#000000',
+    inline: true,
+    defaultRepresentation: 'HEX',
     components: {
       // elementy pickera
       preview: true,
@@ -606,9 +608,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // aktualizacja ukrytego inputa przy wyborze
-  pickr.on('save', (color) => {
+  pickr.on('change', (color) => {
     document.getElementById("PlanetColor").value = color.toHEXA().toString();
-    pickr.hide(); // opcjonalnie chowanie po "Save"
   });
 });
   
