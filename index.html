@@ -205,6 +205,9 @@ button:disabled {
   /* Wymuś kursor (przekreślone kółko) dla przycisków z klasą lock-while-edit */
   .lock-while-edit:disabled {
   cursor: not-allowed !important;
+  color: #aaa;
+  pointer-events: none; /* blokuje kliknięcia */
+  opacity: 0.6; 
   }
   
 </style>
@@ -332,8 +335,8 @@ button:disabled {
   <div style="display:flex; gap:0.5rem;">
   <button onclick="acceptEditPlanet()">Akceptuj</button>
   <button onclick="cancelEditPlanet()">Anuluj</button>
+  </div>
 </div>
-    
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2>Lista planet</h2>
     <div id="planetList"></div>
@@ -572,7 +575,16 @@ function savePlanetDetails(){
   updateCurrentPlanetHeader();
 }
 
-  
+  // uniwersalna funkcja blokowania przycisków, inputów i labeli
+function setButtonsDisabled(disabled) {
+  document.querySelectorAll(".lock-while-edit").forEach(el => {
+    if ("disabled" in el) {
+      el.disabled = disabled; // działa na button, input, select, textarea
+    } else {
+      el.classList.toggle("disabled", disabled); // działa na label i inne
+    }
+  });
+}
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
 //////////////////////////////////////////////////////////////////// 
