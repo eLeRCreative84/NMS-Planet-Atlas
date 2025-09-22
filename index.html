@@ -202,6 +202,10 @@ button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+  /* Wymuś kursor (przekreślone kółko) dla przycisków z klasą lock-while-edit */
+  .lock-while-edit:disabled {
+  cursor: not-allowed !important;
+}
   
 </style>
 </head>
@@ -577,7 +581,11 @@ function savePlanetDetails(){
   const button = document.getElementById("addPlanetBtn");
   button.disabled = input.value.trim() === "";
 }
-
+// Po załadowaniu DOM od razu sprawdzamy input i ustawiamy stan przycisku
+document.addEventListener("DOMContentLoaded", () => {
+  checkNewPlanetInput(); // ustawia disabled zgodnie z zawartością input
+});
+  
   //Tworzy teksturę o rozmairze 1 piksel x 1 piksel o zadanym kolorze i zmienia na base64
 function hexToBase64Texture(hex) {
   // Tworzymy canvas 1x1
