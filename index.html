@@ -291,7 +291,7 @@ button:disabled {
   <div id="planety" class="tab-content">
    
     <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
-        <input type="text" id="newPlanetName" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
+        <input type="text" id="newPlanetName" class="lock-while-edit" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
  <!-- Przycisk Dodaj planetę i wybierz kolor planety z palety Hex -->
   <div class="planet-action-row">
  <div class="color-picker-btn">
@@ -306,7 +306,7 @@ button:disabled {
     <!-- Przycisk dodaj texturę -->
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
   <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-  <input type="text" id="planetTextureUrl" placeholder="URL tekstury" oninput="checkTextureInput()" />
+  <input type="text" id="planetTextureUrl" class="lock-while-edit" placeholder="URL tekstury" oninput="checkTextureInput()" />
 
   <div class="planet-buttons-row">
     <button id="setTextureBtn" class="lock-while-edit" onclick="addTextureUrl()">Ustaw teksturę</button>
@@ -488,6 +488,7 @@ let globeZoomMultiplier = 1;
 let autoRotate = false;
 let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
+let isEditing = false; // globalna flaga
 
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -744,6 +745,7 @@ function renderPlanetRow(p) {
   }
   
   btn.onclick = () => {
+    if (isEditing) return; // 🚫 blokada w trybie edycji
     currentPlanet = p;
     updateCurrentPlanetHeader();
     addPoles(p);
@@ -804,6 +806,9 @@ function editSelectedPlanet() {
     alert("Najpierw zaznacz planetę.");
     return;
   }
+  isEditing = true;
+  setButtonsDisabled(true);
+  
 const box = document.getElementById("editPlanetBox");
   const input = document.getElementById("editPlanetName");
 
@@ -851,6 +856,8 @@ function acceptEditPlanet() {
   updateSelectedPlanetButtons();
   document.getElementById("editPlanetBox").style.display = "none";
   setButtonsDisabled(false); // ✅ odblokowanie
+  isEditing = false;
+  setButtonsDisabled(false);
   }
 
   // Anulowanie edycji
@@ -858,6 +865,8 @@ function cancelEditPlanet() {
   // po prostu chowamy formularz
   document.getElementById("editPlanetBox").style.display = "none";
   setButtonsDisabled(false); // ✅ odblokowanie
+  isEditing = false;
+  setButtonsDisabled(false);
   }
   
 // Usunięcie zaznaczonej planety z potwierdzeniem
