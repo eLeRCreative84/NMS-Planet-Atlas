@@ -248,19 +248,25 @@ button:disabled {
 
   <!-- Zakładka PLANETY -->
   <div id="planety" class="tab-content">
-   
-    <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
-        <input type="text" id="newPlanetName" class="lock-while-edit" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
- <!-- Przycisk Dodaj planetę i wybierz kolor planety z palety Hex -->
-  <div class="planet-action-row">
- <div class="color-picker-btn">
-  <label for="PlanetColor">Wybierz kolor</label>
-  <input type="color" id="PlanetColor" value="#000000">
+     
+  <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+  <!-- nazwa planety -->
+  <input type="text" id="newPlanetName" class="lock-while-edit"
+         placeholder="Nazwa nowej planety"
+         oninput="checkNewPlanetInput()" />
+
+  <!-- label + piker -->
+  <div style="display:flex; align-items:center; gap:0.5rem;">
+    <label for="PlanetColor" style="flex:1; font-weight:bold;">Wybierz kolor</label>
+    <input type="color" id="PlanetColor" value="#000000"
+           style="flex:1; height:2.2rem; border:none; border-radius:4px; cursor:pointer;">
+  </div>
+
+  <!-- guzik tworzenia planety -->
+  <button id="addPlanetBtn" class="lock-while-edit"
+          onclick="addNewPlanet()">Stwórz nową planetę</button>
 </div>
 
-  <button id="addPlanetBtn" class="lock-while-edit" onclick="addNewPlanet()" >Dodaj nową planetę</button>
-</div>
-   </div>
     
     <!-- Przycisk dodaj texturę -->
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
