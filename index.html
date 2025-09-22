@@ -5,11 +5,6 @@
 <title>Atlas Planetarny</title>
 <script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
-<!-- CSS Pickr -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
-<!-- JS Pickr -->
-<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
-
 <style>
   body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
   #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
@@ -152,56 +147,11 @@
   align-items: stretch;
 }
 
-/* wspólne ustawienia obu przycisków */
-.color-picker-btn, #addPlanetBtn {
-  flex: 1;
-  height: 3rem;             /* niższy, spójny wygląd */
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;              /* odstęp między napisem a pickerem */
-  padding: 0 0.5rem;
-  box-sizing: border-box;
-}
-
-.color-picker-btn {
-  background: #0288d1;
-  color: white;
- }
-
-.color-picker-btn label {
-  margin: 0;
-  line-height: 1;
-}
-
-.color-picker-btn input[type="color"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: none;
-  background: none;
-  width: 2rem;    /* sam kwadrat pickera */
-  height: 2rem;
-  padding: 0;
-  cursor: pointer;
-}
-
 #addPlanetBtn {
   background: #1976d2;
   color: white;
 }
-/* Wymusza wyrównanie przycisków "Wybierz kolor z pikerem" i "Stwórz nową planetę". */
-.planet-action-row { display: flex; gap: .5rem; align-items: center; }
-.planet-action-row > * { display: inline-flex; align-items: center; justify-content: center; padding: 0 .5rem; box-sizing: border-box; width: auto !important; }
-.color-picker-btn label { margin: 0; line-height: 1; display: inline-block; }
-.color-picker-btn input[type="color"] { width: 2rem; height: 2rem; padding: 0; margin: 0; vertical-align: middle; display: inline-block; box-sizing: border-box; }
-#addPlanetBtn { margin: 0; padding: 0 .5rem; vertical-align: middle; }
-
+  
   /* Wyszarzanie niekatywnych pyrzycisków */
 button:disabled {
   opacity: 0.5;
@@ -212,17 +162,6 @@ button:disabled {
   cursor: not-allowed !important;
   }
 
-/* Ukrycie przycisku-launchera */
-#color-picker .pcr-button {
-  display: none !important;
-}
-  
-#color-picker .pcr-app {
-  position: relative !important; /* 🚀 usuwa „chmurkowe” pozycjonowanie */
-  box-shadow: none !important;
-  margin-top: 8px;
-}
-  
 </style>
 </head>
 <body>
@@ -322,12 +261,6 @@ button:disabled {
   <button id="addPlanetBtn" class="lock-while-edit" onclick="addNewPlanet()" >Dodaj nową planetę</button>
 </div>
    </div>
-    
-    <!-- Wbudowany piker -->
-    <label>Wybierz kolor</label>
-    <div id="color-picker" class="lock-while-edit"></div>
-    <!-- ukryty input na kolor -->
-    <input type="hidden" id="PlanetColor" value="#000000">
     
     <!-- Przycisk dodaj texturę -->
 <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
@@ -593,38 +526,6 @@ function savePlanetDetails(){
   refreshPlanetList();
   updateCurrentPlanetHeader();
 }
-  
-//Biblioteka (pełny picker wbudowany w stronę)
-document.addEventListener("DOMContentLoaded", () => {
-  const pickr = Pickr.create({
-    el: '#color-picker',
-    container: '#color-picker',
-    theme: 'classic', // classic / monolith / nano
-    default: '#000000',
-    inline: true,
-    useAsButton: false,
-    defaultRepresentation: 'HEX',
-    components: {
-      // elementy pickera
-      preview: true,
-      opacity: true,
-      hue: true,
-
-      // interakcje
-      interaction: {
-        hex: true,
-        rgba: true,
-        input: true,
-        save: true
-      }
-    }
-  });
-
-  // aktualizacja ukrytego inputa przy wyborze
-  pickr.on('change', (color) => {
-    document.getElementById("PlanetColor").value = color.toHEXA().toString();
-  });
-});
   
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
