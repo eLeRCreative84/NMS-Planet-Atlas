@@ -580,7 +580,8 @@ function addNewPlanet() {
   refreshPlanetList();
   refreshPointsList();
   refreshGlobePoints();
-
+  updateSelectedPlanetButtons();
+  
   // Ustaw od razu glob na wybraną teksturę
   globe.globeImageUrl(textureBase64);
   
