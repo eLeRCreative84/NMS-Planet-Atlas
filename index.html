@@ -834,14 +834,16 @@ const box = document.getElementById("editPlanetBox");
   
 // Zatwierdzenie edycji
 function acceptEditPlanet() {
-  // Sprawdza czy nazwa już istnieje
-  if (atlas[newName] && newName !== currentPlanet) {
-  alert("Planeta o tej nazwie już istnieje!");
-  return;
-}
   const newName = document.getElementById("editPlanetName").value.trim();
+  // Sprawdza czy nazwa już istnieje
+  
   if (!newName) {
     alert("Podaj nową nazwę planety.");
+    return;
+  }
+
+  if (atlas[newName] && newName !== currentPlanet) {
+    alert("Planeta o tej nazwie już istnieje!");
     return;
   }
 
@@ -849,7 +851,6 @@ function acceptEditPlanet() {
   atlas[newName] = atlas[currentPlanet];
   delete atlas[currentPlanet];
   
-
   planetDetails[newName] = planetDetails[currentPlanet] || {};
   delete planetDetails[currentPlanet];
 
@@ -863,9 +864,12 @@ function acceptEditPlanet() {
   updateCurrentPlanetHeader();
   updateSelectedPlanetButtons();
   document.getElementById("editPlanetBox").style.display = "none";
+  
+  // przywracamy stan przycisków + sprawdzamy input nowej planety
   setButtonsDisabled(false); // ✅ odblokowanie
   isEditing = false;
   setButtonsDisabled(false);
+  checkNewPlanetInput();
   }
 
   // Anulowanie edycji
@@ -875,6 +879,7 @@ function cancelEditPlanet() {
   setButtonsDisabled(false); // ✅ odblokowanie
   isEditing = false;
   setButtonsDisabled(false);
+  checkNewPlanetInput();
   }
   
 // Usunięcie zaznaczonej planety z potwierdzeniem
