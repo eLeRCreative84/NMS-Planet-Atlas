@@ -209,9 +209,9 @@ button:disabled {
 <div id="form">
   <div id="tabs">
     <button class="active" onclick="openTab('start')">Start</button>
-    <button onclick="openTab('planety')">Planety</button>
-    <button onclick="openTab('punkty')">Punkty</button>
-    <button onclick="openTab('detale')">Detale planety</button>
+    <button class="lock-while-edit" onclick="openTab('planety')">Planety</button>
+    <button class="lock-while-edit" onclick="openTab('punkty')">Punkty</button>
+    <button class="lock-while-edit" onclick="openTab('detale')">Detale planety</button>
   </div>
 
   <!-- Zakładka START -->
@@ -319,7 +319,7 @@ button:disabled {
 
 <div class="planet-buttons-row" style="margin-bottom:1rem;">
   <button id="editSelectedPlanetBtn" onclick="editSelectedPlanet()" disabled>Edytuj zaznaczoną</button>
-  <button id="deleteSelectedPlanetBtn" class="lock-while-edit" onclick="deleteSelectedPlanet()" disabled>Usuń zaznaczoną</button>
+  <button id="deleteSelectedPlanetBtn" class="lock-while-edit" onclick="deleteSelectedPlanet()" >Usuń zaznaczoną</button>
 </div>
 
 <!-- Ukryty kontener na edycję -->
@@ -894,7 +894,7 @@ updateSelectedPlanetButtons();
 
 // Funkcja pomocnicza (włącz/wyłącz przycisk
 function setButtonsDisabled(disabled) {
-  document.querySelectorAll(".lock-while-edit").forEach(btn => {
+  document.querySelectorAll(".lock-while-edit, .active").forEach(btn => {
     btn.disabled = disabled;
   });
 }
@@ -1427,6 +1427,7 @@ window.onload = () => {
   refreshPointsList();
   updateNoPlanetsMessage();
   updateCurrentPlanetHeader()
+  checkNewPlanetInput();
   };
 
 </script>
