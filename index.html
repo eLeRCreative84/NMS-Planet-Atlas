@@ -72,6 +72,7 @@
   justify-content: center; /* poziome centrowanie */
   align-items: center;     /* pionowe centrowanie */
   overflow: hidden;        /* żeby nic nie wystawało */
+  
 }
 
 #globeViz {
@@ -134,7 +135,46 @@ button:disabled {
   .lock-while-edit:disabled {
   cursor: not-allowed !important;
   }
+  
+/* Lista planet */
+#planetSidebar {
+  position: absolute;
+  top: 0;
+  right: 0;                       /* panel po prawej stronie */
+  height: 100%;                   /* pełna wysokość okna */
+  width: 220px;                    /* szerokość panelu */
+  background: rgba(10, 30, 60, 0.8); /* półprzezroczyste tło */
+  color: white;
+  padding: 0.8rem;
+  box-sizing: border-box;
+  overflow-y: auto;               /* scroll przy długiej liście */
+  z-index: 11;                    /* nad globem */
+  border-left: 2px solid #102b56; /* lekki oddzielający pasek */
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
 
+/* Lista planet w panelu */
+#planetListSidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#planetListSidebar li {
+  background: #1a2b4d;
+  margin: 0.3rem 0;
+  padding: 0.3rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#planetListSidebar li:hover {
+  background: #27407a;
+}
+  
 </style>
 </head>
 <body>
@@ -268,9 +308,13 @@ button:disabled {
   </div>
 </div>
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-    <h2>Lista planet</h2>
-    <div id="planetList"></div>
-  </div>
+
+
+<!-- Panel z listą planet po prawej stronie -->
+<div id="planetSidebar">
+  <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
+  <div id="planetListSidebar"></div>
+</div>
 
   <!-- Zakładka PUNKTY -->
   <div id="punkty" class="tab-content">
@@ -504,6 +548,24 @@ function savePlanetDetails(){
   refreshPlanetList();
   updateCurrentPlanetHeader();
 }
+  //Renderowanie list planet na wizualizacji globu
+  function refreshPlanetSidebar() {
+  const sidebar = document.getElementById("planetListSidebar");
+  sidebar.innerHTML = "";
+
+  if (!atlas) return;
+
+  Object.keys(atlas).forEach(planetName => {
+    const li = document.createElement("li");
+    li.textContent = planetName;
+    li.onclick = () => {
+      currentPlanet = planetName;
+      document.getElementById("planetOverlayHeader").textContent = planetName;
+      refreshGlobePoints();
+    };
+    sidebar.appendChild(li);
+  });
+}
   
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
@@ -581,6 +643,7 @@ function addNewPlanet() {
   refreshPointsList();
   refreshGlobePoints();
   updateSelectedPlanetButtons();
+  refreshPlanetSidebar();
   
   // Ustaw od razu glob na wybraną teksturę
   globe.globeImageUrl(textureBase64);
@@ -799,6 +862,7 @@ function acceptEditPlanet() {
   refreshPlanetList();
   updateCurrentPlanetHeader();
   updateSelectedPlanetButtons();
+  refreshPlanetSidebar();
   document.getElementById("editPlanetBox").style.display = "none";
   setButtonsDisabled(false);
   isEditing = false;
@@ -844,6 +908,7 @@ function deleteSelectedPlanet() {
   refreshPointsList();
   refreshGlobePoints();
   updateSelectedPlanetButtons();
+  refreshPlanetSidebar();
 }
 
 // Wywołanie przy starcie, żeby przyciski były poprawnie wyszarzone jeśli brak planet
@@ -1253,6 +1318,7 @@ function importAtlas(event){
       refreshPointsList();
       refreshGlobePoints();
       updateNoPlanetsMessage()
+      refreshPlanetSidebar();
 
       alert("Import zakończony!");
     } catch(err){ alert("Błąd importu JSON"); }
