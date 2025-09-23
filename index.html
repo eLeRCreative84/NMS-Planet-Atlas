@@ -1255,10 +1255,10 @@ document.getElementById("myLng").addEventListener("input", updateMyLocation);
     // po typach
     if (!activeTypes.includes(p.type)) return false;
     // dodatkowe filtry
-    if (activeExtras.includes("extracted")) {
+    if (activeExtras.includes("Wydobyty")) {
       if (!(p.type === "Zasób" && p.extracted)) return false;
     }
-    if (activeExtras.includes("visited")) {
+    if (activeExtras.includes("Odwiedzony")) {
       if (!(["Ruiny","Struktura","Inne"].includes(p.type) && p.visited)) return false;
     }
     return true;
