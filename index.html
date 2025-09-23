@@ -1008,26 +1008,32 @@ function refreshPointsList() {
         showBtn.className = "show";
         showBtn.style.background = "#388e3c";
         showBtn.style.color = "white";
+      
         showBtn.onclick = () => {
           globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1000);
 
-          // zapobiegamy nakładaniu timeoutów
+          // usuń highlight ze wszystkich punktów
+          atlas[currentPlanet].forEach(p => delete p.__highlight);
+          if (myLocationPoint) delete myLocationPoint.__highlight;
+
+          // zatrzymaj ewentualny stary timeout
           if (highlightTimeout) {
-          clearTimeout(highlightTimeout);
-          highlightTimeout = null;
-        }
+            clearTimeout(highlightTimeout);
+            highlightTimeout = null;
+          }
 
-        // ustaw highlight i odśwież glob (zachowując aktualne filtry)
-        point.__highlight = true;
-        refreshGlobePoints();
-
-        // usuń highlight po 2s i odśwież glob ponownie
-        highlightTimeout = setTimeout(() => {
-          delete point.__highlight;
+          // ustaw highlight na klikniętym punkcie
+          point.__highlight = true;
           refreshGlobePoints();
-          highlightTimeout = null;
-        }, 2000);
-      };
+
+          // zdejmij highlight po 2s
+          highlightTimeout = setTimeout(() => {
+            delete point.__highlight;
+            refreshGlobePoints();
+            highlightTimeout = null;
+          }, 2000);
+        };
+
         btnDiv.appendChild(showBtn);
 
         // Checkbox dla extracted/visited
