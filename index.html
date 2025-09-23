@@ -483,7 +483,8 @@ let autoRotate = false;
 let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
-
+let highlightTimeout = null;
+  
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
 //////////////////////////////////////////////////////////////////// 
@@ -1008,25 +1009,25 @@ function refreshPointsList() {
         showBtn.style.background = "#388e3c";
         showBtn.style.color = "white";
         showBtn.onclick = () => {
-            globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1000);
-            point.__highlight = true;
-            globe.pointColor(d => {
-                if (d.__highlight) return "orange";
-                switch (d.type) {
-                    case "Zasób": return d.extracted ? "gray" : "gold";
-                    case "Baza": return "blue";
-                    case "Ruiny": return d.visited ? "lime" : "orange";
-                    case "Struktura": return d.visited ? "cyan" : "magenta";
-                    case "Inne": return d.visited ? "purple" : "brown";
-                    default: return "red";
-                }
-            });
-            globe.pointsData(atlas[currentPlanet]);
-            setTimeout(() => {
-                delete point.__highlight;
-                globe.pointsData(atlas[currentPlanet]);
-            }, 2000);
-        };
+          globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1000);
+
+          // zapobiegamy nakładaniu timeoutów
+          if (highlightTimeout) {
+          clearTimeout(highlightTimeout);
+          highlightTimeout = null;
+        }
+
+        // ustaw highlight i odśwież glob (zachowując aktualne filtry)
+        point.__highlight = true;
+        refreshGlobePoints();
+
+        // usuń highlight po 2s i odśwież glob ponownie
+        highlightTimeout = setTimeout(() => {
+          delete point.__highlight;
+          refreshGlobePoints();
+          highlightTimeout = null;
+        }, 2000);
+      };
         btnDiv.appendChild(showBtn);
 
         // Checkbox dla extracted/visited
@@ -1047,7 +1048,7 @@ function refreshPointsList() {
         const editBtn = document.createElement("button");
         editBtn.textContent = "Edytuj";
         editBtn.className = "edit";
-        editBtn.onclick = () => editPoint(point.timestamp);
+        editBtn.onclick = () => editPoint(point.timestamp); // Musimy jednoznacznie wskazać który punkt w atlasie edytujemy. Najprościej przekazywać nie indeks, tylko unikalny identyfikator (timestamp, który już dodajemy do każdego punktu).
         btnDiv.appendChild(editBtn);
 
         // Usuwanie punktu
@@ -1095,8 +1096,7 @@ function getFilteredPoints(points) {
     });
 }
 
-  
-// Kliknięcie Edytuj nie usuwa punktu od razu.
+ // Kliknięcie Edytuj nie usuwa punktu od razu.
 //Punkt jest tymczasowo przygotowany do edycji (ładuje się do formularza).
 //Dopiero kliknięcie Nadpisz punkt faktycznie zmienia dane.
 //Jak klikniesz „Punkty” bez zapisania → lista zostaje nietknięta.
@@ -1496,17 +1496,19 @@ const globe = Globe()(document.getElementById("globeViz"))
       if (["Ruiny","Struktura","Inne"].includes(d.type)) label += d.visited ? " [Odwiedzony]" : " [Nieodwiedzony]";
       return label;
     })
-  .pointColor(d=>{
-    switch(d.type){
-      case "Zasób": return d.extracted?"gray":"gold";
-      case "Baza": return "blue";
-      case "Ruiny": return "brown";
-      case "Struktura": return "purple";
-      case "Inne": return "pink";
-      case "Pole": return "red";
-      default: return "red";
-    }
-  })
+  .pointColor(d => {
+  if (d && d.__highlight) return "orange";   // zawsze najpierw sprawdź highlight
+                                             // wtedy nie trzeba nadpisywać pointColor w show i highlight będzie działać zawsze, przy każdym odświeżeniu.
+  switch (d.type) {
+    case "Zasób":     return d.extracted ? "gray" : "gold";
+    case "Baza":      return "blue";
+    case "Ruiny":     return d.visited ? "lime" : "orange";
+    case "Struktura": return d.visited ? "cyan" : "magenta";
+    case "Inne":      return d.visited ? "purple" : "brown";
+    case "Pole":      return "red";
+    default:          return "red";
+  }
+})
   .pointRadius(() => pointScale)
   .htmlElementsData([])
   .htmlElement(d=>{
