@@ -1251,18 +1251,24 @@ document.getElementById("myLng").addEventListener("input", updateMyLocation);
   const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
                             .map(cb => cb.value);
   // filtrujemy punkty
-  const filteredPoints = allPoints.filter(p => {
-    // po typach
-    if (!activeTypes.includes(p.type)) return false;
-    // dodatkowe filtry
-    if (activeExtras.includes("Wydobyty")) {
-      if (!(p.type === "Zasób" && p.extracted)) return false;
-    }
-    if (activeExtras.includes("Odwiedzony")) {
-      if (!(["Ruiny","Struktura","Inne"].includes(p.type) && p.visited)) return false;
-    }
-    return true;
-  });
+  // Sprawdzamy filtr tylko dla odpowiednich typów. 
+  // Jeśli punkt jest typu innego niż “Zasób”, checkbox "Wydobyty" go nie rusza.
+ const filteredPoints = allPoints.filter(p => {
+  // filtr po typach
+  if (!activeTypes.includes(p.type)) return false;
+
+  // filtr Wydobyty
+  if (activeExtras.includes("Wydobyty") && p.type === "Zasób" && !p.extracted) {
+    return false;
+  }
+
+  // filtr Odwiedzony
+  if (activeExtras.includes("Odwiedzony") && ["Ruiny","Struktura","Inne"].includes(p.type) && !p.visited) {
+    return false;
+  }
+
+  return true;
+});
   globe.pointsData(filteredPoints)
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
   globe.htmlElementsData(filteredPoints.filter(d => d.type === "Pole" || d.type === "Moja"));
