@@ -972,7 +972,7 @@ function refreshPointsList(){
   list.innerHTML = "";
   if(!currentPlanet || !atlas[currentPlanet]) return;
 
-  let points = getFilteredPoints();
+  let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
   const sort = document.getElementById("sortPoints").value;
   if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
   if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
@@ -1299,7 +1299,23 @@ document.getElementById("myLng").addEventListener("input", updateMyLocation);
   const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
                             .map(cb => cb.value);
   // filtrujemy punkty
-  let filteredPoints = getFilteredPoints();
+  const filteredPoints = allPoints.filter(p => {
+  if (!activeTypes.includes(p.type)) return false;
+
+  // Filtry dla Zasób
+  if (p.type === "Zasób") {
+    if (p.extracted && !activeExtras.includes("Wydobyty")) return false;      // wydobyty, ale filtr Wydobyty nie zaznaczony → ukryj
+    if (!p.extracted && !activeExtras.includes("Niewydobyty")) return false; // niewydobyty, ale filtr Niewydobyty nie zaznaczony → ukryj
+  }
+
+  // Filtry dla Ruiny/Struktura/Inne
+  if (["Ruiny","Struktura","Inne"].includes(p.type)) {
+    if (p.visited && !activeExtras.includes("Odwiedzony")) return false;     // odwiedzony, filtr Odwiedzony nie zaznaczony → ukryj
+    if (!p.visited && !activeExtras.includes("Nieodwiedzony")) return false; // nieodwiedzony, filtr Nieodwiedzony nie zaznaczony → ukryj
+  }
+
+  return true;
+});
 
   globe.pointsData(filteredPoints)
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
