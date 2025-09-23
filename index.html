@@ -178,18 +178,19 @@ button:disabled {
 /* Filtry punktów */
 #pointFilters {
   display: grid;
-  grid-template-columns: 1fr auto; /* kolumna na tekst + wąska kolumna na checkbox */
+  grid-template-columns: 1fr auto 1fr auto; /* opis–checkbox | opis–checkbox */
   gap: 0.5rem 1rem;
   margin-bottom: 1rem;
+  align-items: center; /* pionowe wyrównanie */
 }
 
 #pointFilters label {
-  display: contents; /* dzieci labelki (tekst + input) trzymają się siatki */
+  display: contents; /* pozwala tekst i input wpisać się w siatkę */
   cursor: pointer;
 }
 
 #pointFilters input[type="checkbox"] {
-  margin: 0 auto;   /* checkbox wycentrowany w swojej kolumnie */
+  margin: 0 auto; /* wyśrodkowanie checkboxów w swojej kolumnie */
 }
  
 </style>
