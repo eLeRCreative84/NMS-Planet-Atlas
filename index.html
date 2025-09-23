@@ -174,289 +174,246 @@ button:disabled {
 #planetListSidebar li:hover {
   background: #27407a;
 }
-  
+
 </style>
 </head>
 <body>
-<div id="form">
-  <div id="tabs">
-    <button class="lock-while-edit active" onclick="openTab('start')">Start</button>
-    <button class="lock-while-edit" onclick="openTab('planety')">Planety</button>
-    <button class="lock-while-edit" onclick="openTab('punkty')">Punkty</button>
-    <button class="lock-while-edit" onclick="openTab('detale')">Detale planety</button>
-  </div>
-
-  <!-- Zakładka START -->
-  <div id="start" class="tab-content active">
-   
-    <div id="noPlanetsMessage" style="color: #ffcc00; font-weight: bold; text-align: center; margin: 0.5rem 0;">
-  Stwórz nową planetę lub importuj dane JSON
-</div>
-
+  <div id="form">
+    <div id="tabs">
+      <button class="lock-while-edit active" onclick="openTab('start')">Start</button>
+      <button class="lock-while-edit" onclick="openTab('planety')">Planety</button>
+      <button class="lock-while-edit" onclick="openTab('punkty')">Punkty</button>
+      <button class="lock-while-edit" onclick="openTab('detale')">Detale planety</button>
+    </div>
+    <!-- Zakładka START -->
+    <div id="start" class="tab-content active">
+      <div id="noPlanetsMessage" style="color: #ffcc00; font-weight: bold; text-align: center; margin: 0.5rem 0;">
+        Stwórz nową planetę lub importuj dane JSON
+      </div>
       <h2>Dodaj punkt</h2>
       <div class="xy-inputs">
-  <div>
-    <label>X (−90 do 90)</label>
-    <input type="number" id="lat" step="1" min="-90" max="90" />
-  </div>
-  <div>
-    <label>Y (−180 do 180)</label>
-    <input type="number" id="lng" step="1" min="-180" max="180" />
-  </div>
-</div>
-
-    <label>Nazwa punktu</label>
-    <input type="text" id="name" />
-    <label>Typ</label>
-    <select id="type">
-      <option>Zasób</option>
-      <option>Baza</option>
-      <option>Ruiny</option>
-      <option>Struktura</option>
-      <option>Inne</option>
-    </select>
-    <label>Notatki</label>
-    <textarea id="notes"></textarea>
-
-    <button onclick="addPoint()">Dodaj punkt</button>
+        <div>
+          <label>X (−90 do 90)</label>
+          <input type="number" id="lat" step="1" min="-90" max="90" />
+        </div>
+        <div>
+          <label>Y (−180 do 180)</label>
+          <input type="number" id="lng" step="1" min="-180" max="180" />
+        </div>
+      </div>
+      <label>Nazwa punktu</label>
+      <input type="text" id="name" />
+      <label>Typ</label>
+      <select id="type">
+        <option>Zasób</option>
+        <option>Baza</option>
+        <option>Ruiny</option>
+        <option>Struktura</option>
+        <option>Inne</option>
+      </select>
+      <label>Notatki</label>
+      <textarea id="notes"></textarea>
+      <button onclick="addPoint()">Dodaj punkt</button>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-    <h2>Skalowanie globu i punktów</h2>
-
-<!-- Suwak 1: Skalowanie punktów -->
-<label>Skalowanie punktów</label>
-<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-  <input type="range" id="pointScale" min="0.1" max="1" step="0.1" value="0.4" oninput="updatePointScale()" style="flex:1;" />
-  <span id="pointScaleValue" style="width:2rem; text-align:center;">0.4</span>
-  <button onclick="resetPointScale()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
-</div>
-
-<!-- Suwak 2: Wysokość słupka -->
-<label>Wysokość słupka</label>
-<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-  <input type="range" id="pointsDistanceMultiplier" min="0.5" max="30" step="0.5" value="1" oninput="updatePointsDistanceMultiplier()" style="flex:1;" />
-  <span id="pointsDistanceMultiplierValue" style="width:2rem; text-align:center;">1</span>
-  <button onclick="resetPointsDistanceMultiplier()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
-</div>
-
-<!-- Suwak 3: Zoom globu -->
-<label>Zoom globu</label>
-<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-  <input type="range" id="globeZoomMultiplier" min="0.5" max="2" step="0.05" value="1" oninput="updateGlobeZoomMultiplier()" style="flex:1;" />
-  <span id="globeZoomMultiplierValue" style="width:2rem; text-align:center;">1</span>
-  <button onclick="resetGlobeZoomMultiplier()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
-</div>
-
-    <!-- Autoobrót -->
-<div style="display:flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
-  <span>Obracanie globu</span>
-  <input type="checkbox" id="autoRotateCheckbox" onchange="toggleAutoRotate()" />
-</div>
-    
-   <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-   
-    <h2>Import/Eksport</h2>
-    <button class="lock-while-edit" onclick="exportAtlas()">Eksport JSON</button>
-    <input class="lock-while-edit" type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
+      <h2>Skalowanie globu i punktów</h2>
+      <!-- Suwak 1: Skalowanie punktów -->
+      <label>Skalowanie punktów</label>
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+        <input type="range" id="pointScale" min="0.1" max="1" step="0.1" value="0.4" oninput="updatePointScale()" style="flex:1;" />
+        <span id="pointScaleValue" style="width:2rem; text-align:center;">0.4</span>
+        <button onclick="resetPointScale()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
+      </div>
+      <!-- Suwak 2: Wysokość słupka -->
+      <label>Wysokość słupka</label>
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+        <input type="range" id="pointsDistanceMultiplier" min="0.5" max="30" step="0.5" value="1" oninput="updatePointsDistanceMultiplier()" style="flex:1;" />
+        <span id="pointsDistanceMultiplierValue" style="width:2rem; text-align:center;">1</span>
+        <button onclick="resetPointsDistanceMultiplier()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
+      </div>
+      <!-- Suwak 3: Zoom globu -->
+      <label>Zoom globu</label>
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+        <input type="range" id="globeZoomMultiplier" min="0.5" max="2" step="0.05" value="1" oninput="updateGlobeZoomMultiplier()" style="flex:1;" />
+        <span id="globeZoomMultiplierValue" style="width:2rem; text-align:center;">1</span>
+        <button onclick="resetGlobeZoomMultiplier()" style="padding:0.2rem 0.3rem; font-size:12px; width:auto;">Reset</button>
+      </div>
+      <!-- Autoobrót -->
+      <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+        <span>Obracanie globu</span>
+        <input type="checkbox" id="autoRotateCheckbox" onchange="toggleAutoRotate()" />
+      </div>
+      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+      <h2>Import/Eksport</h2>
+      <button class="lock-while-edit" onclick="exportAtlas()">Eksport JSON</button>
+      <input class="lock-while-edit" type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
+    </div>
+    <!-- Zakładka PLANETY -->
+    <div id="planety" class="tab-content">
+      <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+        <!-- nazwa planety -->
+        <input type="text" id="newPlanetName" class="lock-while-edit" placeholder="Nazwa nowej planety" oninput="checkNewPlanetInput()" />
+        <!-- label + piker -->
+       	<div style="text-align:center">
+          <label>  Wybierz kolor </label>
+          <input type="color" id="PlanetColor" value="#000000" class="lock-while-edit" style="width:100%; height:40px;">
+        </div>
+        <!-- guzik tworzenia planety -->
+        <button id="addPlanetBtn" class="lock-while-edit" onclick="addNewPlanet()">Stwórz nową planetę</button>
+      </div>
+      <!-- Przycisk dodaj texturę i zmień kolor -->
+      <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+        <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+        <input type="text" id="planetTextureUrl" class="lock-while-edit" placeholder="URL tekstury" oninput="checkTextureInput()" />
+        <div class="planet-buttons-row">
+          <button id="setTextureBtn" class="lock-while-edit" onclick="addTextureUrl()">Ustaw teksturę</button>
+          <button id="setColorBtn" class="lock-while-edit" onclick="changePlanetColor()">Zmień kolor</button>
+        </div>
+      </div>
+      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+      <div class="planet-buttons-row" style="margin-bottom:1rem;">
+        <button id="editSelectedPlanetBtn" onclick="editSelectedPlanet()" disabled>Zmień nazwę</button>
+        <button id="deleteSelectedPlanetBtn" class="lock-while-edit" onclick="deleteSelectedPlanet()" disabled>Usuń planetę</button>
+      </div>
+      <!-- Ukryty kontener na edycję -->
+      <div id="editPlanetBox" style="display:none; margin-bottom:1rem;">
+        <input type="text" id="editPlanetName" placeholder="Nowa nazwa planety" style="width:100%; margin-bottom:0.5rem;">
+        <div style="display:flex; gap:0.5rem;">
+          <button onclick="acceptEditPlanet()">Akceptuj</button>
+          <button onclick="cancelEditPlanet()">Anuluj</button>
+        </div>
+      </div>
+      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+      <!-- Zakładka PUNKTY -->
+      <div id="punkty" class="tab-content">
+        <label>Sortuj:</label>
+        <select id="sortPoints" onchange="refreshPointsList()">
+          <option value="nameAsc">Nazwa A–Z</option>
+          <option value="nameDesc">Nazwa Z–A</option>
+          <option value="type">Typ</option>
+          <option value="newest">Najnowsze</option>
+          <option value="oldest">Najstarsze</option>
+        </select>
+        <ul id="pointsList"></ul>
+      </div>
+    </div>
+    <!-- Zakładka DETALE PLANETY -->
+    <div id="detale" class="tab-content">
+      <label>Galaktyka</label><input type="text" id="detailGalaxy" />
+      <label>Region</label><input type="text" id="detailRegion" />
+      <label>Układ planetarny</label><input type="text" id="detailSystem" />
+      <label>Biom</label>
+      <select id="detailBiome">
+        <option value="">-- wybierz --</option>
+        <option>Bujna</option>
+        <option>Jałowa</option>
+        <option>Martwa</option>
+        <option>Egzotyczna</option>
+        <option>Mega Egzotyczna</option>
+        <option>Spalona</option>
+        <option>Zamrożona</option>
+        <option>Toksyczna</option>
+        <option>Napromieniowana</option>
+        <option>Bagno</option>
+        <option>Wulkaniczna</option>
+        <option>Gazowy Gigant</option>
+      </select>
+      <label>Pogoda</label>
+      <select id="detailWeather">
+        <option value="">-- wybierz --</option>
+        <option>Brak atmosfery</option>
+        <option>Słonecznie</option>
+        <option>Chłodno</option>
+        <option>Mroźno</option>
+        <option>Ciepło</option>
+        <option>Gorąco</option>
+        <option>Wilgotno</option>
+        <option>Deszczowo</option>
+        <option>Burzowo</option>
+        <option>Radioaktywne</option>
+        <option>Toksyczne</option>
+        <option>Kwasyczne</option>
+        <option>Pyłowe</option>
+        <option>Wulkaniczne</option>
+        <option>Burze piaskowe</option>
+        <option>Tornada</option>
+        <option>Meteoryty</option>
+        <option>Burze ogniste</option>
+        <option>Wysokie ciśnienie</option>
+        <option>Niskie ciśnienie</option>
+        <option>Burze magnetyczne</option>
+        <option>Burze elektryczne</option>
+      </select>
+      <label>Strażnicy</label>
+      <select id="detailSentinels">
+        <option value="">-- wybierz --</option>
+        <option>Pasywne</option>
+        <option>Brak</option>
+        <option>Zrelaksowane</option>
+        <option>Ograniczone</option>
+        <option>Niskie</option>
+        <option>Niskie bezpieczeństwo</option>
+        <option>Minimalne</option>
+        <option>Aktywne</option>
+        <option>Średnie</option>
+        <option>Standardowe</option>
+        <option>Typowe</option>
+        <option>Uważne</option>
+      </select>
+      <label>Flora</label>
+      <select id="detailFlora">
+        <option value="">-- wybierz --</option>
+        <option>Brak</option>
+        <option>Sporadyczna</option>
+        <option>Skąpa</option>
+        <option>Średnia</option>
+        <option>Obfita</option>
+        <option>Ekstremalna</option>
+      </select>
+      <label>Fauna</label>
+      <select id="detailFauna">
+        <option value="">-- wybierz --</option>
+        <option>Brak</option>
+        <option>Sporadyczna</option>
+        <option>Skąpa</option>
+        <option>Średnia</option>
+        <option>Obfita</option>
+        <option>Ekstremalna</option>
+      </select>
+      <label>Odkryty przez</label><input type="text" id="detailDiscovered" />
+      <label>Tryb gry</label>
+      <select id="detailMode">
+        <option value="">-- wybierz --</option>
+        <option>Normalny</option>
+        <option>Kreatywny</option>
+        <option>Survival</option>
+        <option>Permadeath</option>
+      </select>
+      <label>Zaktualizowano</label><input type="text" id="detailUpdated" />
+      <label>Koordynaty</label><input type="text" id="detailCoords" />
+      <!-- Przycisk przejdź do NMS Portals -->
+      <button onclick="window.open('https://nmsportals.github.io', '_blank')" style="margin-top:0.5rem; background:#1976d2; color:white; padding:0.5rem; border:none; border-radius:4px; cursor:pointer;"> Przejdź do NMS Portals </button>
+      <label>Notatki planety</label><textarea id="detailNotes"></textarea>
+      <button onclick="savePlanetDetails()">Zapisz opis planety</button>
+    </div>
   </div>
-
-  <!-- Zakładka PLANETY -->
-  <div id="planety" class="tab-content">
-     
-  <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
-  <!-- nazwa planety -->
-  <input type="text" id="newPlanetName" class="lock-while-edit"
-         placeholder="Nazwa nowej planety"
-         oninput="checkNewPlanetInput()" />
-
-  <!-- label + piker -->
- 	<div style="text-align:center">
-  <label>  Wybierz kolor </label>
-  <input type="color" id="PlanetColor" value="#000000" class="lock-while-edit" style="width:100%; height:40px;">
-</div>
-
-  <!-- guzik tworzenia planety -->
-  <button id="addPlanetBtn" class="lock-while-edit"
-          onclick="addNewPlanet()">Stwórz nową planetę</button>
-</div>
-
-    
-    <!-- Przycisk dodaj texturę -->
-<div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
-  <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-  <input type="text" id="planetTextureUrl" class="lock-while-edit" placeholder="URL tekstury" oninput="checkTextureInput()" />
-
-  <div class="planet-buttons-row">
-    <button id="setTextureBtn" class="lock-while-edit" onclick="addTextureUrl()">Ustaw teksturę</button>
-    <button id="setColorBtn" class="lock-while-edit" onclick="changePlanetColor()">Zmień kolor</button>
-
+  <!-- Obszar wizualizacji globu -->
+  <div id="globeWrapper" style="position: relative;">
+    <!-- nagłówek overlay -->
+    <div id="planetOverlayHeader"></div>
+    <!-- Panel z listą planet po prawej stronie -->
+    <div id="planetSidebar">
+      <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
+      <div id="planetListSidebar"></div>
+    </div>
+    <!-- nagłówek moja lokalizacja -->
+    <div id="myLocationBox" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6); color:white; padding:0.5rem; border-radius:8px; z-index:10;">
+      <div style="font-weight:bold; margin-bottom:0.5rem;">Moja lokalizacja</div>
+      <label>X: <input type="number" id="myLat" step="0.01" style="width:70px;"></label>
+      <label>Y: <input type="number" id="myLng" step="0.01" style="width:70px;"></label>
+    </div>
+    <!-- glob -->
+    <div id="globeViz"></div>
   </div>
-</div>
-    
-    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-
-<div class="planet-buttons-row" style="margin-bottom:1rem;">
-  <button id="editSelectedPlanetBtn" onclick="editSelectedPlanet()" disabled>Zmień nazwę</button>
-  <button id="deleteSelectedPlanetBtn" class="lock-while-edit" onclick="deleteSelectedPlanet()" disabled>Usuń planetę</button>
-</div>
-
-<!-- Ukryty kontener na edycję -->
-<div id="editPlanetBox" style="display:none; margin-bottom:1rem;">
-  <input type="text" id="editPlanetName" placeholder="Nowa nazwa planety" style="width:100%; margin-bottom:0.5rem;">
-  <div style="display:flex; gap:0.5rem;">
-  <button onclick="acceptEditPlanet()">Akceptuj</button>
-  <button onclick="cancelEditPlanet()">Anuluj</button>
-  </div>
-</div>
-    <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-
-  <!-- Zakładka DETALE PLANETY -->
-<div id="detale" class="tab-content">
-  <label>Galaktyka</label><input type="text" id="detailGalaxy" />
-  <label>Region</label><input type="text" id="detailRegion" />
-  <label>Układ planetarny</label><input type="text" id="detailSystem" />
-
-  <label>Biom</label>
-  <select id="detailBiome">
-    <option value="">-- wybierz --</option>
-    <option>Bujna</option>
-    <option>Jałowa</option>
-    <option>Martwa</option>
-    <option>Egzotyczna</option>
-    <option>Mega Egzotyczna</option>
-    <option>Spalona</option>
-    <option>Zamrożona</option>
-    <option>Toksyczna</option>
-    <option>Napromieniowana</option>
-    <option>Bagno</option>
-    <option>Wulkaniczna</option>
-    <option>Gazowy Gigant</option>
-  </select>
-
-  <label>Pogoda</label>
-<select id="detailWeather">
-  <option value="">-- wybierz --</option>
-<option>Brak atmosfery</option>
-    <option>Słonecznie</option>
-    <option>Chłodno</option>
-    <option>Mroźno</option>
-    <option>Ciepło</option>
-    <option>Gorąco</option>
-    <option>Wilgotno</option>
-    <option>Deszczowo</option>
-    <option>Burzowo</option>
-    <option>Radioaktywne</option>
-    <option>Toksyczne</option>
-    <option>Kwasyczne</option>
-    <option>Pyłowe</option>
-    <option>Wulkaniczne</option>
-    <option>Burze piaskowe</option>
-    <option>Tornada</option>
-    <option>Meteoryty</option>
-    <option>Burze ogniste</option>
-    <option>Wysokie ciśnienie</option>
-    <option>Niskie ciśnienie</option>
-    <option>Burze magnetyczne</option>
-    <option>Burze elektryczne</option>
-</select>
-
-  <label>Strażnicy</label>
-  <select id="detailSentinels">
-    <option value="">-- wybierz --</option>
-    <option>Pasywne</option>
-    <option>Brak</option>
-    <option>Zrelaksowane</option>
-    <option>Ograniczone</option>
-    <option>Niskie</option>
-    <option>Niskie bezpieczeństwo</option>
-    <option>Minimalne</option>
-    <option>Aktywne</option>
-    <option>Średnie</option>
-    <option>Standardowe</option>
-    <option>Typowe</option>
-    <option>Uważne</option>
-  </select>
-
-  <label>Flora</label>
-  <select id="detailFlora">
-    <option value="">-- wybierz --</option>
-    <option>Brak</option>
-    <option>Sporadyczna</option>
-    <option>Skąpa</option>
-    <option>Średnia</option>
-    <option>Obfita</option>
-    <option>Ekstremalna</option>
-  </select>
-
-  <label>Fauna</label>
-  <select id="detailFauna">
-    <option value="">-- wybierz --</option>
-    <option>Brak</option>
-    <option>Sporadyczna</option>
-    <option>Skąpa</option>
-    <option>Średnia</option>
-    <option>Obfita</option>
-    <option>Ekstremalna</option>
-  </select>
-
-  <label>Odkryty przez</label><input type="text" id="detailDiscovered" />
-
-  <label>Tryb gry</label>
-  <select id="detailMode">
-    <option value="">-- wybierz --</option>
-    <option>Normalny</option>
-    <option>Kreatywny</option>
-    <option>Survival</option>
-    <option>Permadeath</option>
-  </select>
-
-  <label>Zaktualizowano</label><input type="text" id="detailUpdated" />
-  <label>Koordynaty</label><input type="text" id="detailCoords" />
-  <!-- Przycisk przejdź do NMS Portals -->
-<button onclick="window.open('https://nmsportals.github.io', '_blank')" 
-        style="margin-top:0.5rem; background:#1976d2; color:white; padding:0.5rem; border:none; border-radius:4px; cursor:pointer;">
-  Przejdź do NMS Portals
-</button>
-  
-  <label>Notatki planety</label><textarea id="detailNotes"></textarea>
-  <button onclick="savePlanetDetails()">Zapisz opis planety</button>
-</div>
-
-<!-- Panel z listą planet po prawej stronie -->
-<div id="planetSidebar">
-  <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
-  <div id="planetListSidebar"></div>
-</div>
-</div>
-  <!-- Zakładka PUNKTY -->
-  <div id="punkty" class="tab-content">
-    <label>Sortuj:</label>
-    <select id="sortPoints" onchange="refreshPointsList()">
-      <option value="nameAsc">Nazwa A–Z</option>
-      <option value="nameDesc">Nazwa Z–A</option>
-      <option value="type">Typ</option>
-      <option value="newest">Najnowsze</option>
-      <option value="oldest">Najstarsze</option>
-    </select>
-    <ul id="pointsList"></ul>
-  </div>
-    
-</div>
-
-<div id="globeWrapper" style="position: relative;">
-
-  <!-- nagłówek overlay -->
-  <div id="planetOverlayHeader"></div>
-
-<!-- nagłówek moja lokalizacja -->
-<div id="myLocationBox" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6); color:white; padding:0.5rem; border-radius:8px; z-index:10;">
-  <div style="font-weight:bold; margin-bottom:0.5rem;">Moja lokalizacja</div>
-  <label>X: <input type="number" id="myLat" step="0.01" style="width:70px;"></label>
-  <label>Y: <input type="number" id="myLng" step="0.01" style="width:70px;"></label>
-</div>
-
-  <!-- glob -->
-  <div id="globeViz"></div>
-</div>
 
 <script>
 let atlas = {};
