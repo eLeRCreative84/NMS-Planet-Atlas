@@ -486,11 +486,6 @@ button:disabled {
   <div id="globeWrapper" style="position: relative;">
     <!-- nagłówek overlay -->
     <div id="planetOverlayHeader"></div>
-    <!-- Panel z listą planet po prawej stronie -->
-    <div id="planetSidebar">
-      <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
-      <div id="planetListSidebar"></div>
-    </div>
     <!-- nagłówek moja lokalizacja -->
     <div id="myLocationBox" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6); color:white; padding:0.5rem; border-radius:8px; z-index:10;">
       <div style="font-weight:bold; margin-bottom:0.5rem;">Moja lokalizacja</div>
@@ -499,15 +494,15 @@ button:disabled {
     </div>
     <!-- glob -->
     <div id="globeViz"></div>
-   
-   <div id="planetSidebar">
-  <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
-  <div id="planetListSidebar"></div>
-</div>
-
-<!-- Guzik zwijania panelu -->
-<button id="toggleSidebarBtn">&#9654;</button> <!-- strzałka w prawo -->
     
+    <!-- Panel z listą planet po prawej stronie -->
+    <div id="planetSidebar">
+      <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
+      <div id="planetListSidebar"></div>
+    </div>
+   
+    <!-- Guzik zwijania panelu -->
+    <button id="toggleSidebarBtn">&#9654;</button> <!-- strzałka w prawo -->
   </div>
 
 <script>
@@ -1616,7 +1611,7 @@ window.onload = () => {
   refreshPlanetList();
   refreshPointsList();
   updateNoPlanetsMessage();
-  updateCurrentPlanetHeader()
+  updateCurrentPlanetHeader();
   checkNewPlanetInput();
   };
 
@@ -1626,6 +1621,7 @@ const planetSidebar = document.getElementById("planetSidebar");
 
 toggleSidebarBtn.addEventListener("click", () => {
   planetSidebar.classList.toggle("collapsed");
+  toggleSidebarBtn.innerHTML = planetSidebar.classList.contains("collapsed") ? "&#9664;" : "&#9654;";
 });
 
   
