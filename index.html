@@ -1535,15 +1535,30 @@ if (currentPlanet && atlas[currentPlanet]) {
   globe.pointsData(atlas[currentPlanet]);
   globe.htmlElementsData(atlas[currentPlanet].filter(p => p.type === "Pole"));
 }
-
-  // odświeżanie po zmianie checkboxów filtry
+//Nasłuchiwacze dla filtrów typów i dodatkowych
+  // Checkboxy typów punktów
 document.querySelectorAll(".pointFilter").forEach(cb => {
-  cb.addEventListener("change", refreshGlobePoints);
+    cb.addEventListener("change", () => {
+        refreshPointsList();
+        refreshGlobePoints();
+    });
 });
 
+// Checkboxy dodatkowe (Wydobyty/Niewydobyty/Odwiedzony/Nieodwiedzony)
 document.querySelectorAll(".extraFilter").forEach(cb => {
-  cb.addEventListener("change", refreshGlobePoints);
+    cb.addEventListener("change", () => {
+        refreshPointsList();
+        refreshGlobePoints();
+    });
 });
+
+  //Nasłuchiwacz dla sortowania
+  const sortSelect = document.getElementById("sortPoints");
+if(sortSelect) {
+    sortSelect.addEventListener("change", () => {
+        refreshPointsList();
+    });
+}
   
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
