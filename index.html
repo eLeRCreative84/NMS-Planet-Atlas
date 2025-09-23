@@ -1572,16 +1572,16 @@ if (currentPlanet && atlas[currentPlanet]) {
 
   // odświeżanie po zmianie checkboxów filtry
 document.querySelectorAll(".pointFilter").forEach(cb => {
-  cb.addEventListener("change", refreshGlobePoints);
+  cb.addEventListener("change", () => {
     refreshGlobePoints();
-    refreshPointsList(); 
+    refreshPointsList();
   });
 });
-// odświeżanie po zmianie checkboxów dodatkowe filtry
-  document.querySelectorAll(".extraFilter").forEach(cb => {
-  cb.addEventListener("change", refreshGlobePoints);
+
+document.querySelectorAll(".extraFilter").forEach(cb => {
+  cb.addEventListener("change", () => {
     refreshGlobePoints();
-    refreshPointsList(); 
+    refreshPointsList();
   });
 });
   
