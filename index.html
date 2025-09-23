@@ -151,6 +151,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  transition: transform 0.3s ease;
 }
 
 /* Lista planet w panelu */
@@ -175,8 +176,7 @@ button:disabled {
 /* Panel planet – tryb zwinięty */
 #planetSidebar.collapsed {
   transform: translateX(100%);
-  transition: transform 0.3s ease;
-}
+  }
 
 /* Guzik do zwijania/rozwijania */
 #togglePlanetSidebarBtn {
@@ -1611,7 +1611,7 @@ toggleBtn.id = "toggleSidebarBtn";
 toggleBtn.textContent = "⮜"; 
 toggleBtn.style.position = "absolute";
 toggleBtn.style.top = "10px";
-toggleBtn.style.right = "220px";
+toggleBtn.style.right = sidebar.offsetWidth + "px";
 toggleBtn.style.zIndex = "12";
 toggleBtn.style.background = "#1976d2";
 toggleBtn.style.color = "white";
@@ -1625,12 +1625,10 @@ document.getElementById("globeWrapper").appendChild(toggleBtn);
 toggleBtn.addEventListener("click", () => {
   sidebar.classList.toggle("collapsed");
   if (sidebar.classList.contains("collapsed")) {
-    sidebar.style.transform = "translateX(100%)";
     toggleBtn.style.right = "0";
     toggleBtn.textContent = "⮞";
   } else {
-    sidebar.style.transform = "translateX(0)";
-    toggleBtn.style.right = "220px";
+    toggleBtn.style.right = sidebar.offsetWidth + "px";
     toggleBtn.textContent = "⮜";
   }
 });
