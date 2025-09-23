@@ -972,7 +972,29 @@ function refreshPointsList(){
   list.innerHTML = "";
   if(!currentPlanet || !atlas[currentPlanet]) return;
 
-  let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
+  // Filtrujemy punkty tak jak na globie
+  let allPoints = atlas[currentPlanet].filter(p => p.type !== "Pole");
+  const activeTypes = getActivePointTypes();
+  const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
+                            .map(cb => cb.value);
+  
+  const points = allPoints.filter(p => {
+    if (!activeTypes.includes(p.type)) return false;
+
+    if (p.type === "Zasób") {
+      if (p.extracted && !activeExtras.includes("Wydobyty")) return false;
+      if (!p.extracted && !activeExtras.includes("Niewydobyty")) return false;
+    }
+
+    if (["Ruiny","Struktura","Inne"].includes(p.type)) {
+      if (p.visited && !activeExtras.includes("Odwiedzony")) return false;
+      if (!p.visited && !activeExtras.includes("Nieodwiedzony")) return false;
+    }
+
+    return true;
+  });
+
+  // Sortowanie
   const sort = document.getElementById("sortPoints").value;
   if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
   if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
