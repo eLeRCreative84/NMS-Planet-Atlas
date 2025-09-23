@@ -972,41 +972,29 @@ function refreshPointsList(){
   list.innerHTML = "";
   if(!currentPlanet || !atlas[currentPlanet]) return;
 
-  // Filtrujemy punkty tak jak na globie
-  let allPoints = atlas[currentPlanet].filter(p => p.type !== "Pole");
-  const activeTypes = getActivePointTypes();
-  const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
-                            .map(cb => cb.value);
+    // pobieramy wszystkie punkty 
+  let points = [...atlas[currentPlanet]];
   
-  const points = allPoints.filter(p => {
-    if (!activeTypes.includes(p.type)) return false;
+  // filtrujemy punkty wg checkboxów tak jak glob
+  const filteredPoints = getFilteredPoints(points);
 
-    if (p.type === "Zasób") {
-      if (p.extracted && !activeExtras.includes("Wydobyty")) return false;
-      if (!p.extracted && !activeExtras.includes("Niewydobyty")) return false;
-    }
-
-    if (["Ruiny","Struktura","Inne"].includes(p.type)) {
-      if (p.visited && !activeExtras.includes("Odwiedzony")) return false;
-      if (!p.visited && !activeExtras.includes("Nieodwiedzony")) return false;
-    }
-
-    return true;
-  });
-
-  // Sortowanie
+  // sortowanie
   const sort = document.getElementById("sortPoints").value;
-  if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
-  if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
-  if(sort==="type") points.sort((a,b)=> (a.type||"").localeCompare(b.type||""));
-  if(sort==="newest") points.sort((a,b)=> (b.timestamp||0)-(a.timestamp||0));
-  if(sort==="oldest") points.sort((a,b)=> (a.timestamp||0)-(b.timestamp||0));
+  if(sort==="nameAsc") filteredPoints.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
+  if(sort==="nameDesc") filteredPoints.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
+  if(sort==="type") filteredPoints.sort((a,b)=> (a.type||"").localeCompare(b.type||""));
+  if(sort==="newest") filteredPoints.sort((a,b)=> (b.timestamp||0)-(a.timestamp||0));
+  if(sort==="oldest") filteredPoints.sort((a,b)=> (a.timestamp||0)-(b.timestamp||0));
 
-  points.forEach((point,index)=>{
+  // wyświetlanie
+  filteredPoints.forEach((point,index)=>{
     const li = document.createElement("li");
     li.style.display = "flex";
     li.style.flexDirection = "column";
     li.style.alignItems = "flex-start";
+    const info = document.createElement("span");
+    info.innerHTML = `${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
+    li.appendChild(info);
 
     const info = document.createElement("span");
     info.innerHTML = `${point.name || "Bez nazwy"} (${point.type})<br>X:${point.lat}, Y:${point.lng}`;
