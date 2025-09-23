@@ -171,6 +171,27 @@ button:disabled {
 #planetListSidebar li:hover {
   background: #27407a;
 }
+
+/* Panel planet – tryb zwinięty */
+#planetSidebar.collapsed {
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+/* Guzik do zwijania/rozwijania */
+#togglePlanetSidebarBtn {
+  position: absolute;
+  top: 10px;
+  right: 230px; /* domyślnie obok panelu */
+  z-index: 12;
+  background: #102b56;
+  color: white;
+  border: none;
+  border-radius: 6px 0 0 6px;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  transition: right 0.3s ease;
+}
   
 /* Filtry punktów */
 #pointFilters {
@@ -468,6 +489,9 @@ button:disabled {
     </div>
     <!-- glob -->
     <div id="globeViz"></div>
+   
+    <!-- Przycisk do zwijania/rozwijania panelu planet -->
+    <button id="toggleSidebarBtn">⮜</button>
   </div>
 
 <script>
@@ -608,6 +632,21 @@ function savePlanetDetails(){
   });
 }
 
+  //Zwijanie listy planet
+    const sidebar = document.getElementById("planetSidebar");
+  const toggleBtn = document.getElementById("togglePlanetSidebarBtn");
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+
+    if (sidebar.classList.contains("collapsed")) {
+      toggleBtn.textContent = "⮞";       // zmiana strzałki
+      toggleBtn.style.right = "10px";    // przy samej krawędzi ekranu
+    } else {
+      toggleBtn.textContent = "⮜";
+      toggleBtn.style.right = "230px";   // obok rozwiniętego panelu
+    }
+  });
   
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
