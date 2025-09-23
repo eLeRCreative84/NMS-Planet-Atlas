@@ -1254,17 +1254,18 @@ document.getElementById("myLng").addEventListener("input", updateMyLocation);
                             .map(cb => cb.value);
   // filtrujemy punkty
   const filteredPoints = allPoints.filter(p => {
-  // filtr po typach
   if (!activeTypes.includes(p.type)) return false;
 
-  // filtr Wydobyty: tylko dla Zasób
-  if (p.type === "Zasób" && activeExtras.includes("Wydobyty") && !p.extracted) {
-    return false; // ukryj, jeśli nie wydobyty
+  // Filtr Wydobyty: pokazuj punkty Zasób, które są wydobyte, tylko jeśli filtr jest zaznaczony
+  if (p.type === "Zasób") {
+    if (p.extracted && !activeExtras.includes("Wydobyty")) return false; // punkt wydobyty, filtr nie zaznaczony → ukryj
+    if (!p.extracted && activeExtras.includes("Wydobyty")) return false; // punkt nie wydobyty, filtr zaznaczony → ukryj
   }
 
-  // filtr Odwiedzony: tylko dla Ruiny/Struktura/Inne
-  if (["Ruiny","Struktura","Inne"].includes(p.type) && activeExtras.includes("Odwiedzony") && !p.visited) {
-    return false; // ukryj, jeśli nie odwiedzony
+  // Filtr Odwiedzony: pokazuj punkty Ruiny/Struktura/Inne, które są odwiedzone, tylko jeśli filtr jest zaznaczony
+  if (["Ruiny","Struktura","Inne"].includes(p.type)) {
+    if (p.visited && !activeExtras.includes("Odwiedzony")) return false; // punkt odwiedzony, filtr nie zaznaczony → ukryj
+    if (!p.visited && activeExtras.includes("Odwiedzony")) return false; // punkt nie odwiedzony, filtr zaznaczony → ukryj
   }
 
   return true;
