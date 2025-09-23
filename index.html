@@ -1070,6 +1070,11 @@ function getFilteredPoints() {
 
   let allPoints = atlas[currentPlanet].filter(p => p.type !== "Pole");
 
+  // dodaj gwiazdkę (pozycję gracza), jeśli istnieje
+  if (myLocationPoint) {
+    allPoints.push(myLocationPoint);
+  }
+
   // aktywne typy punktów
   const activeTypes = Array.from(document.querySelectorAll(".pointFilter:checked"))
                            .map(cb => cb.value);
