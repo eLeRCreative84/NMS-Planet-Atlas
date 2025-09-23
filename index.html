@@ -632,22 +632,7 @@ function savePlanetDetails(){
   });
 }
 
-  //Zwijanie listy planet
-    const sidebar = document.getElementById("planetSidebar");
-  const toggleBtn = document.getElementById("togglePlanetSidebarBtn");
-
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
-
-    if (sidebar.classList.contains("collapsed")) {
-      toggleBtn.textContent = "⮞";       // zmiana strzałki
-      toggleBtn.style.right = "10px";    // przy samej krawędzi ekranu
-    } else {
-      toggleBtn.textContent = "⮜";
-      toggleBtn.style.right = "230px";   // obok rozwiniętego panelu
-    }
-  });
-  
+ 
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
 //////////////////////////////////////////////////////////////////// 
@@ -1619,6 +1604,37 @@ window.onload = () => {
   checkNewPlanetInput();
   };
 
+// Logika do zwijania bocznego panelu
+const sidebar = document.getElementById("planetSidebar");
+const toggleBtn = document.createElement("button");
+toggleBtn.id = "toggleSidebarBtn";
+toggleBtn.textContent = "⮜"; 
+toggleBtn.style.position = "absolute";
+toggleBtn.style.top = "10px";
+toggleBtn.style.right = "220px";
+toggleBtn.style.zIndex = "12";
+toggleBtn.style.background = "#1976d2";
+toggleBtn.style.color = "white";
+toggleBtn.style.border = "none";
+toggleBtn.style.padding = "0.3rem 0.6rem";
+toggleBtn.style.borderRadius = "4px";
+toggleBtn.style.cursor = "pointer";
+
+document.getElementById("globeWrapper").appendChild(toggleBtn);
+
+toggleBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("collapsed");
+  if (sidebar.classList.contains("collapsed")) {
+    sidebar.style.transform = "translateX(100%)";
+    toggleBtn.style.right = "0";
+    toggleBtn.textContent = "⮞";
+  } else {
+    sidebar.style.transform = "translateX(0)";
+    toggleBtn.style.right = "220px";
+    toggleBtn.textContent = "⮜";
+  }
+});
+  
 </script>
 </body>
 </html>
