@@ -1078,6 +1078,11 @@ function getFilteredPoints() {
   const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
                             .map(cb => cb.value);
 
+  // jeśli brak aktywnych filtrów → pokaż wszystkie punkty
+  if (activeTypes.length === 0 && activeExtras.length === 0) {
+    return allPoints;
+  }
+  
   return allPoints.filter(p => {
     // filtr po typach
     if (!activeTypes.includes(p.type)) return false;
