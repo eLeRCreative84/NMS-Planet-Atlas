@@ -972,7 +972,7 @@ function refreshPointsList(){
   list.innerHTML = "";
   if(!currentPlanet || !atlas[currentPlanet]) return;
 
-  let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
+  let points = getFilteredPoints();
   const sort = document.getElementById("sortPoints").value;
   if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
   if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
@@ -1573,10 +1573,16 @@ if (currentPlanet && atlas[currentPlanet]) {
   // odświeżanie po zmianie checkboxów filtry
 document.querySelectorAll(".pointFilter").forEach(cb => {
   cb.addEventListener("change", refreshGlobePoints);
+    refreshGlobePoints();
+    refreshPointsList(); 
+  });
 });
 // odświeżanie po zmianie checkboxów dodatkowe filtry
   document.querySelectorAll(".extraFilter").forEach(cb => {
   cb.addEventListener("change", refreshGlobePoints);
+    refreshGlobePoints();
+    refreshPointsList(); 
+  });
 });
   
 globe.showGraticules(true).graticuleLineWidth(0.5);
