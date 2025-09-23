@@ -321,6 +321,7 @@ button:disabled {
     <div id="punkty" class="tab-content">
       <div id="pointFilters">
         <div><label>Filtruj</label></div>
+        <div style="height:0.5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
         <label>Zasób <input type="checkbox" class="pointFilter" value="Zasób" checked></label>
         <label>Baza <input type="checkbox" class="pointFilter" value="Baza" checked></label>
         <label>Ruiny <input type="checkbox" class="pointFilter" value="Ruiny" checked></label>
@@ -331,6 +332,7 @@ button:disabled {
       </div>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
       <label>Filtry dodatkowe</label>
+      <div style="height:0.5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
       <div id="extraFilters">
         <label>Wydobyty <input type="checkbox" class="extraFilter" value="Wydobyty" checked></label>
         <label>Odwiedzony <input type="checkbox" class="extraFilter" value="Odwiedzony" checked></label>
@@ -1251,24 +1253,23 @@ document.getElementById("myLng").addEventListener("input", updateMyLocation);
   const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
                             .map(cb => cb.value);
   // filtrujemy punkty
-  // Sprawdzamy filtr tylko dla odpowiednich typów. 
-  // Jeśli punkt jest typu innego niż “Zasób”, checkbox "Wydobyty" go nie rusza.
- const filteredPoints = allPoints.filter(p => {
+  const filteredPoints = allPoints.filter(p => {
   // filtr po typach
   if (!activeTypes.includes(p.type)) return false;
 
-  // filtr Wydobyty
-  if (activeExtras.includes("Wydobyty") && p.type === "Zasób" && !p.extracted) {
-    return false;
+  // filtr Wydobyty: tylko dla Zasób
+  if (p.type === "Zasób" && activeExtras.includes("Wydobyty") && !p.extracted) {
+    return false; // ukryj, jeśli nie wydobyty
   }
 
-  // filtr Odwiedzony
-  if (activeExtras.includes("Odwiedzony") && ["Ruiny","Struktura","Inne"].includes(p.type) && !p.visited) {
-    return false;
+  // filtr Odwiedzony: tylko dla Ruiny/Struktura/Inne
+  if (["Ruiny","Struktura","Inne"].includes(p.type) && activeExtras.includes("Odwiedzony") && !p.visited) {
+    return false; // ukryj, jeśli nie odwiedzony
   }
 
   return true;
 });
+
   globe.pointsData(filteredPoints)
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
   globe.htmlElementsData(filteredPoints.filter(d => d.type === "Pole" || d.type === "Moja"));
