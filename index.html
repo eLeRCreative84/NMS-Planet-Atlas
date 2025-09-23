@@ -174,7 +174,22 @@ button:disabled {
 #planetListSidebar li:hover {
   background: #27407a;
 }
+  
+/* Filtry punktów */
+ #pointFilters {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* dwie kolumny */
+  gap: 0.5rem 1rem; /* odstęp między wierszami i kolumnami */
+  margin-bottom: 1rem;
+}
 
+#pointFilters label {
+  display: flex;
+  align-items: center; /* wyrównanie tekstu z checkboxem */
+  gap: 0.4rem; /* mała przerwa między kwadracikiem a tekstem */
+  cursor: pointer;
+}
+ 
 </style>
 </head>
 <body>
@@ -292,6 +307,8 @@ button:disabled {
         <label><input type="checkbox" class="pointFilter" value="Ruiny" checked> Ruiny</label>
         <label><input type="checkbox" class="pointFilter" value="Struktura" checked> Struktura</label>
         <label><input type="checkbox" class="pointFilter" value="Inne" checked> Inne</label>
+        <label><input type="checkbox" class="pointFilter" value="Pole" checked> Bieguny</label>
+        <label><input type="checkbox" class="pointFilter" value="Moja" checked> Moja lokalizacja</label>
       </div>
       <label>Sortuj:</label>
       <select id="sortPoints" onchange="refreshPointsList()">
