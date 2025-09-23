@@ -285,6 +285,13 @@ button:disabled {
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
       <!-- Zakładka PUNKTY -->
       <div id="punkty" class="tab-content">
+        <div id="pointFilters" style="margin-bottom: 1rem;">
+          <label><input type="checkbox" class="pointFilter" value="Zasób" checked> Zasób</label>
+          <label><input type="checkbox" class="pointFilter" value="Baza" checked> Baza</label>
+          <label><input type="checkbox" class="pointFilter" value="Ruiny" checked> Ruiny</label>
+          <label><input type="checkbox" class="pointFilter" value="Struktura" checked> Struktura</label>
+          <label><input type="checkbox" class="pointFilter" value="Inne" checked> Inne</label>
+        </div>
         <label>Sortuj:</label>
         <select id="sortPoints" onchange="refreshPointsList()">
           <option value="nameAsc">Nazwa A–Z</option>
@@ -1195,10 +1202,22 @@ document.getElementById("myLng").addEventListener("input", updateMyLocation);
     allPoints.push(myLocationPoint); // tu dodajemy gwiazdkę
   }
 
-  globe.pointsData(allPoints)
-     .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
-  globe.htmlElementsData(allPoints.filter(d => d.type === "Pole" || d.type === "Moja"));
-  }
+    const activeTypes = getActivePointTypes();
+
+  // filtrujemy punkty po typach
+  const filteredPoints = allPoints.filter(p => activeTypes.includes(p.type));
+    
+   globe.pointsData(filteredPoints)
+       .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
+
+  globe.htmlElementsData(filteredPoints.filter(d => d.type === "Pole" || d.type === "Moja"));
+}
+
+// System filtrowania punktów
+function getActivePointTypes() {
+  return Array.from(document.querySelectorAll(".pointFilter:checked"))
+              .map(cb => cb.value);
+}
   
 ////////////////////////////////////////////////////////////////////
 //------------------- Tekstury i kolory planet -------------------//
@@ -1442,6 +1461,12 @@ if (currentPlanet && atlas[currentPlanet]) {
   globe.htmlElementsData(atlas[currentPlanet].filter(p => p.type === "Pole"));
 }
 
+  // odświeżanie po zmianie checkboxów
+document.querySelectorAll(".pointFilter").forEach(cb => {
+  cb.addEventListener("change", refreshGlobePoints);
+});
+
+  
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
 // start
