@@ -336,6 +336,8 @@ button:disabled {
       <div id="extraFilters">
         <label>Wydobyty <input type="checkbox" class="extraFilter" value="Wydobyty" checked></label>
         <label>Odwiedzony <input type="checkbox" class="extraFilter" value="Odwiedzony" checked></label>
+        <label>Niewydobyty <input type="checkbox" class="extraFilter" value="Niewydobyty" checked></label>
+        <label>Niwodwiedzony <input type="checkbox" class="extraFilter" value="Nieodwiedzony" checked></label>
       </div>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
       <label>Sortuj:</label>
@@ -1253,19 +1255,19 @@ document.getElementById("myLng").addEventListener("input", updateMyLocation);
   const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
                             .map(cb => cb.value);
   // filtrujemy punkty
-  const filteredPoints = allPoints.filter(p => {
+ const filteredPoints = allPoints.filter(p => {
   if (!activeTypes.includes(p.type)) return false;
 
-  // Filtr Wydobyty: pokazuj punkty Zasób, które są wydobyte, tylko jeśli filtr jest zaznaczony
+  // Filtry dla Zasób
   if (p.type === "Zasób") {
-    if (p.extracted && !activeExtras.includes("Wydobyty")) return false; // punkt wydobyty, filtr nie zaznaczony → ukryj
-    if (!p.extracted && activeExtras.includes("Wydobyty")) return false; // punkt nie wydobyty, filtr zaznaczony → ukryj
+    if (p.extracted && !activeExtras.includes("Wydobyty")) return false;      // wydobyty, ale filtr Wydobyty nie zaznaczony → ukryj
+    if (!p.extracted && !activeExtras.includes("Niewydobyty")) return false; // niewydobyty, ale filtr Niewydobyty nie zaznaczony → ukryj
   }
 
-  // Filtr Odwiedzony: pokazuj punkty Ruiny/Struktura/Inne, które są odwiedzone, tylko jeśli filtr jest zaznaczony
+  // Filtry dla Ruiny/Struktura/Inne
   if (["Ruiny","Struktura","Inne"].includes(p.type)) {
-    if (p.visited && !activeExtras.includes("Odwiedzony")) return false; // punkt odwiedzony, filtr nie zaznaczony → ukryj
-    if (!p.visited && activeExtras.includes("Odwiedzony")) return false; // punkt nie odwiedzony, filtr zaznaczony → ukryj
+    if (p.visited && !activeExtras.includes("Odwiedzony")) return false;     // odwiedzony, filtr Odwiedzony nie zaznaczony → ukryj
+    if (!p.visited && !activeExtras.includes("Nieodwiedzony")) return false; // nieodwiedzony, filtr Nieodwiedzony nie zaznaczony → ukryj
   }
 
   return true;
