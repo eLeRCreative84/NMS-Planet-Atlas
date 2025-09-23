@@ -72,7 +72,6 @@
   justify-content: center; /* poziome centrowanie */
   align-items: center;     /* pionowe centrowanie */
   overflow: hidden;        /* żeby nic nie wystawało */
-  
 }
 
 #globeViz {
@@ -105,8 +104,7 @@
   pointer-events: none;
   z-index: 10; 
 }
-  
-
+ 
 /* Ustaw przycisk Tekstury i Koloru razem */
 .planet-buttons-row {
   display: flex;
@@ -124,7 +122,6 @@
 
 #setTextureBtn { background: #1976d2; color: white; }
 #setColorBtn   { background: #1976d2; color: white; }
-
   
   /* Wyszarzanie niekatywnych pyrzycisków */
 button:disabled {
@@ -191,6 +188,24 @@ button:disabled {
 
 #pointFilters input[type="checkbox"] {
   margin: 0 auto; /* wyśrodkowanie checkboxów w swojej kolumnie */
+}
+
+/* Dodatkowe filtry */
+#extraFilters {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto; /* opis–checkbox | opis–checkbox */
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+#extraFilters label {
+  display: contents;
+  cursor: pointer;
+}
+
+#extraFilters input[type="checkbox"] {
+  margin: 0 auto;
 }
  
 </style>
@@ -305,6 +320,7 @@ button:disabled {
     <!-- Zakładka PUNKTY -->
     <div id="punkty" class="tab-content">
       <div id="pointFilters">
+        <label>Filtruj</label>
         <label>Zasób <input type="checkbox" class="pointFilter" value="Zasób" checked></label>
         <label>Baza <input type="checkbox" class="pointFilter" value="Baza" checked></label>
         <label>Ruiny <input type="checkbox" class="pointFilter" value="Ruiny" checked></label>
@@ -313,6 +329,13 @@ button:disabled {
         <label>Bieguny <input type="checkbox" class="pointFilter" value="Pole" checked></label>
         <label>Moja lokalizacja <input type="checkbox" class="pointFilter" value="Moja" checked></label>
       </div>
+      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+      <label>Filtry dodatkowe</label>
+      <div id="extraFilters">
+        <label>Wydobyty <input type="checkbox" class="extraFilter" value="Wydobyty" checked></label>
+        <label>Odwiedzony <input type="checkbox" class="extraFilter" value="Odwiedzony" checked></label>
+      </div>
+      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
       <label>Sortuj:</label>
       <select id="sortPoints" onchange="refreshPointsList()">
         <option value="nameAsc">Nazwa A–Z</option>
@@ -321,6 +344,7 @@ button:disabled {
         <option value="newest">Najnowsze</option>
         <option value="oldest">Najstarsze</option>
       </select>
+      <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
       <ul id="pointsList"></ul>
     </div>
     <!-- Zakładka DETALE PLANETY -->
@@ -1213,23 +1237,33 @@ document.getElementById("myLat").addEventListener("input", updateMyLocation);
 document.getElementById("myLng").addEventListener("input", updateMyLocation);
 
 // odświeżamy glob z uwzględnieniem mnożnika wysokości
-  function refreshGlobePoints(){
+ function refreshGlobePoints(){
   if (!currentPlanet) return;
-// kopiujemy punkty z atlasu
+  // kopiujemy punkty z atlasu
   let allPoints = atlas[currentPlanet] ? [...atlas[currentPlanet]] : [];
-
   if (myLocationPoint) {
     allPoints.push(myLocationPoint); // tu dodajemy gwiazdkę
   }
-
-    const activeTypes = getActivePointTypes();
-
-  // filtrujemy punkty po typach
-  const filteredPoints = allPoints.filter(p => activeTypes.includes(p.type));
-    
-   globe.pointsData(filteredPoints)
+  // aktywne typy
+  const activeTypes = getActivePointTypes();
+  // aktywne dodatkowe filtry
+  const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
+                            .map(cb => cb.value);
+  // filtrujemy punkty
+  const filteredPoints = allPoints.filter(p => {
+    // po typach
+    if (!activeTypes.includes(p.type)) return false;
+    // dodatkowe filtry
+    if (activeExtras.includes("extracted")) {
+      if (!(p.type === "Zasób" && p.extracted)) return false;
+    }
+    if (activeExtras.includes("visited")) {
+      if (!(["Ruiny","Struktura","Inne"].includes(p.type) && p.visited)) return false;
+    }
+    return true;
+  });
+  globe.pointsData(filteredPoints)
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
-
   globe.htmlElementsData(filteredPoints.filter(d => d.type === "Pole" || d.type === "Moja"));
 }
 
@@ -1481,11 +1515,14 @@ if (currentPlanet && atlas[currentPlanet]) {
   globe.htmlElementsData(atlas[currentPlanet].filter(p => p.type === "Pole"));
 }
 
-  // odświeżanie po zmianie checkboxów
+  // odświeżanie po zmianie checkboxów filtry
 document.querySelectorAll(".pointFilter").forEach(cb => {
   cb.addEventListener("change", refreshGlobePoints);
 });
-
+// odświeżanie po zmianie checkboxów dodatkowe filtry
+  document.querySelectorAll(".extraFilter").forEach(cb => {
+  cb.addEventListener("change", refreshGlobePoints);
+});
   
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
