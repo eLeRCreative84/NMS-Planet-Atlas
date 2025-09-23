@@ -1615,14 +1615,7 @@ const planetSidebar = document.getElementById("planetSidebar");
 
 toggleSidebarBtn.addEventListener("click", () => {
   planetSidebar.classList.toggle("collapsed");
-
-  if (planetSidebar.classList.contains("collapsed")) {
-    toggleSidebarBtn.innerHTML = "&#9664;"; // strzałka w lewo
-    toggleSidebarBtn.style.right = "10px";
-  } else {
-    toggleSidebarBtn.innerHTML = "&#9654;"; // strzałka w prawo
-    toggleSidebarBtn.style.right = "260px"; // zgodnie z szerokością panelu
-  }
+  toggleSidebarBtn.innerHTML = planetSidebar.classList.contains("collapsed") ? "&#9664;" : "&#9654;";
 });
 
   
