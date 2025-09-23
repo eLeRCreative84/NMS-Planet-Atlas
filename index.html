@@ -1609,18 +1609,12 @@ window.onload = () => {
   };
 
 // Logika do zwijania bocznego panelu
-const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
-const planetSidebar = document.getElementById("planetSidebar");
+const toggleBtn = document.getElementById("toggleSidebarBtn");
+const sidebar = document.getElementById("planetSidebar");
 
-toggleSidebarBtn.addEventListener("click", () => {
-  planetSidebar.classList.toggle("collapsed");
-
-  // zmiana strzałki
-  if (planetSidebar.classList.contains("collapsed")) {
-    toggleSidebarBtn.innerHTML = "&#9664;"; // strzałka w lewo
-  } else {
-    toggleSidebarBtn.innerHTML = "&#9654;"; // strzałka w prawo
-  }
+toggleBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("collapsed");
+  toggleBtn.innerHTML = sidebar.classList.contains("collapsed") ? "&#9664;" : "&#9654;";
 });
 
   
