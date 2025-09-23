@@ -972,7 +972,7 @@ function refreshPointsList(){
   list.innerHTML = "";
   if(!currentPlanet || !atlas[currentPlanet]) return;
 
-  let points = getFilteredPoints();
+  let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
   const sort = document.getElementById("sortPoints").value;
   if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
   if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
@@ -1064,50 +1064,6 @@ btnDiv.appendChild(delBtn);
   });
 }
 
-// Funkcja zwraca przefiltrowane punkty dla aktualnej planety
-function getFilteredPoints() {
-  if (!currentPlanet || !atlas[currentPlanet]) return [];
-
-  let allPoints = atlas[currentPlanet].filter(p => p.type !== "Pole");
-
-  // dodaj gwiazdkę (pozycję gracza), jeśli istnieje
-  if (myLocationPoint) {
-    allPoints.push(myLocationPoint);
-  }
-
-  // aktywne typy punktów
-  const activeTypes = Array.from(document.querySelectorAll(".pointFilter:checked"))
-                           .map(cb => cb.value);
-
-  // aktywne dodatkowe filtry (Wydobyty / Niewydobyty / Odwiedzony / Nieodwiedzony)
-  const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
-                            .map(cb => cb.value);
-
-  // jeśli brak aktywnych filtrów → pokaż wszystkie punkty
-  if (activeTypes.length === 0 && activeExtras.length === 0) {
-    return allPoints;
-  }
-  
-  return allPoints.filter(p => {
-    // filtr po typach
-    if (!activeTypes.includes(p.type)) return false;
-
-    // filtr Wydobyty / Niewydobyty dla Zasób
-    if (p.type === "Zasób") {
-      if (activeExtras.includes("Wydobyty") && !p.extracted) return false; // wydobyty, ale filtr Wydobyty nie zaznaczony → ukryj
-      if (activeExtras.includes("Niewydobyty") && p.extracted) return false; // niewydobyty, ale filtr Niewydobyty nie zaznaczony → ukryj
-    }
-
-    // filtr Odwiedzony / Nieodwiedzony dla Ruiny/Struktura/Inne
-    if (["Ruiny","Struktura","Inne"].includes(p.type)) {
-      if (activeExtras.includes("Odwiedzony") && !p.visited) return false; // odwiedzony, filtr Odwiedzony nie zaznaczony → ukryj
-      if (activeExtras.includes("Nieodwiedzony") && p.visited) return false; // nieodwiedzony, filtr Nieodwiedzony nie zaznaczony → ukryj
-    }
-
-    return true;
-  });
-}
-  
 // Kliknięcie Edytuj nie usuwa punktu od razu.
 //Punkt jest tymczasowo przygotowany do edycji (ładuje się do formularza).
 //Dopiero kliknięcie Nadpisz punkt faktycznie zmienia dane.
@@ -1572,17 +1528,11 @@ if (currentPlanet && atlas[currentPlanet]) {
 
   // odświeżanie po zmianie checkboxów filtry
 document.querySelectorAll(".pointFilter").forEach(cb => {
-  cb.addEventListener("change", () => {
-    refreshGlobePoints();
-    refreshPointsList();
-  });
+  cb.addEventListener("change", refreshGlobePoints);
 });
 
 document.querySelectorAll(".extraFilter").forEach(cb => {
-  cb.addEventListener("change", () => {
-    refreshGlobePoints();
-    refreshPointsList();
-  });
+  cb.addEventListener("change", refreshGlobePoints);
 });
   
 globe.showGraticules(true).graticuleLineWidth(0.5);
