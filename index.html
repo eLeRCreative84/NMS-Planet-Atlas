@@ -337,7 +337,7 @@ button:disabled {
         <label>Wydobyty <input type="checkbox" class="extraFilter" value="Wydobyty" checked></label>
         <label>Odwiedzony <input type="checkbox" class="extraFilter" value="Odwiedzony" checked></label>
         <label>Niewydobyty <input type="checkbox" class="extraFilter" value="Niewydobyty" checked></label>
-        <label>Niwodwiedzony <input type="checkbox" class="extraFilter" value="Nieodwiedzony" checked></label>
+        <label>Nieodwiedzony <input type="checkbox" class="extraFilter" value="Nieodwiedzony" checked></label>
       </div>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
       <label>Sortuj:</label>
@@ -972,7 +972,7 @@ function refreshPointsList(){
   list.innerHTML = "";
   if(!currentPlanet || !atlas[currentPlanet]) return;
 
-  let points = atlas[currentPlanet].filter(p => p.type !== "Pole");
+  let points = getFilteredPoints();
   const sort = document.getElementById("sortPoints").value;
   if(sort==="nameAsc") points.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
   if(sort==="nameDesc") points.sort((a,b)=> (b.name||"").localeCompare(a.name||""));
@@ -1064,6 +1064,40 @@ btnDiv.appendChild(delBtn);
   });
 }
 
+// Funkcja zwraca przefiltrowane punkty dla aktualnej planety
+function getFilteredPoints() {
+  if (!currentPlanet || !atlas[currentPlanet]) return [];
+
+  let allPoints = atlas[currentPlanet].filter(p => p.type !== "Pole");
+
+  // aktywne typy punktów
+  const activeTypes = Array.from(document.querySelectorAll(".pointFilter:checked"))
+                           .map(cb => cb.value);
+
+  // aktywne dodatkowe filtry (Wydobyty / Niewydobyty / Odwiedzony / Nieodwiedzony)
+  const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
+                            .map(cb => cb.value);
+
+  return allPoints.filter(p => {
+    // filtr po typach
+    if (!activeTypes.includes(p.type)) return false;
+
+    // filtr Wydobyty / Niewydobyty dla Zasób
+    if (p.type === "Zasób") {
+      if (activeExtras.includes("Wydobyty") && !p.extracted) return false; // wydobyty, ale filtr Wydobyty nie zaznaczony → ukryj
+      if (activeExtras.includes("Niewydobyty") && p.extracted) return false; // niewydobyty, ale filtr Niewydobyty nie zaznaczony → ukryj
+    }
+
+    // filtr Odwiedzony / Nieodwiedzony dla Ruiny/Struktura/Inne
+    if (["Ruiny","Struktura","Inne"].includes(p.type)) {
+      if (activeExtras.includes("Odwiedzony") && !p.visited) return false; // odwiedzony, filtr Odwiedzony nie zaznaczony → ukryj
+      if (activeExtras.includes("Nieodwiedzony") && p.visited) return false; // nieodwiedzony, filtr Nieodwiedzony nie zaznaczony → ukryj
+    }
+
+    return true;
+  });
+}
+  
 // Kliknięcie Edytuj nie usuwa punktu od razu.
 //Punkt jest tymczasowo przygotowany do edycji (ładuje się do formularza).
 //Dopiero kliknięcie Nadpisz punkt faktycznie zmienia dane.
@@ -1255,23 +1289,7 @@ document.getElementById("myLng").addEventListener("input", updateMyLocation);
   const activeExtras = Array.from(document.querySelectorAll(".extraFilter:checked"))
                             .map(cb => cb.value);
   // filtrujemy punkty
- const filteredPoints = allPoints.filter(p => {
-  if (!activeTypes.includes(p.type)) return false;
-
-  // Filtry dla Zasób
-  if (p.type === "Zasób") {
-    if (p.extracted && !activeExtras.includes("Wydobyty")) return false;      // wydobyty, ale filtr Wydobyty nie zaznaczony → ukryj
-    if (!p.extracted && !activeExtras.includes("Niewydobyty")) return false; // niewydobyty, ale filtr Niewydobyty nie zaznaczony → ukryj
-  }
-
-  // Filtry dla Ruiny/Struktura/Inne
-  if (["Ruiny","Struktura","Inne"].includes(p.type)) {
-    if (p.visited && !activeExtras.includes("Odwiedzony")) return false;     // odwiedzony, filtr Odwiedzony nie zaznaczony → ukryj
-    if (!p.visited && !activeExtras.includes("Nieodwiedzony")) return false; // nieodwiedzony, filtr Nieodwiedzony nie zaznaczony → ukryj
-  }
-
-  return true;
-});
+  let filteredPoints = getFilteredPoints();
 
   globe.pointsData(filteredPoints)
        .pointAltitude(d => (d.altitude || 0.02) * pointsDistanceMultiplier);
@@ -1465,8 +1483,8 @@ const globe = Globe()(document.getElementById("globeViz"))
     // zabezpieczenie: gdy nie ma currentPlanet, zwracamy opis punktu pojedynczo
     if (!currentPlanet || !atlas[currentPlanet]) {
     let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
-    if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
-    if (["Ruiny","Struktura","Inne"].includes(d.type)) label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+    if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Niewydobyty]";
+    if (["Ruiny","Struktura","Inne"].includes(d.type)) label += d.visited ? " [Odwiedzony]" : " [Nieodwiedzony]";
     return label;
   }
 
@@ -1475,15 +1493,15 @@ const globe = Globe()(document.getElementById("globeViz"))
       if (sameLocation.length > 1) {
         return sameLocation.map(p => {
           let label = `${p.name || "Bez nazwy"} (${p.type})`;
-          if (p.type === "Zasób") label += p.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
-          if (["Ruiny","Struktura","Inne"].includes(p.type)) label += p.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+          if (p.type === "Zasób") label += p.extracted ? " [Wydobyty]" : " [Niewydobyty]";
+          if (["Ruiny","Struktura","Inne"].includes(p.type)) label += p.visited ? " [Odwiedzony]" : " [Nieodwiedzony]";
           return label;
         }).join("<br>");
       }
 
       let label = `${d.name || ""} (${d.type})<br>X:${d.lat}, Y:${d.lng}`;
-      if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Nie wydobyty]";
-      if (["Ruiny","Struktura","Inne"].includes(d.type)) label += d.visited ? " [Odwiedzony]" : " [Nie odwiedzony]";
+      if (d.type === "Zasób") label += d.extracted ? " [Wydobyty]" : " [Niewydobyty]";
+      if (["Ruiny","Struktura","Inne"].includes(d.type)) label += d.visited ? " [Odwiedzony]" : " [Nieodwiedzony]";
       return label;
     })
   .pointColor(d=>{
