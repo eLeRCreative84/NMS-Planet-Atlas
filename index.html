@@ -179,18 +179,22 @@ button:disabled {
   }
 
 /* Guzik do zwijania/rozwijania */
-#togglePlanetSidebarBtn {
-  position: absolute;
-  top: 10px;
-  right: 230px; /* domyślnie obok panelu */
-  z-index: 12;
-  background: #102b56;
+#toggleSidebarBtn {
+  position: fixed;         /* nie absolute */
+  top: 20px;
+  right: 260px;            /* szerokość panelu */
+  z-index: 1000;
+  background: #1976d2;
   color: white;
   border: none;
-  border-radius: 6px 0 0 6px;
-  padding: 0.4rem 0.6rem;
+  padding: 6px 10px;
+  border-radius: 4px 0 0 4px;
   cursor: pointer;
   transition: right 0.3s ease;
+}
+
+#planetSidebar.collapsed + #toggleSidebarBtn {
+  right: 0;
 }
   
 /* Filtry punktów */
@@ -491,7 +495,8 @@ button:disabled {
     <div id="globeViz"></div>
    
     <!-- Przycisk do zwijania/rozwijania panelu planet -->
-    <button id="toggleSidebarBtn">⮜</button>
+    <div id="planetSidebar"> ... </div>
+      <button id="toggleSidebarBtn">⮜</button>
   </div>
 
 <script>
@@ -1606,31 +1611,11 @@ window.onload = () => {
 
 // Logika do zwijania bocznego panelu
 const sidebar = document.getElementById("planetSidebar");
-const toggleBtn = document.createElement("button");
-toggleBtn.id = "toggleSidebarBtn";
-toggleBtn.textContent = "⮜"; 
-toggleBtn.style.position = "absolute";
-toggleBtn.style.top = "10px";
-toggleBtn.style.right = sidebar.offsetWidth + "px";
-toggleBtn.style.zIndex = "12";
-toggleBtn.style.background = "#1976d2";
-toggleBtn.style.color = "white";
-toggleBtn.style.border = "none";
-toggleBtn.style.padding = "0.3rem 0.6rem";
-toggleBtn.style.borderRadius = "4px";
-toggleBtn.style.cursor = "pointer";
-
-document.getElementById("globeWrapper").appendChild(toggleBtn);
+const toggleBtn = document.getElementById("toggleSidebarBtn");
 
 toggleBtn.addEventListener("click", () => {
   sidebar.classList.toggle("collapsed");
-  if (sidebar.classList.contains("collapsed")) {
-    toggleBtn.style.right = "0";
-    toggleBtn.textContent = "⮞";
-  } else {
-    toggleBtn.style.right = sidebar.offsetWidth + "px";
-    toggleBtn.textContent = "⮜";
-  }
+  toggleBtn.textContent = sidebar.classList.contains("collapsed") ? "⮞" : "⮜";
 });
   
 </script>
