@@ -169,6 +169,7 @@ button:disabled {
   cursor: pointer;
 }
 
+  /*efekt podświetlenia pozycji w liście planet*/
 #planetListSidebar li:hover {
   background: #27407a;
 }
@@ -195,13 +196,6 @@ button:disabled {
   cursor: pointer;
   transition: right 0.3s ease, transform 0.3s ease;
 }
-
-/* Gdy panel jest zwinięty, guzik przy krawędzi */
-#planetSidebar.collapsed + #toggleSidebarBtn {
-  right: 10px;
-  transform: rotate(180deg); /* strzałka w lewo */
-}
-
   
 /* Filtry punktów */
 #pointFilters {
@@ -1621,7 +1615,14 @@ const planetSidebar = document.getElementById("planetSidebar");
 
 toggleSidebarBtn.addEventListener("click", () => {
   planetSidebar.classList.toggle("collapsed");
-  toggleSidebarBtn.innerHTML = planetSidebar.classList.contains("collapsed") ? "&#9664;" : "&#9654;";
+
+  if (planetSidebar.classList.contains("collapsed")) {
+    toggleSidebarBtn.innerHTML = "&#9664;"; // strzałka w lewo
+    toggleSidebarBtn.style.right = "10px";
+  } else {
+    toggleSidebarBtn.innerHTML = "&#9654;"; // strzałka w prawo
+    toggleSidebarBtn.style.right = "260px"; // zgodnie z szerokością panelu
+  }
 });
 
   
