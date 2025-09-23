@@ -320,7 +320,7 @@ button:disabled {
     <!-- Zakładka PUNKTY -->
     <div id="punkty" class="tab-content">
       <div id="pointFilters">
-        <label>Filtruj</label>
+        <div><label>Filtruj</label></div>
         <label>Zasób <input type="checkbox" class="pointFilter" value="Zasób" checked></label>
         <label>Baza <input type="checkbox" class="pointFilter" value="Baza" checked></label>
         <label>Ruiny <input type="checkbox" class="pointFilter" value="Ruiny" checked></label>
@@ -1097,9 +1097,10 @@ function addPoint(){
   }
 
   const point = {planet: currentPlanet, lat, lng, name, type, notes, timestamp: Date.now()};
-  if(type==="Zasób") point.extracted=false;
-  if(["Inne", "Ruiny", "Struktura"].includes(type)) point.visited = false;
- if (editIndex !== null && atlas[currentPlanet][editIndex]) {
+  // Domyślnie wszystkie punkty są odwiedzone i wydobyte
+    if(type === "Zasób") point.extracted = true; 
+    if(["Inne", "Ruiny", "Struktura"].includes(type)) point.visited = true; 
+    if (editIndex !== null && atlas[currentPlanet][editIndex]) {
   atlas[currentPlanet][editIndex] = point;
   // po nadpisaniu resetujemy stan edycji i chowamy Anuluj
   cancelEditPoint();
