@@ -136,31 +136,57 @@ button:disabled {
   }
   
 /* Lista planet */
+
 #planetSidebar {
   position: fixed;
   top: 0;
-  right: 0;                       /* panel po prawej stronie */
-  height: 100%;                   /* pełna wysokość okna */
-  width: 220px;                    /* szerokość panelu */
-  background: rgba(10, 30, 60, 0.8); /* półprzezroczyste tło */
+  right: 0;
+  height: 100%;
+  width: 220px;
+  background: rgba(10, 30, 60, 0.9);
   color: white;
   padding: 0.8rem;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  box-shadow: -2px 0 10px rgba(0,0,0,0.5);
   box-sizing: border-box;
-  overflow-y: auto;               /* scroll przy długiej liście */
-  z-index: 11;                    /* nad globem */
-  border-left: 2px solid #102b56; /* lekki oddzielający pasek */
+  overflow-y: auto;
+  z-index: 11;
+  border-left: 2px solid #102b56;
   font-size: 14px;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  overflow-y: auto;
+  transition: transform 0.4s ease-in-out; /* animacja */
+  transform: translateX(0);               /* domyślnie widoczny */
 }
 
-/* Ukryty panel przesuwamy w lewo */
+/* Ukryty panel – chowamy w prawo */
 #planetSidebar.hidden {
-  transform: translateX(-100%);
+  transform: translateX(100%);
 }
+
+/* Przycisk do pokazywania/ukrywania panelu */
+#togglePlanetSidebarBtn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  background: linear-gradient(135deg, #1976d2, #42a5f5);
+  border: none;
+  color: white;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: background 0.3s, transform 0.2s;
+  width: auto;   /* nadpisuje globalne button { width: 100% } */
+}
+
+#togglePlanetSidebarBtn:hover {
+  background: linear-gradient(135deg, #1565c0, #1e88e5);
+  transform: scale(1.05);
+}
+
   
 /* Reset stylów listy <ul> w panelu z planetami */
 #planetListSidebar ul {
