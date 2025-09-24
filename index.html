@@ -145,12 +145,13 @@ button:disabled {
   padding: 0.8rem;
   box-sizing: border-box;
   overflow-y: auto;               /* scroll przy długiej liście */
-  z-index: 10;                    /* nad globem */
+  z-index: 11;                    /* nad globem */
   border-left: 2px solid #102b56; /* lekki oddzielający pasek */
   font-size: 14px;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  transform: translateX(0);
   transition: transform 0.3s ease;
 }
  
@@ -183,7 +184,7 @@ button:disabled {
 #toggleSidebarBtn {
   position: absolute;
   top: 10px;
-  right: 10px; /* stałe, nie zmieniamy w JS */
+  right: 260px; /* startowo przy panelu */
   z-index: 20;  /* nad panelem */
   width: 30px;
   height: 30px;
@@ -194,6 +195,10 @@ button:disabled {
   font-size: 18px;
   cursor: pointer;
   transition: transform 0.3s ease;
+}
+ 
+  #toggleSidebarBtn.collapsed {
+  right: 10px;
 }
   
 /* Filtry punktów */
@@ -1609,14 +1614,20 @@ window.onload = () => {
   };
 
 // Logika do zwijania bocznego panelu
-const toggleBtn = document.getElementById("toggleSidebarBtn");
-const sidebar = document.getElementById("planetSidebar");
+const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
+const planetSidebar = document.getElementById("planetSidebar");
 
-toggleBtn.addEventListener("click", () => {
-  sidebar.classList.toggle("collapsed");
-  toggleBtn.innerHTML = sidebar.classList.contains("collapsed") ? "&#9664;" : "&#9654;";
+toggleSidebarBtn.addEventListener("click", () => {
+  planetSidebar.classList.toggle("collapsed");
+  toggleSidebarBtn.classList.toggle("collapsed");
+
+  // Zmieniamy ikonę strzałki
+  if (planetSidebar.classList.contains("collapsed")) {
+    toggleSidebarBtn.innerHTML = "&#9664;"; // strzałka w lewo
+  } else {
+    toggleSidebarBtn.innerHTML = "&#9654;"; // strzałka w prawo
+  }
 });
-
   
 </script>
 </body>
