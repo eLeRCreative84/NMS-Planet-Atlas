@@ -493,6 +493,7 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
+let sidebarVisible = true; // Zmienna przechowująca stan widoczności panelu
   
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -1578,9 +1579,6 @@ if(sortSelect) {
 }
   
 globe.showGraticules(true).graticuleLineWidth(0.5);
-
-// Zmienna przechowująca stan widoczności panelu
-let sidebarVisible = true;
 
 // start
 window.onload = () => {
