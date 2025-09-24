@@ -168,7 +168,8 @@ button:disabled {
 #togglePlanetSidebarBtn {
   position: fixed;
   top: 1rem;
-  left: 1rem;
+  right: 1rem; /* zamiast left */
+  left: auto;
   z-index: 1000;
   background: linear-gradient(135deg, #1976d2, #42a5f5);
   border: none;
@@ -179,7 +180,7 @@ button:disabled {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   transition: background 0.3s, transform 0.2s;
-  width: auto;   /* nadpisuje globalne button { width: 100% } */
+  width: auto; /* nadpisuje globalne button { width: 100% } */
 }
 
 #togglePlanetSidebarBtn:hover {
@@ -1718,6 +1719,7 @@ window.onload = () => {
       }
     });
   }
+};
    
 </script>
 </body>
