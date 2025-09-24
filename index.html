@@ -333,7 +333,7 @@ button:disabled {
 
 
 <!-- PRZYCISK: Ukryj/Pokaż panel (klasa lock-while-edit -> będzie podlegać blokadzie edycji) -->
-  <button id="toggleSidebarBtn" class="lock-while-edit" style="width:100%; margin-bottom:0.5rem;">
+  <button id="togglePlanetSidebarBtn" class="lock-while-edit" style="width:100%; margin-bottom:0.5rem;">
     Ukryj panel
   </button>
       
@@ -588,16 +588,19 @@ function savePlanetDetails(){
 }
   // Renderowanie list planet na wizualizacji globu
 function refreshPlanetSidebar() {
-  const sidebar = document.getElementById("planetSidebar"); // cały panel
+  const sidebar = document.getElementById("planetSidebar");
 
-  // jeśli panel jest ukryty, nic nie rób
+  // Jeśli panel jest ukryty, nic nie rób
   if (sidebar.classList.contains("hidden")) return;
 
-  const listContainer = document.getElementById("planetListSidebar");
-  listContainer.innerHTML = ""; // czyścimy listę
+  sidebar.innerHTML = `
+    <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
+    <div id="planetListSidebar"></div>
+  `;
 
   if (!atlas) return;
 
+  const listContainer = document.getElementById("planetListSidebar");
   const grouped = getGroupedPlanets(); // zachowuje systemy
 
   grouped.forEach(system => {
@@ -638,16 +641,19 @@ function refreshPlanetSidebar() {
   });
 }
 
-  // Toggle panelu
+// Funkcja do toggle panelu
 function togglePlanetSidebar() {
   const sidebar = document.getElementById("planetSidebar");
   sidebar.classList.toggle("hidden");
   
-  // tylko jeśli teraz jest widoczny, odśwież listę
+  // Jeśli panel jest teraz widoczny, odśwież listę planet
   if (!sidebar.classList.contains("hidden")) {
     refreshPlanetSidebar();
   }
 }
+
+// Podłącz przycisk
+document.getElementById("togglePlanetSidebarBtn").addEventListener("click", togglePlanetSidebar);
  
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
