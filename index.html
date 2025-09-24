@@ -159,10 +159,6 @@ button:disabled {
   transform: translateX(0); /* widoczny */
 }
 
-#planetSidebar.hidden {
-  transform: translateX(100%); /* płynnie chowa się w prawo */
-}
-
 /* Ukryty panel – chowamy w prawo */
 #planetSidebar.hidden {
   transform: translateX(100%);
@@ -216,13 +212,6 @@ button:disabled {
   background: #27407a;
 }
 
-/* globalna klasa, którą możemy nakładać na dowolny element (w tym na #planetSidebar) */ 
-/* służy do schowania danego elementu */
-.hidden {
-  display: none !important;
-}
-
-  
 /* Filtry punktów */
 #pointFilters {
   display: grid;
@@ -670,14 +659,18 @@ function savePlanetDetails(){
     });
   });
 }
-
+ 
 // Funkcja do toggle panelu
 function togglePlanetSidebar() {
   const sidebar = document.getElementById("planetSidebar");
+  const btn = document.getElementById("togglePlanetSidebarBtn");
+
   sidebar.classList.toggle("hidden");
-  
   // Jeśli panel jest teraz widoczny, odśwież listę planet
-  if (!sidebar.classList.contains("hidden")) {
+  if (sidebar.classList.contains("hidden")) {
+    btn.textContent = "▶"; // panel ukryty → strzałka w prawo
+  } else {
+    btn.textContent = "◀"; // panel widoczny → strzałka w lewo
     refreshPlanetSidebar();
   }
 }
@@ -1709,23 +1702,6 @@ window.onload = () => {
   updateNoPlanetsMessage();
   updateCurrentPlanetHeader();
   checkNewPlanetInput();
-
-// ----------------- Inicjalizacja przycisku Ukryj/Pokaż panel -----------------
-    const toggleBtn = document.getElementById("toggleSidebarBtn");
-  const planetSidebar = document.getElementById("planetSidebar");
-
-  if (toggleBtn && planetSidebar) {
-    toggleBtn.addEventListener("click", () => {
-      planetSidebar.classList.toggle("hidden"); // dodaje/usuwa klasę
-
-      if (planetSidebar.classList.contains("hidden")) {
-        toggleBtn.textContent = ">";
-      } else {
-        toggleBtn.textContent = "<";
-      }
-    });
-  }
-};
    
 </script>
 </body>
