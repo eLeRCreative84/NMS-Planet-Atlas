@@ -1707,11 +1707,13 @@ window.onload = () => {
   checkNewPlanetInput();
 
 // ----------------- Inicjalizacja przycisku Ukryj/Pokaż panel -----------------
-  document.getElementById("sidebarToggle").addEventListener("click", () => {
+  const toggleBtn = document.getElementById("toggleSidebarBtn");
   const sidebar = document.getElementById("planetSidebar");
-  sidebar.classList.toggle("hidden");
-  });
- };
+
+    toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+    toggleBtn.innerHTML = sidebar.classList.contains("collapsed") ? "&#9664;" : "&#9654;";
+});
    
 </script>
 </body>
