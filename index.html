@@ -212,15 +212,11 @@ button:disabled {
   margin: 0 auto;
 }
 
-
-
+/* globalna klasa, którą możemy nakładać na dowolny element (w tym na #planetSidebar) */ 
+/* służy do schowania danego elementu */
 .hidden {
   display: none !important;
 }
-
-
-
-  
  
 </style>
 </head>
@@ -583,6 +579,7 @@ function savePlanetDetails(){
   alert("Opis zapisany!");
   refreshPlanetList();
   updateCurrentPlanetHeader();
+  refreshPlanetSidebar();
 }
   // Renderowanie list planet na wizualizacji globu
   function refreshPlanetSidebar() {
@@ -745,7 +742,6 @@ function addNewPlanet() {
 }
   
 // Lista planet
-
 // Zwraca dane do renderowania – tylko sortowanie i grupowanie
 function getGroupedPlanets() {
   const createdAtMap = {};
