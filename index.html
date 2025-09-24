@@ -1176,6 +1176,7 @@ function addPoint(){
   atlas[currentPlanet][editIndex] = point;
   // po nadpisaniu resetujemy stan edycji i chowamy Anuluj
   cancelEditPoint();
+  openTab("punkty");
 } else {
   atlas[currentPlanet].push(point);
 }
@@ -1261,6 +1262,7 @@ function cancelEditPoint() {
 
   isEditing = false;
   setButtonsDisabled(false);
+  openTab("punkty");
 }
 
 // Utomatyczne tworzenie biegunów
