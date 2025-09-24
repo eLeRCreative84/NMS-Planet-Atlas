@@ -166,16 +166,16 @@ button:disabled {
 
 /* Przycisk do pokazywania/ukrywania panelu */
 #togglePlanetSidebarBtn {
-  position: fixed;
+  position: absolute; 
   top: 1rem;
-  right: 1rem;
+  right: 220px; /* szerokość panelu */
   z-index: 1000;
   width: 40px;        /* kwadratowy przycisk */
   height: 40px;
   display: flex;      /* wyśrodkowanie strzałki */
   align-items: center;
   justify-content: center;
-  font-size: 20px;    /* wielkość strzałki */
+  font-size: 15px;    /* wielkość strzałki */
   background: linear-gradient(135deg, #1976d2, #42a5f5);
   border: none;
   color: white;
@@ -184,12 +184,15 @@ button:disabled {
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   transition: background 0.3s, transform 0.2s;
 }
-
+  
 #togglePlanetSidebarBtn:hover {
   background: linear-gradient(135deg, #1565c0, #1e88e5);
   transform: scale(1.1);
 }
 
+ #planetSidebar.hidden + #togglePlanetSidebarBtn {
+  right: 0.5rem; /* przy samym brzegu okna */
+}
   
 /* Reset stylów listy <ul> w panelu z planetami */
 #planetListSidebar ul {
@@ -661,16 +664,20 @@ function savePlanetDetails(){
 }
  
 // Funkcja do toggle panelu
-function togglePlanetSidebar() {
+let wasFirstPlanetShown = false;
+
+function togglePlanetSidebar(forceOpen = false) {
   const sidebar = document.getElementById("planetSidebar");
-  const btn = document.getElementById("togglePlanetSidebarBtn");
+
+  if (forceOpen) {
+    sidebar.classList.remove("hidden");
+    refreshPlanetSidebar();
+    return;
+  }
 
   sidebar.classList.toggle("hidden");
-  // Jeśli panel jest teraz widoczny, odśwież listę planet
-  if (sidebar.classList.contains("hidden")) {
-    btn.textContent = "▶"; // panel ukryty → strzałka w prawo
-  } else {
-    btn.textContent = "◀"; // panel widoczny → strzałka w lewo
+
+  if (!sidebar.classList.contains("hidden")) {
     refreshPlanetSidebar();
   }
 }
@@ -754,10 +761,11 @@ function addNewPlanet() {
   refreshPointsList();
   refreshGlobePoints();
   updateSelectedPlanetButtons();
-  // Sprawdź, czy panel planet jest ukryty – jeśli tak, pokaż go aby zainicjować pokaż / ukryj listę planet
-  const sidebar = document.getElementById("planetSidebar");
-    if (sidebar.classList.contains("hidden")) {
-    sidebar.classList.remove("hidden");
+  // okaż panel tylko przy pierwszej nowej planecie
+   if (!window.wasFirstPlanetShown) {
+    const sidebar = document.getElementById("planetSidebar");
+    sidebar.classList.remove("hidden"); 
+    window.wasFirstPlanetShown = true; // zapamiętaj, że już raz pokazaliśmy
   }
     refreshPlanetSidebar();
     // Ustaw od razu glob na wybraną teksturę
