@@ -322,6 +322,8 @@ button:disabled {
         </div>
       </div>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+      <!-- Przycisk do ukrywania/pokazywania panelu planet -->
+      <button id="toggleSidebarBtn" class="lock-while-edit" style="margin-bottom: 0.5rem;">Ukryj panel</button>
     </div>
     <!-- Zakładka PUNKTY -->
     <div id="punkty" class="tab-content">
@@ -470,9 +472,6 @@ button:disabled {
     <!-- glob -->
     <div id="globeViz"></div>
     
-    <!-- Przycisk do ukrywania/pokazywania panelu planet -->
-    <button id="toggleSidebarBtn" class="lock-while-edit" style="margin-bottom: 0.5rem;">Ukryj panel</button>
-
     <!-- Panel z listą planet po prawej stronie -->
     <div id="planetSidebar">
       <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
@@ -1580,36 +1579,8 @@ if(sortSelect) {
   
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
-////////////////////////////////////////////////////////////////////
-//-------- Ukrywanie / Pokazywanie panelu z listą planet ---------//
-////////////////////////////////////////////////////////////////////  
-
 // Zmienna przechowująca stan widoczności panelu
 let sidebarVisible = true;
-
-// Funkcja do przełączania widoczności panelu
-function toggleSidebar() {
-  const sidebar = document.getElementById("planetSidebar");
-  const globeContainer = document.getElementById("globeViz");
-  const toggleBtn = document.getElementById("toggleSidebarBtn");
-
-  if (sidebarVisible) {
-    // Ukryj panel
-    sidebar.style.display = "none";
-    globeContainer.style.width = "100%"; // glob zajmuje całą szerokość
-    toggleBtn.textContent = "Pokaż panel";
-  } else {
-    // Pokaż panel
-    sidebar.style.display = "block";
-    globeContainer.style.width = ""; // przywraca domyślną szerokość
-    toggleBtn.textContent = "Ukryj panel";
-  }
-
-  sidebarVisible = !sidebarVisible;
-}
-
-// Nasłuchiwacz kliknięcia przycisku
-document.getElementById("toggleSidebarBtn").addEventListener("click", toggleSidebar);
 
 // start
 window.onload = () => {
@@ -1619,7 +1590,25 @@ window.onload = () => {
   updateNoPlanetsMessage();
   updateCurrentPlanetHeader();
   checkNewPlanetInput();
-  };
+  // 🔹 Inicjalizacja przycisku ukrywania/pokazywania panelu
+  const toggleBtn = document.getElementById("toggleSidebarBtn");
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      const sidebar = document.getElementById("planetSidebar");
+      const globeContainer = document.getElementById("globeViz");
+      if (!sidebarVisible) {
+        sidebar.style.display = "block";
+        globeContainer.style.width = "";
+        toggleBtn.textContent = "Ukryj panel";
+      } else {
+        sidebar.style.display = "none";
+        globeContainer.style.width = "100%";
+        toggleBtn.textContent = "Pokaż panel";
+      }
+      sidebarVisible = !sidebarVisible;
+    });
+  }
+};
   
 </script>
 </body>
