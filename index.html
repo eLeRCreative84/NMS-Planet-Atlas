@@ -488,7 +488,7 @@ button:disabled {
     <div id="globeViz"></div>
     
     <!-- Panel z listą planet po prawej stronie -->
-    <div id="planetSidebar">
+    <div id="planetSidebar" class="hidden">
       <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
       <div id="planetListSidebar"></div>
     </div>
@@ -638,6 +638,16 @@ function refreshPlanetSidebar() {
   });
 }
 
+  // Toggle panelu
+function togglePlanetSidebar() {
+  const sidebar = document.getElementById("planetSidebar");
+  sidebar.classList.toggle("hidden");
+  
+  // tylko jeśli teraz jest widoczny, odśwież listę
+  if (!sidebar.classList.contains("hidden")) {
+    refreshPlanetSidebar();
+  }
+}
  
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
