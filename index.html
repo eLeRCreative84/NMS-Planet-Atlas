@@ -155,8 +155,12 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  transition: transform 0.4s ease-in-out; /* animacja */
-  transform: translateX(0);               /* domyślnie widoczny */
+  transition: transform 0.4s ease-in-out;
+  transform: translateX(0); /* widoczny */
+}
+
+#planetSidebar.hidden {
+  transform: translateX(100%); /* płynnie chowa się w prawo */
 }
 
 /* Ukryty panel – chowamy w prawo */
@@ -169,23 +173,25 @@ button:disabled {
   position: fixed;
   top: 1rem;
   right: 1rem;
-  left: auto;
   z-index: 1000;
+  width: 40px;        /* kwadratowy przycisk */
+  height: 40px;
+  display: flex;      /* wyśrodkowanie strzałki */
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;    /* wielkość strzałki */
   background: linear-gradient(135deg, #1976d2, #42a5f5);
   border: none;
   color: white;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   transition: background 0.3s, transform 0.2s;
-  width: auto; /* nadpisuje globalne button { width: 100% } */
 }
 
 #togglePlanetSidebarBtn:hover {
   background: linear-gradient(135deg, #1565c0, #1e88e5);
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
   
@@ -1713,9 +1719,9 @@ window.onload = () => {
       planetSidebar.classList.toggle("hidden"); // dodaje/usuwa klasę
 
       if (planetSidebar.classList.contains("hidden")) {
-        toggleBtn.textContent = "&#9664;";
+        toggleBtn.textContent = ""▶";
       } else {
-        toggleBtn.textContent = "&#9654;";
+        toggleBtn.textContent = "◀";
       }
     });
   }
