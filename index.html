@@ -486,7 +486,6 @@ button:disabled {
     </div>
     <!-- glob -->
     <div id="globeViz"></div>
-    
     <!-- Panel z listą planet po prawej stronie -->
     <div id="planetSidebar" class="hidden">
       <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
@@ -508,7 +507,6 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
-
   
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -587,10 +585,10 @@ function savePlanetDetails(){
   updateCurrentPlanetHeader();
 }
   // Renderowanie list planet na wizualizacji globu
-function refreshPlanetSidebar() {
+  function refreshPlanetSidebar() {
   const sidebar = document.getElementById("planetSidebar");
 
-  // Jeśli panel jest ukryty, nic nie rób
+  // Jeśli panel jest ukryty, nic nie rób aby nie blokować pokaż / ukryj listy planet
   if (sidebar.classList.contains("hidden")) return;
 
   sidebar.innerHTML = `
@@ -731,9 +729,13 @@ function addNewPlanet() {
   refreshPointsList();
   refreshGlobePoints();
   updateSelectedPlanetButtons();
-  refreshPlanetSidebar();
-  
-  // Ustaw od razu glob na wybraną teksturę
+  // Sprawdź, czy panel planet jest ukryty – jeśli tak, pokaż go aby zainicjować pokaż / ukryj listę planet
+  const sidebar = document.getElementById("planetSidebar");
+    if (sidebar.classList.contains("hidden")) {
+    sidebar.classList.remove("hidden");
+  }
+    refreshPlanetSidebar();
+    // Ustaw od razu glob na wybraną teksturę
   globe.globeImageUrl(textureBase64);
   
     input.value = "";
@@ -831,7 +833,7 @@ function renderPlanetRow(p) {
   btn.style.borderRadius = "4px";
   btn.style.cursor = "pointer";
 
-// 🔥 Podświetlanie wybranej planety
+// Podświetlanie wybranej planety
   if (p === currentPlanet) {
     btn.style.background = "#1976d2";  // niebieski
     btn.style.color = "white";
@@ -839,7 +841,7 @@ function renderPlanetRow(p) {
   }
   
   btn.onclick = () => {
-    if (isEditing) return; // 🚫 blokada w trybie edycji
+    if (isEditing) return; // blokada w trybie edycji
     currentPlanet = p;
     updateCurrentPlanetHeader();
     addPoles(p);
@@ -914,7 +916,7 @@ const box = document.getElementById("editPlanetBox");
   box.style.gap = "0.5rem"; // żeby input i przyciski były ładnie obok siebie
   input.focus();
 
-  // 🚫 wyłącz inne przyciski
+  // wyłącz inne przyciski
   setButtonsDisabled(true);
   }
   
