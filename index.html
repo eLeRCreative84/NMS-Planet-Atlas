@@ -530,7 +530,7 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
-let wasFirstPlanetShown = false;
+
 
   
 ////////////////////////////////////////////////////////////////////
@@ -666,19 +666,16 @@ function savePlanetDetails(){
 }
  
 // Funkcja do toggle panelu
-function togglePlanetSidebar(forceOpen = false) {
+function togglePlanetSidebar() {
   const sidebar = document.getElementById("planetSidebar");
-
-  if (forceOpen) {
-    sidebar.classList.remove("hidden");
-    refreshPlanetSidebar();
-    return;
-  }
+  const btn = document.getElementById("togglePlanetSidebarBtn");
 
   sidebar.classList.toggle("hidden");
 
-  // tylko jeśli panel otwarty → odśwież listę
-  if (!sidebar.classList.contains("hidden")) {
+  if (sidebar.classList.contains("hidden")) {
+    btn.textContent = "▶"; // panel ukryty → strzałka w prawo
+  } else {
+    btn.textContent = "◀"; // panel widoczny → strzałka w lewo
     refreshPlanetSidebar();
   }
 }
@@ -761,13 +758,7 @@ function addNewPlanet() {
   refreshPointsList();
   refreshGlobePoints();
   updateSelectedPlanetButtons();
- 
-  if (!window.wasFirstPlanetShown) {
-    const sidebar = document.getElementById("planetSidebar");
-    sidebar.classList.remove("hidden"); 
-    window.wasFirstPlanetShown = true; // zapamiętaj, że już raz pokazaliśmy
-  }
-    refreshPlanetSidebar();
+  refreshPlanetSidebar();
     // Ustaw od razu glob na wybraną teksturę
   globe.globeImageUrl(textureBase64);
   
