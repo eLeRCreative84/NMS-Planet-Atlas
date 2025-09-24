@@ -320,6 +320,15 @@ button:disabled {
         </div>
       </div>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+
+
+<!-- PRZYCISK: Ukryj/Pokaż panel (klasa lock-while-edit -> będzie podlegać blokadzie edycji) -->
+  <button id="toggleSidebarBtn" class="lock-while-edit" style="width:100%; margin-bottom:0.5rem;">
+    Ukryj panel
+  </button>
+      
+
+      
     </div>
     <!-- Zakładka PUNKTY -->
     <div id="punkty" class="tab-content">
@@ -489,6 +498,7 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
+let sidebarVisible = true;
   
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -1635,6 +1645,32 @@ window.onload = () => {
   updateNoPlanetsMessage();
   updateCurrentPlanetHeader();
   checkNewPlanetInput();
+
+// ----------------- Inicjalizacja przycisku Ukryj/Pokaż panel -----------------
+  const toggleBtn = document.getElementById("toggleSidebarBtn");
+  const planetSidebar = document.getElementById("planetSidebar");
+
+  // zabezpieczenie: jeśli któregoś elementu brak (nie powinno się zdarzyć),
+  // to nie robimy nic (chroni przed błędami)
+  if (toggleBtn && planetSidebar) {
+    toggleBtn.addEventListener("click", () => {
+      // odwróć flagę (true -> false, false -> true)
+      sidebarVisible = !sidebarVisible;
+
+      if (sidebarVisible) {
+        // pokaż panel
+        planetSidebar.style.display = "";
+        toggleBtn.textContent = "Ukryj panel";
+      } else {
+        // ukryj panel
+        planetSidebar.style.display = "none";
+        toggleBtn.textContent = "Pokaż panel";
+      }
+    });
+  }
+
+
+  
   };
   
 </script>
