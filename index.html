@@ -1698,13 +1698,20 @@ window.onload = () => {
   checkNewPlanetInput();
 
 // ----------------- Inicjalizacja przycisku Ukryj/Pokaż panel -----------------
-  const toggleBtn = document.getElementById("toggleSidebarBtn");
-  const sidebar = document.getElementById("planetSidebar");
+    const toggleBtn = document.getElementById("toggleSidebarBtn");
+  const planetSidebar = document.getElementById("planetSidebar");
 
+  if (toggleBtn && planetSidebar) {
     toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
-    toggleBtn.innerHTML = sidebar.classList.contains("collapsed") ? "&#9664;" : "&#9654;";
-});
+      planetSidebar.classList.toggle("hidden"); // dodaje/usuwa klasę
+
+      if (planetSidebar.classList.contains("hidden")) {
+        toggleBtn.textContent = "&#9664;";
+      } else {
+        toggleBtn.textContent = "&#9654;";
+      }
+    });
+  }
    
 </script>
 </body>
