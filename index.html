@@ -356,15 +356,6 @@ button:disabled {
         </div>
       </div>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-
-
-<!-- PRZYCISK: Ukryj/Pokaż panel (klasa lock-while-edit -> będzie podlegać blokadzie edycji) -->
-  <button id="togglePlanetSidebarBtn" class="lock-while-edit" style="width:100%; margin-bottom:0.5rem;">
-    Ukryj panel
-  </button>
-      
-
-      
     </div>
     <!-- Zakładka PUNKTY -->
     <div id="punkty" class="tab-content">
@@ -513,7 +504,7 @@ button:disabled {
     <!-- glob -->
     <div id="globeViz"></div>
     <!-- Panel z listą planet po prawej stronie -->
-    <button id="sidebarToggle">☰ Planety</button>
+    <button id="togglePlanetSidebarBtn" class="lock-while-edit">&#9654;</button>
     <div id="planetSidebar" class="hidden">
       <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
       <div id="planetListSidebar"></div>
