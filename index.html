@@ -1617,20 +1617,24 @@ window.onload = () => {
   };
 
 // Logika do zwijania bocznego panelu
-const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
-const planetSidebar = document.getElementById("planetSidebar");
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
+  const planetSidebar = document.getElementById("planetSidebar");
 
-toggleSidebarBtn.addEventListener("click", () => {
-  planetSidebar.classList.toggle("collapsed");
-  toggleSidebarBtn.classList.toggle("collapsed");
+  if (!toggleSidebarBtn || !planetSidebar) return;
 
-  // Zmieniamy ikonę strzałki
-  if (planetSidebar.classList.contains("collapsed")) {
-    toggleSidebarBtn.innerHTML = "&#9664;"; // strzałka w lewo
-  } else {
-    toggleSidebarBtn.innerHTML = "&#9654;"; // strzałka w prawo
-  }
+  toggleSidebarBtn.addEventListener("click", () => {
+    planetSidebar.classList.toggle("collapsed");
+    toggleSidebarBtn.classList.toggle("collapsed");
+
+    if (planetSidebar.classList.contains("collapsed")) {
+      toggleSidebarBtn.innerHTML = "&#9664;";
+    } else {
+      toggleSidebarBtn.innerHTML = "&#9654;";
+    }
+  });
 });
+
   
 </script>
 </body>
