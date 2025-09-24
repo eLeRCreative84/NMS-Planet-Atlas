@@ -137,7 +137,7 @@ button:disabled {
   
 /* Lista planet */
 #planetSidebar {
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;                       /* panel po prawej stronie */
   height: 100%;                   /* pełna wysokość okna */
@@ -145,6 +145,7 @@ button:disabled {
   background: rgba(10, 30, 60, 0.8); /* półprzezroczyste tło */
   color: white;
   padding: 0.8rem;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
   box-sizing: border-box;
   overflow-y: auto;               /* scroll przy długiej liście */
   z-index: 11;                    /* nad globem */
@@ -153,8 +154,36 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  overflow-y: auto;
 }
- 
+
+/* Ukryty panel przesuwamy w lewo */
+#planetSidebar.hidden {
+  transform: translateX(-100%);
+}
+
+/* Przycisk toggle */
+#sidebarToggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1100;
+  background: linear-gradient(135deg, #1976d2, #42a5f5);
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: background 0.3s, transform 0.2s;
+}
+
+#sidebarToggle:hover {
+  background: linear-gradient(135deg, #1565c0, #1e88e5);
+  transform: scale(1.05);
+}
+  
 /* Reset stylów listy <ul> w panelu z planetami */
 #planetListSidebar ul {
   list-style: none;       /* usuwa domyślne "kropki" (•) z listy */
@@ -175,6 +204,13 @@ button:disabled {
 #planetListSidebar li:hover {
   background: #27407a;
 }
+
+/* globalna klasa, którą możemy nakładać na dowolny element (w tym na #planetSidebar) */ 
+/* służy do schowania danego elementu */
+.hidden {
+  display: none !important;
+}
+
   
 /* Filtry punktów */
 #pointFilters {
@@ -210,12 +246,6 @@ button:disabled {
 
 #extraFilters input[type="checkbox"] {
   margin: 0 auto;
-}
-
-/* globalna klasa, którą możemy nakładać na dowolny element (w tym na #planetSidebar) */ 
-/* służy do schowania danego elementu */
-.hidden {
-  display: none !important;
 }
  
 </style>
@@ -483,6 +513,7 @@ button:disabled {
     <!-- glob -->
     <div id="globeViz"></div>
     <!-- Panel z listą planet po prawej stronie -->
+    <button id="sidebarToggle">☰ Planety</button>
     <div id="planetSidebar" class="hidden">
       <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
       <div id="planetListSidebar"></div>
@@ -1676,25 +1707,12 @@ window.onload = () => {
   checkNewPlanetInput();
 
 // ----------------- Inicjalizacja przycisku Ukryj/Pokaż panel -----------------
-  const toggleBtn = document.getElementById("toggleSidebarBtn");
-  const planetSidebar = document.getElementById("planetSidebar");
-
-  if (toggleBtn && planetSidebar) {
-    toggleBtn.addEventListener("click", () => {
-      planetSidebar.classList.toggle("hidden"); // dodaje/usuwa klasę
-
-      if (planetSidebar.classList.contains("hidden")) {
-        toggleBtn.textContent = "Pokaż panel";
-      } else {
-        toggleBtn.textContent = "Ukryj panel";
-      }
-    });
-  }
-
-
-  
-  };
-  
+  document.getElementById("sidebarToggle").addEventListener("click", () => {
+  const sidebar = document.getElementById("planetSidebar");
+  sidebar.classList.toggle("hidden");
+  });
+ };
+   
 </script>
 </body>
 </html>
