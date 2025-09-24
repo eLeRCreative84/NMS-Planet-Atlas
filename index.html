@@ -1309,6 +1309,30 @@ function createStarTexture() {
 document.getElementById("myLat").addEventListener("input", updateMyLocation);
 document.getElementById("myLng").addEventListener("input", updateMyLocation);
 
+// Ograniczenie zakresu dla mojej lokalizacji
+const myLatInput = document.getElementById("myLat");
+const myLngInput = document.getElementById("myLng");
+
+function clampMyLatLng() {
+  let lat = parseFloat(myLatInput.value);
+  let lng = parseFloat(myLngInput.value);
+
+  if (!isNaN(lat)) {
+    if (lat < -90) lat = -90;
+    if (lat > 90) lat = 90;
+    myLatInput.value = lat;
+  }
+
+  if (!isNaN(lng)) {
+    if (lng < -180) lng = -180;
+    if (lng > 180) lng = 180;
+    myLngInput.value = lng;
+  }
+}
+
+myLatInput.addEventListener("input", clampMyLatLng);
+myLngInput.addEventListener("input", clampMyLatLng);
+ 
 // odświeżamy glob z uwzględnieniem mnożnika wysokości
  function refreshGlobePoints() {
     if (!currentPlanet) return;
