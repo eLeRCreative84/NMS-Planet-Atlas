@@ -154,7 +154,7 @@ button:disabled {
   flex-direction: column;
   gap: 0.3rem;
 }
-
+ 
 /* Reset stylów listy <ul> w panelu z planetami */
 #planetListSidebar ul {
   list-style: none;       /* usuwa domyślne "kropki" (•) z listy */
@@ -320,8 +320,6 @@ button:disabled {
         </div>
       </div>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-      <!-- Przycisk do ukrywania/pokazywania panelu planet -->
-      <button id="toggleSidebarBtn" class="lock-while-edit" style="margin-bottom: 0.5rem;">Ukryj panel</button>
     </div>
     <!-- Zakładka PUNKTY -->
     <div id="punkty" class="tab-content">
@@ -491,7 +489,6 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
-let sidebarVisible = true; // Zmienna przechowująca stan widoczności panelu
   
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -974,6 +971,31 @@ function setButtonsDisabled(disabled) {
 ////////////////////////////////////////////////////////////////////
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
 //////////////////////////////////////////////////////////////////// 
+
+// Ograniczenie zakresów imputów X I Y
+const latInput = document.getElementById("lat");
+const lngInput = document.getElementById("lng");
+
+function clampLatLng() {
+  let lat = parseFloat(latInput.value);
+  let lng = parseFloat(lngInput.value);
+
+  if (!isNaN(lat)) {
+    if (lat < -90) lat = -90;
+    if (lat > 90) lat = 90;
+    latInput.value = lat;
+  }
+
+  if (!isNaN(lng)) {
+    if (lng < -180) lng = -180;
+    if (lng > 180) lng = 180;
+    lngInput.value = lng;
+  }
+}
+
+// Nasłuchiwanie zmiany wartości
+latInput.addEventListener("input", clampLatLng);
+lngInput.addEventListener("input", clampLatLng);
   
 // Lista punktow
 function refreshPointsList() {
@@ -1586,25 +1608,7 @@ window.onload = () => {
   updateNoPlanetsMessage();
   updateCurrentPlanetHeader();
   checkNewPlanetInput();
-  // 🔹 Inicjalizacja przycisku ukrywania/pokazywania panelu
-  const toggleBtn = document.getElementById("toggleSidebarBtn");
-  if (toggleBtn) {
-    toggleBtn.addEventListener("click", () => {
-      const sidebar = document.getElementById("planetSidebar");
-      const globeContainer = document.getElementById("globeViz");
-      if (!sidebarVisible) {
-        sidebar.style.display = "block";
-        globeContainer.style.width = "";
-        toggleBtn.textContent = "Ukryj panel";
-      } else {
-        sidebar.style.display = "none";
-        globeContainer.style.width = "100%";
-        toggleBtn.textContent = "Pokaż panel";
-      }
-      sidebarVisible = !sidebarVisible;
-    });
-  }
-};
+  };
   
 </script>
 </body>
