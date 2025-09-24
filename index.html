@@ -1114,18 +1114,19 @@ function getFilteredPoints(points) {
         .map(cb => cb.value); // checkboxy dodatkowe
 
     return points.filter(p => {
+        // filtr po typach
         if (!activeTypes.includes(p.type)) return false;
-
+        // filtr Wydobyty / Niewydobyty dla Zasób
         if (p.type === "Zasób") {
             const extracted = !!p.extracted;
-            if (extracted && !activeExtras.includes("Wydobyty")) return false;
-            if (!extracted && !activeExtras.includes("Niewydobyty")) return false;
+            if (extracted && !activeExtras.includes("Wydobyty")) return false; // wydobyty, ale filtr Wydobyty nie zaznaczony → ukryj
+            if (!extracted && !activeExtras.includes("Niewydobyty")) return false; // niewydobyty, ale filtr Niewydobyty nie zaznaczony → ukryj
         }
-
+        // filtr Odwiedzony / Nieodwiedzony dla Ruiny/Struktura/Inne
         if (["Ruiny", "Struktura", "Inne"].includes(p.type)) {
             const visited = !!p.visited;
-            if (visited && !activeExtras.includes("Odwiedzony")) return false;
-            if (!visited && !activeExtras.includes("Nieodwiedzony")) return false;
+            if (visited && !activeExtras.includes("Odwiedzony")) return false; // odwiedzony, filtr Odwiedzony nie zaznaczony → ukryj
+            if (!visited && !activeExtras.includes("Nieodwiedzony")) return false; // nieodwiedzony, filtr Nieodwiedzony nie zaznaczony → ukryj
         }
 
         return true;
