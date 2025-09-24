@@ -8,16 +8,6 @@
 <style>
   body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
   #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
- 
-  
-  #form.collapsed {
-  flex: 0 0 40px; /* lub 0 */
-  min-width: 40px; 
-  max-width: 40px;
-  overflow: hidden;
-}
-
-  
   #globeViz { flex: 1; background: black; position: relative; }
   /* upewniamy się że canvas zajmuje cały obszar kontenera */
   #globeViz canvas { width: 100% !important; height: 100% !important; display: block; background: transparent; }
@@ -100,7 +90,7 @@
   margin: 0 auto;   /* ustawia automatyczne marginesy poziome → efekt: wycentrowanie canvasa w kontenerze */
 }
 
-  /* Nagłówek nad wizualizacją planety */
+/* Nagłówek nad wizualizacją planety */
 #planetOverlayHeader {
   position: absolute;
   top: 10px;
@@ -186,32 +176,6 @@ button:disabled {
   /*efekt podświetlenia pozycji w liście planet*/
 #planetListSidebar li:hover {
   background: #27407a;
-}
-
-/* Transformacja przy zwinięciu */
-#planetSidebar.collapsed {
-  transform: translateX(100%);
- }
-
-/* Guzik do zwijania */
-#toggleSidebarBtn {
-  position: absolute;
-  top: 10px;
-  right: 260px; /* startowo przy panelu */
-  z-index: 20;  /* nad panelem */
-  width: 30px;
-  height: 30px;
-  border: none;
-  border-radius: 4px;
-  background: #1976d2;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
- 
-  #toggleSidebarBtn.collapsed {
-  right: 10px;
 }
   
 /* Filtry punktów */
@@ -511,10 +475,7 @@ button:disabled {
       <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
       <div id="planetListSidebar"></div>
     </div>
-   
-    <!-- Guzik zwijania panelu -->
-    <button id="toggleSidebarBtn">&#9654;</button> <!-- strzałka w prawo -->
-  </div>
+   </div>
 
 <script>
 let atlas = {};
@@ -1625,26 +1586,6 @@ window.onload = () => {
   updateCurrentPlanetHeader();
   checkNewPlanetInput();
   };
-
-// Logika do zwijania bocznego panelu
-document.addEventListener("DOMContentLoaded", () => {
-  const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
-  const planetSidebar = document.getElementById("planetSidebar");
-
-  if (!toggleSidebarBtn || !planetSidebar) return;
-
-  toggleSidebarBtn.addEventListener("click", () => {
-    planetSidebar.classList.toggle("collapsed");
-    toggleSidebarBtn.classList.toggle("collapsed");
-
-    if (planetSidebar.classList.contains("collapsed")) {
-      toggleSidebarBtn.innerHTML = "&#9664;";
-    } else {
-      toggleSidebarBtn.innerHTML = "&#9654;";
-    }
-  });
-});
-
   
 </script>
 </body>
