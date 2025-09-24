@@ -63,29 +63,31 @@
   text-align: center;
 }
   
-/* Ustawienia wizualizacji globu */
+/* Ustawienia głównego kontenera wizualizacji globu w którym znajduje się m.in. glob, nagłówek, moja lokalizacja, panel boczny */
 #globeWrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;           /* flexbox */
-  justify-content: center; /* poziome centrowanie */
-  align-items: center;     /* pionowe centrowanie */
-  overflow: hidden;        /* żeby nic nie wystawało */
+/*  position: relative;        /* kluczowe: wszystko z position:absolute (np. panel, przycisk) liczy się względem tego kontenera */
+  width: 100%;               /* na całą szerokość okna */
+  height: 100%;              /* na całą wysokość okna */
+/*  display: flex;             /* flexbox włączony */
+/*  justify-content: center;   /* dzieci flexa wyśrodkowane poziomo */
+/*  align-items: center;       /* dzieci flexa wyśrodkowane pionowo */
+/*  overflow: hidden;          /* elementy wystające poza wrapper są ucinane */
+  
 }
-
+/* Stylowanie dla całego kontenera #globeViz */
 #globeViz {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;        /* umożliwia pozycjonowanie absolutne elementów wewnątrz (np. overlayów) */
+  width: 100%;               /* pełna szerokość rodzica (#globeWrapper) */
+  height: 100%;              /* pełna wysokość rodzica (#globeWrapper) */
+  display: flex;             /* włącza Flexbox */
+  justify-content: center;   /* poziome centrowanie dzieci (canvas) */
+  align-items: center;       /* pionowe centrowanie dzieci (canvas) */
 }
-
+  
+/* Definiowanie kontenera w którym renderuje się glob (globe.gl / three.js). */
 #globeViz canvas {
-  display: block;
-  margin: 0 auto;
+  display: block;   /* zmienia canvas z inline na block – dzięki temu zachowuje się jak div i nie ma "spacji" obok */
+  margin: 0 auto;   /* ustawia automatyczne marginesy poziome → efekt: wycentrowanie canvasa w kontenerze */
 }
 
   /* Nagłówek nad wizualizacją planety */
@@ -155,19 +157,20 @@ button:disabled {
   transition: transform 0.3s ease;
 }
  
-/* Lista planet w panelu */
+/* Reset stylów listy <ul> w panelu z planetami */
 #planetListSidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none;       /* usuwa domyślne "kropki" (•) z listy */
+  padding: 0;             /* usuwa domyślny wewnętrzny odstęp od lewej strony */
+  margin: 0;              /* usuwa domyślny zewnętrzny odstęp wokół listy */
 }
 
+/* Wygląd pojedynczych planet w liście planet */
 #planetListSidebar li {
-  background: #1a2b4d;
-  margin: 0.3rem 0;
-  padding: 0.3rem;
-  border-radius: 5px;
-  cursor: pointer;
+  background: #1a2b4d;   /* ciemnoniebieskie tło każdego elementu listy */
+  margin: 0.3rem 0;      /* odstęp góra/dół między elementami */
+  padding: 0.3rem;       /* wewnętrzny odstęp tekstu od krawędzi */
+  border-radius: 5px;    /* zaokrąglenie rogów */
+  cursor: pointer;       /* zmiana kursora na "rączkę" przy najechaniu (klikalne) */
 }
 
   /*efekt podświetlenia pozycji w liście planet*/
