@@ -161,23 +161,6 @@ button:disabled {
 #planetSidebar.hidden {
   transform: translateX(-100%);
 }
-
-/* Przycisk toggle */
-#toggleSidebarBtn {
-  position: fixed;
-  top: 1rem;
-  left: 1rem;
-  z-index: 1100;
-  background: linear-gradient(135deg, #1976d2, #42a5f5);
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  transition: background 0.3s, transform 0.2s;
-}
   
 /* Reset stylów listy <ul> w panelu z planetami */
 #planetListSidebar ul {
@@ -499,11 +482,13 @@ button:disabled {
     <!-- glob -->
     <div id="globeViz"></div>
     <!-- Panel z listą planet po prawej stronie -->
-    <button id="togglePlanetSidebarBtn" class="lock-while-edit">&#9654;</button>
+    
     <div id="planetSidebar" class="hidden">
       <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
       <div id="planetListSidebar"></div>
     </div>
+    <!-- Przycisk do pokazywania/ukrywania panelu -->
+    <button id="togglePlanetSidebarBtn" style="position: fixed; top: 1rem; left: 1rem; z-index: 1000;"> Planety </button>
    </div>
 
 <script>
