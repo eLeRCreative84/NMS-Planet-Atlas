@@ -530,6 +530,7 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
+let wasFirstPlanetShown = false;
 
   
 ////////////////////////////////////////////////////////////////////
@@ -753,7 +754,6 @@ function addNewPlanet() {
     texture: textureBase64,  // Przypisanie koloru planety w formie tekstury
     extraInfo: {}, // miejsce na dodatkowe, niestandardowe dane planety
     createdAt: Date.now() //automatycznie zapisany czas dodania planety
-    
   });
   currentPlanet = name;
   updateCurrentPlanetHeader();
@@ -761,6 +761,11 @@ function addNewPlanet() {
   refreshPointsList();
   refreshGlobePoints();
   updateSelectedPlanetButtons();
+ 
+  if (!window.wasFirstPlanetShown) {
+    const sidebar = document.getElementById("planetSidebar");
+    sidebar.classList.remove("hidden"); 
+    window.wasFirstPlanetShown = true; // zapamiętaj, że już raz pokazaliśmy
   }
     refreshPlanetSidebar();
     // Ustaw od razu glob na wybraną teksturę
