@@ -586,10 +586,15 @@ function savePlanetDetails(){
   refreshPlanetList();
   updateCurrentPlanetHeader();
 }
-  //Renderowanie list planet na wizualizacji globu
-  function refreshPlanetSidebar() {
-  const sidebar = document.getElementById("planetListSidebar");
-  sidebar.innerHTML = "";
+  // Renderowanie list planet na wizualizacji globu
+function refreshPlanetSidebar() {
+  const sidebar = document.getElementById("planetSidebar"); // cały panel
+
+  // jeśli panel jest ukryty, nic nie rób
+  if (sidebar.classList.contains("hidden")) return;
+
+  const listContainer = document.getElementById("planetListSidebar");
+  listContainer.innerHTML = ""; // czyścimy listę
 
   if (!atlas) return;
 
@@ -601,7 +606,7 @@ function savePlanetDetails(){
     header.textContent = system.name === "Nieznany" ? "Nieznany układ" : "Układ: " + system.name;
     header.style.margin = "0.5rem 0";
     header.style.color = system.name === "Nieznany" ? "#aaa" : "#ffcc00";
-    sidebar.appendChild(header);
+    listContainer.appendChild(header);
 
     // planety w systemie
     system.planets.forEach(planetName => {
@@ -628,7 +633,7 @@ function savePlanetDetails(){
         refreshPlanetSidebar(); // odświeżamy sidebar, żeby podświetlenie działało
       };
 
-      sidebar.appendChild(li);
+      listContainer.appendChild(li);
     });
   });
 }
