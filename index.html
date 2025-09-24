@@ -211,6 +211,16 @@ button:disabled {
 #extraFilters input[type="checkbox"] {
   margin: 0 auto;
 }
+
+
+
+.hidden {
+  display: none !important;
+}
+
+
+
+  
  
 </style>
 </head>
@@ -498,7 +508,7 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
-let sidebarVisible = true;
+
   
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -1650,21 +1660,14 @@ window.onload = () => {
   const toggleBtn = document.getElementById("toggleSidebarBtn");
   const planetSidebar = document.getElementById("planetSidebar");
 
-  // zabezpieczenie: jeśli któregoś elementu brak (nie powinno się zdarzyć),
-  // to nie robimy nic (chroni przed błędami)
   if (toggleBtn && planetSidebar) {
     toggleBtn.addEventListener("click", () => {
-      // odwróć flagę (true -> false, false -> true)
-      sidebarVisible = !sidebarVisible;
+      planetSidebar.classList.toggle("hidden"); // dodaje/usuwa klasę
 
-      if (sidebarVisible) {
-        // pokaż panel
-        planetSidebar.style.display = "";
-        toggleBtn.textContent = "Ukryj panel";
-      } else {
-        // ukryj panel
-        planetSidebar.style.display = "none";
+      if (planetSidebar.classList.contains("hidden")) {
         toggleBtn.textContent = "Pokaż panel";
+      } else {
+        toggleBtn.textContent = "Ukryj panel";
       }
     });
   }
