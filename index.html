@@ -254,7 +254,65 @@ button:disabled {
 #extraFilters input[type="checkbox"] {
   margin: 0 auto;
 }
- 
+
+/* Minigaleria */
+#textureGalleryContainer {
+  background: #1a2b4d;
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: max-content;
+  margin: 0 auto;
+}
+
+#textureGallery {
+  display: grid;
+  grid-template-columns: repeat(6, 60px); /* 6 kolumn */
+  grid-template-rows: repeat(2, 60px);    /* 2 wiersze */
+  gap: 0.3rem;
+  overflow: hidden;
+  padding-right: 0.2rem; /* dodatkowe zabezpieczenie przed ucinaniem po prawej */
+  padding-bottom: 0.2rem; /* zabezpieczenie przed ucinaniem od dołu */
+}
+
+.texture-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 4px;
+}
+
+.texture-thumb:hover {
+  border-color: #42a5f5;
+}
+
+#textureGalleryControls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+#prevTexturePage, #nextTexturePage {
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+#prevTexturePage:disabled,
+#nextTexturePage:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 </style>
 </head>
 <body>
@@ -349,6 +407,14 @@ button:disabled {
           <button id="setColorBtn" class="lock-while-edit" onclick="changePlanetColor()">Zmień kolor</button>
         </div>
       </div>
+	    <!-- Galeria miniatur -->
+	  	<div id="textureGalleryContainer" class="lock-while-edit">
+  		  <div id="textureGallery"></div>
+  		  <div id="textureGalleryControls">
+  			  <button id="prevTexturePage" onclick="changeTexturePage(-1)">◀</button>
+  		  	<button id="nextTexturePage" onclick="changeTexturePage(1)">▶</button>
+		    </div>
+		  </div>
       <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
       <div class="planet-buttons-row" style="margin-bottom:1rem;">
         <button id="editSelectedPlanetBtn" onclick="editSelectedPlanet()" disabled>Zmień nazwę</button>
@@ -1452,21 +1518,43 @@ function addTextureUrl() {
     alert("Podaj URL tekstury!");
     return;
   }
-  
-  // Znajdź wpis planety w planetData
-  const planet = planetData.find(p => p.name === currentPlanet);
-  if (!planet) {
-    alert("Najpierw wybierz planetę!");
+
+  // sprawdzenie podstawowe, URL musi zaczynać się od http(s):// lub textures/
+  if (!/^https?:\/\/|^textures\//.test(texture)) {
+    alert("Nieprawidłowy URL lub lokalna ścieżka!");
     return;
   }
 
-  // zapisz nową teksturę w danych planety
-  planet.texture = texture;
+  // sprawdzamy, czy plik istnieje
+  const img = new Image();
+  img.src = texture;
+  img.onload = () => {
+    // obraz istnieje → zapisujemy w planetData
+    const planet = planetData.find(p => p.name === currentPlanet);
+    if (!planet) {
+      alert("Najpierw wybierz planetę!");
+      return;
+    }
 
-  // ustaw teksturę na globie
-  globe.globeImageUrl(texture);
+    // zapisz nową teksturę w danych planety
+    planet.texture = texture;
 
-  alert(`Dodano teksturę do planety ${currentPlanet}`);
+    // ustaw teksturę na globie
+    globe.globeImageUrl(texture);
+
+    // dopisanie do listy textures, jeśli nowa
+    if (!textures.includes(texture)) {
+      textures.push(texture);
+      // ustaw stronę galerii tak, by nowa miniatura była widoczna
+      currentTexturePage = Math.floor((textures.length - 1) / TEXTURES_PER_PAGE);
+      renderTexturePage();
+    }
+
+    alert(`Dodano teksturę do planety ${currentPlanet}`);
+  };
+  img.onerror = () => {
+    alert("Nie udało się załadować obrazu. Sprawdź URL lub lokalną ścieżkę.");
+  };
 }
 
   // Przełącznik aktywnej planety
@@ -1508,13 +1596,56 @@ function checkTextureInput() {
   const button = input.nextElementSibling; // przycisk obok pola
   button.disabled = input.value.trim() === "";
 }
-  
+
+//Galeria miniatur 
+const textures = []; // lista wszystkich tekstur
+let currentTexturePage = 0;
+const TEXTURES_PER_PAGE = 12; // 2 wiersze x 6 kolumn
+
+// renderuje aktualną stronę galerii
+function renderTexturePage() {
+  const gallery = document.getElementById('textureGallery');
+  gallery.innerHTML = '';
+
+  const start = currentTexturePage * TEXTURES_PER_PAGE;
+  const end = start + TEXTURES_PER_PAGE;
+  const pageTextures = textures.slice(start, end);
+
+  pageTextures.forEach(tex => {
+    const img = document.createElement('img');
+    img.src = tex;
+    img.className = 'texture-thumb';
+    img.title = tex;
+    img.onclick = () => {
+      document.getElementById('planetTextureUrl').value = tex;
+      addTextureUrl();
+    };
+    gallery.appendChild(img);
+  });
+
+  // włącz/wyłącz przyciski
+  document.getElementById('prevTexturePage').disabled = currentTexturePage === 0;
+  document.getElementById('nextTexturePage').disabled = end >= textures.length;
+}
+
+// zmiana strony galerii
+function changeTexturePage(delta) {
+  currentTexturePage += delta;
+  renderTexturePage();
+}
+
+
 ////////////////////////////////////////////////////////////////////
 //---------------- Eksport / Import Atlasu ---------------//
 ////////////////////////////////////////////////////////////////////  
 
 function exportAtlas(){
-  const blob = new Blob([JSON.stringify({atlas,planetDetails, planetData},null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({
+    atlas,
+    planetDetails,
+    planetData,
+    textures // dodajemy listę galerii do JSON
+  }, null, 2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -1532,24 +1663,30 @@ function importAtlas(event){
       const data = JSON.parse(e.target.result);
       if(data.atlas) atlas = data.atlas;
       if(data.planetDetails) planetDetails = data.planetDetails;
-      if(data.planetData) planetData = data.planetData; // Wczytanie planetData
-      // ustaw pierwszą planetę jako currentPlanet
-      const planets = Object.keys(atlas);
-     currentPlanet = planets[0] || null;
-      if (currentPlanet) {
-        selectPlanet(currentPlanet);   // od razu ustawia teksturę globu
-      } else {
-        globe.globeImageUrl(blackTextureURL); // brak planet → czarny glob
+      if(data.planetData) planetData = data.planetData;
+      if(data.textures) {
+        textures.length = 0;        // wyczyść obecną listę
+        textures.push(...data.textures); // wczytaj importowane
+        currentTexturePage = 0;     // ustaw początkową stronę
+        renderTexturePage();        // odtwórz galerię
       }
-      updateCurrentPlanetHeader(); // aby nagłówek był poprawny nawet jeśli currentPlanet jest null
+      const planets = Object.keys(atlas);
+      currentPlanet = planets[0] || null;
+      if (currentPlanet) selectPlanet(currentPlanet);
+      else globe.globeImageUrl(blackTextureURL);
+
+      updateCurrentPlanetHeader();
       refreshPlanetList();
       refreshPointsList();
       refreshGlobePoints();
-      updateNoPlanetsMessage()
+      updateNoPlanetsMessage();
       refreshPlanetSidebar();
 
       alert("Import zakończony!");
-    } catch(err){ alert("Błąd importu JSON"); }
+    } catch(err){ 
+      console.error(err);
+      alert("Błąd importu JSON"); 
+    }
   };
   reader.readAsText(file);
 }
