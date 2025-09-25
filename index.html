@@ -502,6 +502,13 @@ button:disabled {
   <div id="globeWrapper" style="position: relative;">
     <!-- nagłówek overlay -->
     <div id="planetOverlayHeader"></div>
+
+    <div id="planetOverlayHeader" style="display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+      <button id="prevPlanetBtn" style="display:none;">◀</button>
+      <span id="planetOverlayText">Brak wybranej planety</span>
+      <button id="nextPlanetBtn" style="display:none;">▶</button>
+    </div>
+    
     <!-- nagłówek moja lokalizacja -->
     <div id="myLocationBox" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6); color:white; padding:0.5rem; border-radius:8px; z-index:10;">
       <div style="font-weight:bold; margin-bottom:0.5rem;">Moja lokalizacja</div>
@@ -558,16 +565,22 @@ function updateCurrentPlanetHeader() {
   const overlay = document.getElementById("planetOverlayHeader");
   if (!overlay) return;
 
+  const textEl = document.getElementById("planetOverlayText");
+
   // Jeśli blokada jest aktywna i currentPlanet jest null → ustaw raz i zablokuj nadpisanie
   if (headerLock && !currentPlanet) {
-    overlay.textContent = "Brak wybranej planety";
+    if (textEl) textEl.textContent = "Brak wybranej planety";
     return; // wychodzimy bez nadpisywania dalej
   }
 
   // Normalne działanie po starcie
-  overlay.textContent = currentPlanet
-    ? `${currentPlanet}`
-    : "Brak wybranej planety";
+  if (textEl) {
+    textEl.textContent = currentPlanet
+      ? `${currentPlanet}`
+      : "Brak wybranej planety";
+  }
+
+  updatePlanetNavigation();
 }
 
 // odblokowanie blokady po starcie (0ms po załadowaniu strony)
@@ -587,6 +600,36 @@ function updateNoPlanetsMessage() {
     msg.style.display = "none";
   }
   updateCurrentPlanetHeader();
+}
+
+// Funkcja do sterowania strzałkami
+function updatePlanetNavigation() {
+  const prevBtn = document.getElementById("prevPlanetBtn");
+  const nextBtn = document.getElementById("nextPlanetBtn");
+
+  const planets = planetData.map(p => p.name);
+  if (planets.length < 2 || !currentPlanet) {
+    prevBtn.style.display = "none";
+    nextBtn.style.display = "none";
+    return;
+  }
+
+  prevBtn.style.display = "inline-block";
+  nextBtn.style.display = "inline-block";
+
+  const currentIndex = planets.indexOf(currentPlanet);
+
+  prevBtn.onclick = () => {
+    const newIndex = (currentIndex - 1 + planets.length) % planets.length;
+    selectPlanet(planets[newIndex]);
+    updateCurrentPlanetHeader();
+  };
+
+  nextBtn.onclick = () => {
+    const newIndex = (currentIndex + 1) % planets.length;
+    selectPlanet(planets[newIndex]);
+    updateCurrentPlanetHeader();
+  };
 }
   
 // Detale planety (założyłeś te funkcje wcześniej — zostawiamy je działające)
