@@ -534,7 +534,7 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
-let headerLock = true; // blokada na starcie
+let headerLock = true; // blokada na starcie celem zablokowania możliwości nadpisania nagłówka
   
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -570,12 +570,12 @@ function updateCurrentPlanetHeader() {
     : "Brak wybranej planety";
 }
 
-// odblokowanie blokady po starcie (np. 100ms po załadowaniu strony)
+// odblokowanie blokady po starcie (0ms po załadowaniu strony)
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     headerLock = false;
     updateCurrentPlanetHeader(); // odśwież jeszcze raz po zdjęciu blokady
-  }, 100);
+  }, 0);
 });
 
 function updateNoPlanetsMessage() {
