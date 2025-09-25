@@ -539,16 +539,6 @@ let highlightTimeout = null;
 //----------------- Zakładki i inne elementy UI -----------------//
 //////////////////////////////////////////////////////////////////// 
 
-function updateNoPlanetsMessage() {
-  const msg = document.getElementById("noPlanetsMessage");
-  const planets = Object.keys(atlas);
-  if (planets.length === 0) {
-    msg.style.display = "block";
-  } else {
-    msg.style.display = "none";
-  }
-}
-  
 // Zakładki
 function openTab(tabId) {
   document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
@@ -570,8 +560,19 @@ function updateCurrentPlanetHeader() {
       ? `${currentPlanet}`
       : "Brak wybranej planety";
   }
+  updateNoPlanetsMessage()
 }
 
+function updateNoPlanetsMessage() {
+  const msg = document.getElementById("noPlanetsMessage");
+  const planets = Object.keys(atlas);
+  if (planets.length === 0) {
+    msg.style.display = "block";
+  } else {
+    msg.style.display = "none";
+  }
+}
+  
 // Detale planety (założyłeś te funkcje wcześniej — zostawiamy je działające)
 function loadPlanetDetails(){
   if(!currentPlanet) return;
