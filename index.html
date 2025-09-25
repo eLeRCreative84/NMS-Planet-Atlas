@@ -534,13 +534,21 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
-
-
   
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
 //////////////////////////////////////////////////////////////////// 
 
+function updateNoPlanetsMessage() {
+  const msg = document.getElementById("noPlanetsMessage");
+  const planets = Object.keys(atlas);
+  if (planets.length === 0) {
+    msg.style.display = "block";
+  } else {
+    msg.style.display = "none";
+  }
+}
+  
 // Zakładki
 function openTab(tabId) {
   document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
@@ -552,7 +560,6 @@ function openTab(tabId) {
     if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
   });
 updateCurrentPlanetHeader();
-updateNoPlanetsMessage();
 }
   
 //zmiana nagłówka z nazwą planety
@@ -562,16 +569,6 @@ function updateCurrentPlanetHeader() {
     overlay.textContent = currentPlanet
       ? `${currentPlanet}`
       : "Brak wybranej planety";
-  }
-}
-
-function updateNoPlanetsMessage() {
-  const msg = document.getElementById("noPlanetsMessage");
-  const planets = Object.keys(atlas);
-  if (planets.length === 0) {
-    msg.style.display = "block";
-  } else {
-    msg.style.display = "none";
   }
 }
 
