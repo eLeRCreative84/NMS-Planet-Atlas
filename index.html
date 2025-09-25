@@ -517,7 +517,7 @@ button:disabled {
       <div id="planetListSidebar"></div>
     </div>
     <!-- Przycisk do pokazywania/ukrywania panelu -->
-   <button id="togglePlanetSidebarBtn">◀</button>
+   <button id="togglePlanetSidebarBtn">▶</button>
    </div>
 
 <script>
@@ -679,7 +679,7 @@ function togglePlanetSidebar() {
   if (sidebar.classList.contains("hidden")) {
     btn.textContent = "◀"; // panel ukryty → strzałka w prawo
   } else {
-    btn.textContent = "▶"; // panel widoczny → strzałka w lewo
+    btn.textContent = "["; // panel widoczny → strzałka w lewo
     refreshPlanetSidebar();
   }
 }
