@@ -534,6 +534,7 @@ let rotateSpeed = 0.001; // prędkość obrotu w radianach na frame
 let myLocationPoint = null;  
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
+let headerLock = true; // blokada na starcie
   
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -555,12 +556,27 @@ updateCurrentPlanetHeader();
 //zmiana nagłówka z nazwą planety
 function updateCurrentPlanetHeader() {
   const overlay = document.getElementById("planetOverlayHeader");
-  if (overlay) {
-    overlay.textContent = currentPlanet
-      ? `${currentPlanet}`
-      : "Brak wybranej planety";
+  if (!overlay) return;
+
+  // Jeśli blokada jest aktywna i currentPlanet jest null → ustaw raz i zablokuj nadpisanie
+  if (headerLock && !currentPlanet) {
+    overlay.textContent = "Brak wybranej planety";
+    return; // wychodzimy bez nadpisywania dalej
   }
+
+  // Normalne działanie po starcie
+  overlay.textContent = currentPlanet
+    ? `${currentPlanet}`
+    : "Brak wybranej planety";
 }
+
+// odblokowanie blokady po starcie (np. 100ms po załadowaniu strony)
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    headerLock = false;
+    updateCurrentPlanetHeader(); // odśwież jeszcze raz po zdjęciu blokady
+  }, 100);
+});
 
 function updateNoPlanetsMessage() {
   const msg = document.getElementById("noPlanetsMessage");
