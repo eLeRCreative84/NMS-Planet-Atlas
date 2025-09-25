@@ -555,11 +555,8 @@ updateCurrentPlanetHeader();
 //zmiana nagłówka z nazwą planety
 function updateCurrentPlanetHeader() {
   const overlay = document.getElementById("planetOverlayHeader");
-  if (overlay) {
-    overlay.textContent = currentPlanet
-      ? `${currentPlanet}`
-      : "Brak wybranej planety";
-  }
+  if (!overlay) return;
+  overlay.textContent = currentPlanet ? currentPlanet : "Brak wybranej planety";
 }
 
 function updateNoPlanetsMessage() {
@@ -1696,14 +1693,14 @@ if(sortSelect) {
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
 // start
-document.addEventListener("DOMContentLoaded", () => {
+window.onload = () => {
   openTab("start"); // aktywuj pierwszą zakładkę
   refreshPlanetList();
   refreshPointsList();
   updateNoPlanetsMessage();
-  checkNewPlanetInput();
   updateCurrentPlanetHeader();
-});
+  checkNewPlanetInput();
+}
   
 </script>
 </body>
