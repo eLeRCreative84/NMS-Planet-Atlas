@@ -588,13 +588,6 @@ function updateNoPlanetsMessage() {
   }
   updateCurrentPlanetHeader();
 }
-
-  // Obserwuj zmiany wewnątrz elementu (tekst/childy)
-  mo.observe(overlay, { characterData: true, childList: true, subtree: true });
-
-  // Dla porządku: po 5 sekundach przestajemy obserwować (nie zostawiamy leaków)
-  setTimeout(() => mo.disconnect(), 5000);
-}
   
 // Detale planety (założyłeś te funkcje wcześniej — zostawiamy je działające)
 function loadPlanetDetails(){
