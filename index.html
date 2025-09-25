@@ -555,8 +555,11 @@ updateCurrentPlanetHeader();
 //zmiana nagłówka z nazwą planety
 function updateCurrentPlanetHeader() {
   const overlay = document.getElementById("planetOverlayHeader");
-  if (!overlay) return;
-  overlay.textContent = currentPlanet ? currentPlanet : "Brak wybranej planety";
+  if (overlay) {
+    overlay.textContent = currentPlanet
+      ? `${currentPlanet}`
+      : "Brak wybranej planety";
+  }
 }
 
 function updateNoPlanetsMessage() {
@@ -567,6 +570,36 @@ function updateNoPlanetsMessage() {
   } else {
     msg.style.display = "none";
   }
+}
+
+// --- Bezpieczne ustawienie nagłówka (odporne na późniejsze nadpisania) ---
+function ensurePlanetHeaderShows() {
+  const overlay = document.getElementById("planetOverlayHeader");
+  if (!overlay) return;
+
+  // Ustaw natychmiast
+  updateCurrentPlanetHeader();
+
+  // Powtórz na następną klatkę (często naprawia race conditions)
+  requestAnimationFrame(() => updateCurrentPlanetHeader());
+
+  // Dodatkowy timeout jako fallback (kilka ms później)
+  setTimeout(() => updateCurrentPlanetHeader(), 50);
+
+  // Jeśli coś później modyfikuje zawartość elementu, przywracamy
+  // (np. inny fragment tego samego kodu przypadkowo czyści textContent)
+  const mo = new MutationObserver((mutations) => {
+    // jeśli ktoś usunął tekst lub ustawił pusty string, przywracamy
+    if (!overlay.textContent || overlay.textContent.trim() === "") {
+      updateCurrentPlanetHeader();
+    }
+  });
+
+  // Obserwuj zmiany wewnątrz elementu (tekst/childy)
+  mo.observe(overlay, { characterData: true, childList: true, subtree: true });
+
+  // Dla porządku: po 5 sekundach przestajemy obserwować (nie zostawiamy leaków)
+  setTimeout(() => mo.disconnect(), 5000);
 }
   
 // Detale planety (założyłeś te funkcje wcześniej — zostawiamy je działające)
@@ -1700,6 +1733,7 @@ window.onload = () => {
   updateNoPlanetsMessage();
   updateCurrentPlanetHeader();
   checkNewPlanetInput();
+  ensurePlanetHeaderShows();
 }
   
 </script>
