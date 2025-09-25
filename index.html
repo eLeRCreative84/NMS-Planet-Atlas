@@ -32,7 +32,7 @@
   .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
   .tab-content.active { display: block; }
 
-/* Nagłówek aktualnej planety */
+/* Nagłówek aktualnej planety  sprawdzić czy to nie dubel */
 .currentPlanetHeader {
   margin: 0.2rem 0 0.5rem 0;
   font-size: 1.2rem;
@@ -104,9 +104,27 @@
   font-weight: bold;
   text-align: center;
   pointer-events: none;
-  z-index: 10; 
+  z-index: 1000; 
 }
- 
+
+/* Przyciski przełączania się między kolejnymi planetami */
+  #planetOverlayHeader button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  transition: transform 0.2s;
+  z-index: 1001; /* nad globem */
+}
+
+#planetOverlayHeader button:hover {
+  transform: scale(1.2);
+  color: #ffcc00;
+}
+  
+  
 /* Ustaw przycisk Tekstury i Koloru razem */
 .planet-buttons-row {
   display: flex;
@@ -218,7 +236,7 @@ button:disabled {
 #planetListSidebar li:hover {
   background: #27407a;
 }
-
+  
 /* Filtry punktów */
 #pointFilters {
   display: grid;
