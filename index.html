@@ -190,8 +190,12 @@ button:disabled {
   transform: scale(1.1);
 }
 
- #planetSidebar.hidden + #togglePlanetSidebarBtn {
-  right: 0.5rem; /* przy samym brzegu okna */
+#planetSidebar:not(.hidden) + #togglePlanetSidebarBtn {
+  right: 230px; /* przy panelu */
+}
+
+#planetSidebar.hidden + #togglePlanetSidebarBtn {
+  right: 0.5rem; /* przy krawędzi */
 }
   
 /* Reset stylów listy <ul> w panelu z planetami */
