@@ -552,6 +552,7 @@ function openTab(tabId) {
     if (btn.getAttribute("onclick") && btn.getAttribute("onclick").includes(`'${tabId}'`)) btn.classList.add("active");
   });
 updateCurrentPlanetHeader();
+updateNoPlanetsMessage();
 }
   
 //zmiana nagłówka z nazwą planety
