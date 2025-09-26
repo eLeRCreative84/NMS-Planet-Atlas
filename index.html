@@ -616,9 +616,9 @@ button:disabled {
 
 <script>
 let atlas = {};
-let planetDetails = {};
-let planetData = []; // alias: galaxyData[currentGalaxy]
-let currentPlanet = null;
+let planetDetails = {}; // szczegóły każdej planety
+let planetData = []; // lista planet z dodatkowymi info
+let currentPlanet = null; // aktualnie wybrana planeta
 let pointScale = parseFloat(document.getElementById("pointScale").value);
 let editIndex = null;
 let pointsDistanceMultiplier = 1;
@@ -706,7 +706,7 @@ function loadPlanetDetails(){
 function savePlanetDetails(){
   if(!currentPlanet) return;
   planetDetails[currentPlanet]={
-    galaxy:document.getElementById("detailGalaxy").value,
+    galaxy: currentGalaxy,
     region:document.getElementById("detailRegion").value,
     system:document.getElementById("detailSystem").value,
     biome:document.getElementById("detailBiome").value,
@@ -846,7 +846,7 @@ function addNewPlanet() {
   
   // Dodaj pustą strukturę detali od razu:
   planetDetails[name] = {
-    galaxy: "",
+    galaxy: currentGalaxy,
     region: "",
     system: "",
     biome: "",
@@ -874,6 +874,7 @@ function addNewPlanet() {
   refreshGlobePoints();
   updateSelectedPlanetButtons();
   refreshPlanetSidebar();
+  updatePlanetData(name, { galaxy: currentGalaxy });
     // Ustaw od razu glob na wybraną teksturę
   globe.globeImageUrl(textureBase64);
   
@@ -1150,25 +1151,9 @@ function setButtonsDisabled(disabled) {
 }
 
 // Galaktyki
-function selectGalaxy(name) {
-  if (!galaxyData[name]) {
-    galaxyData[name] = []; // jeśli galaktyka jeszcze nie istnieje
-  }
-  currentGalaxy = name;
-  planetData = galaxyData[currentGalaxy]; // alias
-  
-  refreshPlanetList();
-  refreshPointsList();
-  refreshPlanetSidebar();
-  
-  currentPlanet = planetData.length > 0 ? planetData[0].name : null;
-  if (currentPlanet) {
-    selectPlanet(currentPlanet);
-  } else {
-    globe.globeImageUrl(blackTextureURL);
-  }
+function selectGalaxy(galaxy) {
+  currentGalaxy = galaxy; // wszystkie nowe planety będą przypisane do tej galaktyki
 }
-
 	
 ////////////////////////////////////////////////////////////////////
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
