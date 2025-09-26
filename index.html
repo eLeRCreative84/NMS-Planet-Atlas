@@ -467,7 +467,7 @@ button:disabled {
     <!-- Zakładka DETALE PLANETY -->
     <div id="detale" class="tab-content">
       <label>Galaktyka</label>
-		<select id="galaxySelect" onchange="selectGalaxy(this.value)">
+		<select id="detailGalaxy" onchange="updateDefaultGalaxy(this.value)">
 		<option value="Euclid">Euclid</option><option value="Hilbert Dimension">Hilbert Dimension</option><option value="Calypso">Calypso</option><option value="Hesperius Dimension">Hesperius Dimension</option><option value="Hyades">Hyades</option><option value="Ickjamatew">Ickjamatew</option><option value="Budullangr">Budullangr</option><option value="Kikolgallr">Kikolgallr</option><option value="Eltiensleen">Eltiensleen</option><option value="Eissentam">Eissentam</option>
 		<option value="Elkupalos">Elkupalos</option><option value="Aptarkaba">Aptarkaba</option><option value="Ontiniangp">Ontiniangp</option><option value="Odiwagiri">Odiwagiri</option><option value="Ogtialabi">Ogtialabi</option><option value="Muhacksonto">Muhacksonto</option><option value="Hitonskyer">Hitonskyer</option><option value="Rerasmutul">Rerasmutul</option><option value="Isdoraijung">Isdoraijung</option><option value="Doctinawyra">Doctinawyra</option>
 		<option value="Loychazinq">Loychazinq</option><option value="Zukasizawa">Zukasizawa</option><option value="Ekwathore">Ekwathore</option><option value="Yeberhahne">Yeberhahne</option><option value="Twerbetek">Twerbetek</option><option value="Sivarates">Sivarates</option><option value="Eajerandal">Eajerandal</option><option value="Aldukesci">Aldukesci</option><option value="Wotyarogii">Wotyarogii</option><option value="Sudzerbal">Sudzerbal</option>
@@ -629,8 +629,8 @@ let myLocationPoint = null;
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
 let headerLock = true; // blokada na starcie celem zablokowania możliwości nadpisania nagłówka
-let galaxyData = {}; // główny obiekt
-let currentGalaxy = "Euclid";
+let defaultGalaxy = "Euclid";
+
 	
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -846,7 +846,7 @@ function addNewPlanet() {
   
   // Dodaj pustą strukturę detali od razu:
   planetDetails[name] = {
-    galaxy: currentGalaxy,
+    galaxy: defaultGalaxy,
     region: "",
     system: "",
     biome: "",
@@ -874,7 +874,7 @@ function addNewPlanet() {
   refreshGlobePoints();
   updateSelectedPlanetButtons();
   refreshPlanetSidebar();
-  updatePlanetData(name, { galaxy: currentGalaxy });
+  
     // Ustaw od razu glob na wybraną teksturę
   globe.globeImageUrl(textureBase64);
   
@@ -1151,8 +1151,11 @@ function setButtonsDisabled(disabled) {
 }
 
 // Galaktyki
-function selectGalaxy(galaxy) {
-  currentGalaxy = galaxy; // wszystkie nowe planety będą przypisane do tej galaktyki
+function updateDefaultGalaxy(galaxy) {
+  defaultGalaxy = galaxy || "Euclid";
+  if (currentPlanet && planetDetails[currentPlanet]) {
+    planetDetails[currentPlanet].galaxy = defaultGalaxy;
+  }
 }
 	
 ////////////////////////////////////////////////////////////////////
@@ -1679,7 +1682,7 @@ function exportAtlas(){
   const blob = new Blob([JSON.stringify({
     atlas,
     planetDetails,
-    galaxyData, // zamiast planetData
+    planetData, 
     textures // dodajemy listę galerii do JSON
   }, null, 2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
@@ -1699,7 +1702,7 @@ function importAtlas(event){
       const data = JSON.parse(e.target.result);
       if(data.atlas) atlas = data.atlas;
       if(data.planetDetails) planetDetails = data.planetDetails;
-      if(data.galaxyData) galaxyData = data.galaxyData; // wczytujemy galaktyki
+      if(data.planetData) planetDetails = data.planetData;
       if(data.textures) {
         textures.length = 0;        // wyczyść obecną listę
         textures.push(...data.textures); // wczytaj importowane
