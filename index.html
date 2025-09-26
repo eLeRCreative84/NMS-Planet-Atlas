@@ -842,23 +842,18 @@ input.addEventListener("input", () => {
     option.textContent = g;
     option.addEventListener("click", () => {
       input.value = g;
-      currentGalaxy = g; // ustawiamy aktualną galaktykę
+      currentGalaxy = g;
       dropdown.style.display = "none";
-      option.addEventListener("click", () => {
- 		input.value = g;
- 		currentGalaxy = g; // ustawiamy aktualną galaktykę
-		dropdown.style.display = "none";
 
-		refreshPlanetSidebar();         // odśwież listę planet w sidebarze
- 		updateCurrentPlanetHeader(); // jeśli masz nagłówek z aktualną galaktyką
-		});
-     	dropdown.appendChild(option);
-  	});
+      refreshPlanetList();         // <- filtrowanie planet wg galaktyki
+      updateCurrentPlanetHeader(); // <- aktualizacja nagłówka
+    });
+    dropdown.appendChild(option);
+  });
 
   dropdown.style.display = "block";
 });
 
-// zamknięcie dropdownu po kliknięciu poza
 document.addEventListener("click", e => {
   if (!e.target.closest(".galaxy-selector")) {
     dropdown.style.display = "none";
