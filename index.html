@@ -312,7 +312,41 @@ button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+	
+/* Selektor galaktyk */
+.galaxy-selector {
+  position: relative;
+  width: 250px;
+}
 
+#galaxyInput {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  display: none;
+  z-index: 10;
+}
+
+.dropdown div {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.dropdown div:hover {
+  background: #eee;
+}
+	
 </style>
 </head>
 <body>
@@ -466,35 +500,11 @@ button:disabled {
     </div>
     <!-- Zakładka DETALE PLANETY -->
     <div id="detale" class="tab-content">
-      <label>Galaktyka</label>
-		<select id="detailGalaxy" onchange="updateDefaultGalaxy(this.value)">
-		<option value="Euclid">Euclid</option><option value="Hilbert Dimension">Hilbert Dimension</option><option value="Calypso">Calypso</option><option value="Hesperius Dimension">Hesperius Dimension</option><option value="Hyades">Hyades</option><option value="Ickjamatew">Ickjamatew</option><option value="Budullangr">Budullangr</option><option value="Kikolgallr">Kikolgallr</option><option value="Eltiensleen">Eltiensleen</option><option value="Eissentam">Eissentam</option>
-		<option value="Elkupalos">Elkupalos</option><option value="Aptarkaba">Aptarkaba</option><option value="Ontiniangp">Ontiniangp</option><option value="Odiwagiri">Odiwagiri</option><option value="Ogtialabi">Ogtialabi</option><option value="Muhacksonto">Muhacksonto</option><option value="Hitonskyer">Hitonskyer</option><option value="Rerasmutul">Rerasmutul</option><option value="Isdoraijung">Isdoraijung</option><option value="Doctinawyra">Doctinawyra</option>
-		<option value="Loychazinq">Loychazinq</option><option value="Zukasizawa">Zukasizawa</option><option value="Ekwathore">Ekwathore</option><option value="Yeberhahne">Yeberhahne</option><option value="Twerbetek">Twerbetek</option><option value="Sivarates">Sivarates</option><option value="Eajerandal">Eajerandal</option><option value="Aldukesci">Aldukesci</option><option value="Wotyarogii">Wotyarogii</option><option value="Sudzerbal">Sudzerbal</option>
-		<option value="Maupenzhay">Maupenzhay</option><option value="Sugueziume">Sugueziume</option><option value="Brogoweldian">Brogoweldian</option><option value="Ehbogdenbu">Ehbogdenbu</option><option value="Ijsenufryos">Ijsenufryos</option><option value="Nipikulha">Nipikulha</option><option value="Autsurabin">Autsurabin</option><option value="Lusontrygiamh">Lusontrygiamh</option><option value="Rewmanawa">Rewmanawa</option><option value="Ethiophodhe">Ethiophodhe</option>
-		<option value="Urastrykle">Urastrykle</option><option value="Xobeurindj">Xobeurindj</option><option value="Oniijialdu">Oniijialdu</option><option value="Wucetosucc">Wucetosucc</option><option value="Ebyeloof">Ebyeloof</option><option value="Odyavanta">Odyavanta</option><option value="Milekistri">Milekistri</option><option value="Waferganh">Waferganh</option><option value="Agnusopwit">Agnusopwit</option><option value="Teyaypilny">Teyaypilny</option>
-		<option value="Zalienkosm">Zalienkosm</option><option value="Ladgudiraf">Ladgudiraf</option><option value="Mushonponte">Mushonponte</option><option value="Amsentisz">Amsentisz</option><option value="Fladiselm">Fladiselm</option><option value="Laanawemb">Laanawemb</option><option value="Ilkerloor">Ilkerloor</option><option value="Davanossi">Davanossi</option><option value="Ploehrliou">Ploehrliou</option><option value="Corpinyaya">Corpinyaya</option>
-		<option value="Leckandmeram">Leckandmeram</option><option value="Quulngais">Quulngais</option><option value="Nokokipsechl">Nokokipsechl</option><option value="Rinblodesa">Rinblodesa</option><option value="Loydporpen">Loydporpen</option><option value="Ibtrevskip">Ibtrevskip</option><option value="Elkowaldb">Elkowaldb</option><option value="Heholhofsko">Heholhofsko</option><option value="Yebrilowisod">Yebrilowisod</option><option value="Husalvangewi">Husalvangewi</option>
-		<option value="Ovna'uesed">Ovna'uesed</option><option value="Bahibusey">Bahibusey</option><option value="Nuybeliaure">Nuybeliaure</option><option value="Doshawchuc">Doshawchuc</option><option value="Ruckinarkh">Ruckinarkh</option><option value="Thorettac">Thorettac</option><option value="Nuponoparau">Nuponoparau</option><option value="Moglaschil">Moglaschil</option><option value="Uiweupose">Uiweupose</option><option value="Nasmilete">Nasmilete</option>
-		<option value="Ekdaluskin">Ekdaluskin</option><option value="Hakapanasy">Hakapanasy</option><option value="Dimonimba">Dimonimba</option><option value="Cajaccari">Cajaccari</option><option value="Olonerovo">Olonerovo</option><option value="Umlanswick">Umlanswick</option><option value="Henayliszm">Henayliszm</option><option value="Utzenmate">Utzenmate</option><option value="Umirpaiya">Umirpaiya</option><option value="Paholiang">Paholiang</option>
-		<option value="Iaereznika">Iaereznika</option><option value="Yudukagath">Yudukagath</option><option value="Boealalosnj">Boealalosnj</option><option value="Yaevarcko">Yaevarcko</option><option value="Coellosipp">Coellosipp</option><option value="Wayndohalou">Wayndohalou</option><option value="Smoduraykl">Smoduraykl</option><option value="Apmaneessu">Apmaneessu</option><option value="Hicanpaav">Hicanpaav</option><option value="Akvasanta">Akvasanta</option>
-		<option value="Tuychelisaor">Tuychelisaor</option><option value="Rivskimbe">Rivskimbe</option><option value="Daksanquix">Daksanquix</option><option value="Kissonlin">Kissonlin</option><option value="Aediabiel">Aediabiel</option><option value="Ulosaginyik">Ulosaginyik</option><option value="Roclaytonycar">Roclaytonycar</option><option value="Kichiaroa">Kichiaroa</option><option value="Irceauffey">Irceauffey</option><option value="Nudquathsenfe">Nudquathsenfe</option>
-		<option value="Getaizakaal">Getaizakaal</option><option value="Hansolmien">Hansolmien</option><option value="Bloytisagra">Bloytisagra</option><option value="Ladsenlay">Ladsenlay</option><option value="Luyugoslasr">Luyugoslasr</option><option value="Ubredhatk">Ubredhatk</option><option value="Cidoniana">Cidoniana</option><option value="Jasinessa">Jasinessa</option><option value="Torweierf">Torweierf</option><option value="Saffneckm">Saffneckm</option>
-		<option value="Thnistner">Thnistner</option><option value="Dotusingg">Dotusingg</option><option value="Luleukous">Luleukous</option><option value="Jelmandan">Jelmandan</option><option value="Otimanaso">Otimanaso</option><option value="Enjaxusanto">Enjaxusanto</option><option value="Sezviktorew">Sezviktorew</option><option value="Zikehpm">Zikehpm</option><option value="Bephembah">Bephembah</option><option value="Broomerrai">Broomerrai</option>
-		<option value="Meximicka">Meximicka</option><option value="Venessika">Venessika</option><option value="Gaiteseling">Gaiteseling</option><option value="Zosakasiro">Zosakasiro</option><option value="Drajayanes">Drajayanes</option><option value="Ooibekuar">Ooibekuar</option><option value="Urckiansi">Urckiansi</option><option value="Dozivadido">Dozivadido</option><option value="Emiekereks">Emiekereks</option><option value="Meykinunukur">Meykinunukur</option>
-		<option value="Kimycuristh">Kimycuristh</option><option value="Roansfien">Roansfien</option><option value="Isgarmeso">Isgarmeso</option><option value="Daitibeli">Daitibeli</option><option value="Gucuttarik">Gucuttarik</option><option value="Enlaythie">Enlaythie</option><option value="Drewweste">Drewweste</option><option value="Akbulkabi">Akbulkabi</option><option value="Homskiw">Homskiw</option><option value="Zavainlani">Zavainlani</option>
-		<option value="Jewijkmas">Jewijkmas</option><option value="Itlhotagra">Itlhotagra</option><option value="Podalicess">Podalicess</option><option value="Hiviusauer">Hiviusauer</option><option value="Halsebenk">Halsebenk</option><option value="Puikitoac">Puikitoac</option><option value="Gaybakuaria">Gaybakuaria</option><option value="Grbodubhe">Grbodubhe</option><option value="Rycempler">Rycempler</option><option value="Indjalala">Indjalala</option>
-		<option value="Fontenikk">Fontenikk</option><option value="Pasycihelwhee">Pasycihelwhee</option><option value="Ikbaksmit">Ikbaksmit</option><option value="Telicianses">Telicianses</option><option value="Oyleyzhan">Oyleyzhan</option><option value="Uagerosat">Uagerosat</option><option value="Impoxectin">Impoxectin</option><option value="Twoodmand">Twoodmand</option><option value="Hilfsesorbs">Hilfsesorbs</option><option value="Ezdaranit">Ezdaranit</option>
-		<option value="Wiensanshe">Wiensanshe</option><option value="Ewheelonc">Ewheelonc</option><option value="Litzmantufa">Litzmantufa</option><option value="Emarmatosi">Emarmatosi</option><option value="Mufimbomacvi">Mufimbomacvi</option><option value="Wongquarum">Wongquarum</option><option value="Hapirajua">Hapirajua</option><option value="Igbinduina">Igbinduina</option><option value="Wepaitvas">Wepaitvas</option><option value="Sthatigudi">Sthatigudi</option>
-		<option value="Yekathsebehn">Yekathsebehn</option><option value="Ebedeagurst">Ebedeagurst</option><option value="Nolisonia">Nolisonia</option><option value="Ulexovitab">Ulexovitab</option><option value="Iodhinxois">Iodhinxois</option><option value="Irroswitzs">Irroswitzs</option><option value="Bifredait">Bifredait</option><option value="Beiraghedwe">Beiraghedwe</option><option value="Yeonatlak">Yeonatlak</option><option value="Cugnatachh">Cugnatachh</option>
-		<option value="Nozoryenki">Nozoryenki</option><option value="Ebralduri">Ebralduri</option><option value="Evcickcandj">Evcickcandj</option><option value="Ziybosswin">Ziybosswin</option><option value="Heperclait">Heperclait</option><option value="Sugiuniam">Sugiuniam</option><option value="Aaseertush">Aaseertush</option><option value="Uglyestemaa">Uglyestemaa</option><option value="Horeroedsh">Horeroedsh</option><option value="Drundemiso">Drundemiso</option>
-		<option value="Ityanianat">Ityanianat</option><option value="Purneyrine">Purneyrine</option><option value="Dokiessmat">Dokiessmat</option><option value="Nupiacheh">Nupiacheh</option><option value="Dihewsonj">Dihewsonj</option><option value="Rudrailhik">Rudrailhik</option><option value="Tweretnort">Tweretnort</option><option value="Snatreetze">Snatreetze</option><option value="Iwundaracos">Iwundaracos</option><option value="Digarlewena">Digarlewena</option>
-		<option value="Erquagsta">Erquagsta</option><option value="Logovoloin">Logovoloin</option><option value="Boyaghosganh">Boyaghosganh</option><option value="Kuolungau">Kuolungau</option><option value="Pehneldept">Pehneldept</option><option value="Yevettiiqidcon">Yevettiiqidcon</option><option value="Sahliacabru">Sahliacabru</option><option value="Noggalterpor">Noggalterpor</option><option value="Chmageaki">Chmageaki</option><option value="Veticueca">Veticueca</option>
-		<option value="Vittesbursul">Vittesbursul</option><option value="Nootanore">Nootanore</option><option value="Innebdjerah">Innebdjerah</option><option value="Kisvarcini">Kisvarcini</option><option value="Cuzcogipper">Cuzcogipper</option><option value="Pamanhermonsu">Pamanhermonsu</option><option value="Brotoghek">Brotoghek</option><option value="Mibittara">Mibittara</option><option value="Huruahili">Huruahili</option><option value="Raldwicarn">Raldwicarn</option>
-		<option value="Ezdartlic">Ezdartlic</option><option value="Badesclema">Badesclema</option><option value="Isenkeyan">Isenkeyan</option><option value="Iadoitesu">Iadoitesu</option><option value="Yagrovoisi">Yagrovoisi</option><option value="Ewcomechio">Ewcomechio</option><option value="Inunnunnoda">Inunnunnoda</option><option value="Dischiutun">Dischiutun</option><option value="Yuwarugha">Yuwarugha</option><option value="Ialmendra">Ialmendra</option>
-		<option value="Reponudrle">Reponudrle</option><option value="Rinjanagrbo">Rinjanagrbo</option><option value="Zeziceloh">Zeziceloh</option><option value="Oeileutasc">Oeileutasc</option><option value="Zicniijinis">Zicniijinis</option><option value="Dugnowarilda">Dugnowarilda</option><option value="Neuxoisan">Neuxoisan</option><option value="Ilmenhorn">Ilmenhorn</option><option value="Rukwatsuku">Rukwatsuku</option><option value="Nepitzaspru">Nepitzaspru</option>
-		<option value="Chcehoemig">Chcehoemig</option><option value="Haffneyrin">Haffneyrin</option><option value="Uliciawai">Uliciawai</option><option value="Tuhgrespod">Tuhgrespod</option><option value="Iousongola">Iousongola</option><option value="Odyalutai">Odyalutai</option>
-		</select>
+      <div class="galaxy-selector">
+  		<input type="text" id="galaxyInput" placeholder="Wybierz galaktykę...">
+  		<div id="galaxyDropdown" class="dropdown"></div>
+	  </div>
+		
       <label>Region</label><input type="text" id="detailRegion" />
       <label>Układ planetarny</label><input type="text" id="detailSystem" />
       <label>Biom</label>
@@ -797,6 +807,56 @@ function togglePlanetSidebar() {
 
 // Podłącz przycisk
 document.getElementById("togglePlanetSidebarBtn").addEventListener("click", togglePlanetSidebar);
+
+// Selektor galaktyk
+const galaxies = [
+  "Euclid", "Hilbert Dimension", "Calypso", "Hesperius Dimension", "Hyades", "Ickjamatew", "Budullangr", "Kikolgallr", "Eltiensleen", "Eissentam", "Elkupalos", "Aptarkaba", "Ontiniangp", "Odiwagiri", "Ogtialabi", "Muhacksonto", "Hitonskyer", "Rerasmutul", "Isdoraijung", "Doctinawyra", "Loychazinq", "Zukasizawa", "Ekwathore", "Yeberhahne", "Twerbetek", "Sivarates", "Eajerandal", "Aldukesci", "Wotyarogii", "Sudzerbal", "Maupenzhay", "Sugueziume", "Brogoweldian", "Ehbogdenbu", "Ijsenufryos", "Nipikulha", "Autsurabin", "Lusontrygiamh", "Rewmanawa", "Ethiophodhe", "Urastrykle", "Xobeurindj", "Oniijialdu", "Wucetosucc", "Ebyeloof", "Odyavanta", "Milekistri", "Waferganh", "Agnusopwit", "Teyaypilny", "Zalienkosm", "Ladgudiraf", "Mushonponte", "Amsentisz", "Fladiselm", "Laanawemb", "Ilkerloor", "Davanossi", "Ploehrliou", "Corpinyaya", "Leckandmeram", "Quulngais", "Nokokipsechl", "Rinblodesa", "Loydporpen", "Ibtrevskip", "Elkowaldb", "Heholhofsko", "Yebrilowisod", "Husalvangewi", "Ovna'uesed", "Bahibusey", "Nuybeliaure", "Doshawchuc", "Ruckinarkh", "Thorettac", "Nuponoparau", "Moglaschil", "Uiweupose", "Nasmilete", "Ekdaluskin", "Hakapanasy", "Dimonimba", "Cajaccari", "Olonerovo", "Umlanswick", "Henayliszm", "Utzenmate", "Umirpaiya", "Paholiang", "Iaereznika", "Yudukagath", "Boealalosnj", "Yaevarcko", "Coellosipp", "Wayndohalou", "Smoduraykl", "Apmaneessu", "Hicanpaav", "Akvasanta", "Tuychelisaor", "Rivskimbe", "Daksanquix", "Kissonlin", "Aediabiel", "Ulosaginyik", "Roclaytonycar", "Kichiaroa", "Irceauffey", "Nudquathsenfe", "Getaizakaal", "Hansolmien", "Bloytisagra", "Ladsenlay", "Luyugoslasr", "Ubredhatk", "Cidoniana", "Jasinessa", "Torweierf", "Saffneckm", "Thnistner", "Dotusingg", "Luleukous", "Jelmandan", "Otimanaso", "Enjaxusanto", "Sezviktorew", "Zikehpm", "Bephembah", "Broomerrai", "Meximicka", "Venessika", "Gaiteseling", "Zosakasiro", "Drajayanes", "Ooibekuar", "Urckiansi", "Dozivadido", "Emiekereks", "Meykinunukur", "Kimycuristh", "Roansfien", "Isgarmeso", "Daitibeli", "Gucuttarik", "Enlaythie", "Drewweste", "Akbulkabi", "Homskiw", "Zavainlani", "Jewijkmas", "Itlhotagra", "Podalicess", "Hiviusauer", "Halsebenk", "Puikitoac", "Gaybakuaria", "Grbodubhe", "Rycempler", "Indjalala", "Fontenikk", "Pasycihelwhee", "Ikbaksmit", "Telicianses", "Oyleyzhan", "Uagerosat", "Impoxectin", "Twoodmand", "Hilfsesorbs", "Ezdaranit", "Wiensanshe", "Ewheelonc", "Litzmantufa", "Emarmatosi", "Mufimbomacvi", "Wongquarum", "Hapirajua", "Igbinduina", "Wepaitvas", "Sthatigudi", "Yekathsebehn", "Ebedeagurst", "Nolisonia", "Ulexovitab", "Iodhinxois", "Irroswitzs", "Bifredait", "Beiraghedwe", "Yeonatlak", "Cugnatachh", "Nozoryenki", "Ebralduri", "Evcickcandj", "Ziybosswin", "Heperclait", "Sugiuniam", "Aaseertush", "Uglyestemaa", "Horeroedsh", "Drundemiso", "Ityanianat", "Purneyrine", "Dokiessmat", "Nupiacheh", "Dihewsonj", "Rudrailhik", "Tweretnort", "Snatreetze", "Iwundaracos", "Digarlewena", "Erquagsta", "Logovoloin", "Boyaghosganh", "Kuolungau", "Pehneldept", "Yevettiiqidcon", "Sahliacabru", "Noggalterpor", "Chmageaki", "Veticueca", "Vittesbursul", "Nootanore", "Innebdjerah", "Kisvarcini", "Cuzcogipper", "Pamanhermonsu", "Brotoghek", "Mibittara", "Huruahili", "Raldwicarn", "Ezdartlic", "Badesclema", "Isenkeyan", "Iadoitesu", "Yagrovoisi", "Ewcomechio", "Inunnunnoda", "Dischiutun", "Yuwarugha", "Ialmendra", "Reponudrle", "Rinjanagrbo", "Zeziceloh", "Oeileutasc", "Zicniijinis", "Dugnowarilda", "Neuxoisan", "Ilmenhorn", "Rukwatsuku", "Nepitzaspru", "Chcehoemig", "Haffneyrin", "Uliciawai", "Tuhgrespod", "Iousongola", "Odyalutai"
+];
+
+let currentGalaxy = "Euclid"; // domyślna
+
+const input = document.getElementById("galaxyInput");
+const dropdown = document.getElementById("galaxyDropdown");
+
+// pokazanie listy przy wpisywaniu
+input.addEventListener("input", () => {
+  const val = input.value.toLowerCase();
+  dropdown.innerHTML = "";
+
+  if (!val) {
+    dropdown.style.display = "none";
+    return;
+  }
+
+  const filtered = galaxies.filter(g => g.toLowerCase().includes(val));
+
+  if (filtered.length === 0) {
+    dropdown.style.display = "none";
+    return;
+  }
+
+  filtered.forEach(g => {
+    const option = document.createElement("div");
+    option.textContent = g;
+    option.addEventListener("click", () => {
+      input.value = g;
+      currentGalaxy = g; // ustawiamy aktualną galaktykę
+      dropdown.style.display = "none";
+      console.log("Wybrano galaktykę:", currentGalaxy);
+      // tu możesz np. przeładować listę planet z tej galaktyki
+    });
+    dropdown.appendChild(option);
+  });
+
+  dropdown.style.display = "block";
+});
+
+// zamknięcie dropdownu po kliknięciu poza
+document.addEventListener("click", e => {
+  if (!e.target.closest(".galaxy-selector")) {
+    dropdown.style.display = "none";
+  }
+});
  
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
