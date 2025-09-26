@@ -706,7 +706,7 @@ function loadPlanetDetails(){
 function savePlanetDetails(){
   if(!currentPlanet) return;
   planetDetails[currentPlanet]={
-    galaxy: currentGalaxy,
+    galaxy:document.getElementById("detailGalaxy").value,
     region:document.getElementById("detailRegion").value,
     system:document.getElementById("detailSystem").value,
     biome:document.getElementById("detailBiome").value,
@@ -1682,7 +1682,7 @@ function exportAtlas(){
   const blob = new Blob([JSON.stringify({
     atlas,
     planetDetails,
-    planetData, 
+    planetData,
     textures // dodajemy listę galerii do JSON
   }, null, 2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
@@ -1702,18 +1702,15 @@ function importAtlas(event){
       const data = JSON.parse(e.target.result);
       if(data.atlas) atlas = data.atlas;
       if(data.planetDetails) planetDetails = data.planetDetails;
-      if(data.planetData) planetDetails = data.planetData;
+      if(data.planetData) planetData = data.planetData;
       if(data.textures) {
         textures.length = 0;        // wyczyść obecną listę
         textures.push(...data.textures); // wczytaj importowane
         currentTexturePage = 0;     // ustaw początkową stronę
         renderTexturePage();        // odtwórz galerię
       }
-      // ustaw domyślną galaktykę
-      const galaxies = Object.keys(galaxyData);
-      currentGalaxy = galaxies[0] || "Euclid";
-      planetData = galaxyData[currentGalaxy] || [];
-      currentPlanet = planetData.length > 0 ? planetData[0].name : null;
+      const planets = Object.keys(atlas);
+      currentPlanet = planets[0] || null;
       if (currentPlanet) selectPlanet(currentPlanet);
       else globe.globeImageUrl(blackTextureURL);
 
