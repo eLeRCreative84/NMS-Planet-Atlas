@@ -466,7 +466,35 @@ button:disabled {
     </div>
     <!-- Zakładka DETALE PLANETY -->
     <div id="detale" class="tab-content">
-      <label>Galaktyka</label><input type="text" id="detailGalaxy" />
+      <label>Galaktyka</label>
+		<select id="detailGalaxy" onchange="updateDefaultGalaxy(this.value)">
+		<option value="1">Euclid</option><option value="2">Hilbert Dimension</option><option value="3">Calypso</option><option value="4">Hesperius Dimension</option><option value="5">Hyades</option><option value="6">Ickjamatew</option><option value="7">Budullangr</option><option value="8">Kikolgallr</option><option value="9">Eltiensleen</option><option value="10">Eissentam</option>
+		  <option value="11">Elkupalos</option><option value="12">Aptarkaba</option><option value="13">Ontiniangp</option><option value="14">Odiwagiri</option><option value="15">Ogtialabi</option><option value="16">Muhacksonto</option><option value="17">Hitonskyer</option><option value="18">Rerasmutul</option><option value="19">Isdoraijung</option><option value="20">Doctinawyra</option>
+		  <option value="21">Loychazinq</option><option value="22">Zukasizawa</option><option value="23">Ekwathore</option><option value="24">Yeberhahne</option><option value="25">Twerbetek</option><option value="26">Sivarates</option><option value="27">Eajerandal</option><option value="28">Aldukesci</option><option value="29">Wotyarogii</option><option value="30">Sudzerbal</option>
+		  <option value="31">Maupenzhay</option><option value="32">Sugueziume</option><option value="33">Brogoweldian</option><option value="34">Ehbogdenbu</option><option value="35">Ijsenufryos</option><option value="36">Nipikulha</option><option value="37">Autsurabin</option><option value="38">Lusontrygiamh</option><option value="39">Rewmanawa</option><option value="40">Ethiophodhe</option>
+		  <option value="41">Urastrykle</option><option value="42">Xobeurindj</option><option value="43">Oniijialdu</option><option value="44">Wucetosucc</option><option value="45">Ebyeloof</option><option value="46">Odyavanta</option><option value="47">Milekistri</option><option value="48">Waferganh</option><option value="49">Agnusopwit</option><option value="50">Teyaypilny</option>
+		  <option value="51">Zalienkosm</option><option value="52">Ladgudiraf</option><option value="53">Mushonponte</option><option value="54">Amsentisz</option><option value="55">Fladiselm</option><option value="56">Laanawemb</option><option value="57">Ilkerloor</option><option value="58">Davanossi</option><option value="59">Ploehrliou</option><option value="60">Corpinyaya</option>
+		  <option value="61">Leckandmeram</option><option value="62">Quulngais</option><option value="63">Nokokipsechl</option><option value="64">Rinblodesa</option><option value="65">Loydporpen</option><option value="66">Ibtrevskip</option><option value="67">Elkowaldb</option><option value="68">Heholhofsko</option><option value="69">Yebrilowisod</option><option value="70">Husalvangewi</option>
+		  <option value="71">Ovna'uesed</option><option value="72">Bahibusey</option><option value="73">Nuybeliaure</option><option value="74">Doshawchuc</option><option value="75">Ruckinarkh</option><option value="76">Thorettac</option><option value="77">Nuponoparau</option><option value="78">Moglaschil</option><option value="79">Uiweupose</option><option value="80">Nasmilete</option>
+		  <option value="81">Ekdaluskin</option><option value="82">Hakapanasy</option><option value="83">Dimonimba</option><option value="84">Cajaccari</option><option value="85">Olonerovo</option><option value="86">Umlanswick</option><option value="87">Henayliszm</option><option value="88">Utzenmate</option><option value="89">Umirpaiya</option><option value="90">Paholiang</option>
+		  <option value="91">Iaereznika</option><option value="92">Yudukagath</option><option value="93">Boealalosnj</option><option value="94">Yaevarcko</option><option value="95">Coellosipp</option><option value="96">Wayndohalou</option><option value="97">Smoduraykl</option><option value="98">Apmaneessu</option><option value="99">Hicanpaav</option><option value="100">Akvasanta</option>
+		  <option value="101">Tuychelisaor</option><option value="102">Rivskimbe</option><option value="103">Daksanquix</option><option value="104">Kissonlin</option><option value="105">Aediabiel</option><option value="106">Ulosaginyik</option><option value="107">Roclaytonycar</option><option value="108">Kichiaroa</option><option value="109">Irceauffey</option><option value="110">Nudquathsenfe</option>
+		  <option value="111">Getaizakaal</option><option value="112">Hansolmien</option><option value="113">Bloytisagra</option><option value="114">Ladsenlay</option><option value="115">Luyugoslasr</option><option value="116">Ubredhatk</option><option value="117">Cidoniana</option><option value="118">Jasinessa</option><option value="119">Torweierf</option><option value="120">Saffneckm</option>
+		  <option value="121">Thnistner</option><option value="122">Dotusingg</option><option value="123">Luleukous</option><option value="124">Jelmandan</option><option value="125">Otimanaso</option><option value="126">Enjaxusanto</option><option value="127">Sezviktorew</option><option value="128">Zikehpm</option><option value="129">Bephembah</option><option value="130">Broomerrai</option>
+		  <option value="131">Meximicka</option><option value="132">Venessika</option><option value="133">Gaiteseling</option><option value="134">Zosakasiro</option><option value="135">Drajayanes</option><option value="136">Ooibekuar</option><option value="137">Urckiansi</option><option value="138">Dozivadido</option><option value="139">Emiekereks</option><option value="140">Meykinunukur</option>
+		  <option value="141">Kimycuristh</option><option value="142">Roansfien</option><option value="143">Isgarmeso</option><option value="144">Daitibeli</option><option value="145">Gucuttarik</option><option value="146">Enlaythie</option><option value="147">Drewweste</option><option value="148">Akbulkabi</option><option value="149">Homskiw</option><option value="150">Zavainlani</option>
+		  <option value="151">Jewijkmas</option><option value="152">Itlhotagra</option><option value="153">Podalicess</option><option value="154">Hiviusauer</option><option value="155">Halsebenk</option><option value="156">Puikitoac</option><option value="157">Gaybakuaria</option><option value="158">Grbodubhe</option><option value="159">Rycempler</option><option value="160">Indjalala</option>
+		  <option value="161">Fontenikk</option><option value="162">Pasycihelwhee</option><option value="163">Ikbaksmit</option><option value="164">Telicianses</option><option value="165">Oyleyzhan</option><option value="166">Uagerosat</option><option value="167">Impoxectin</option><option value="168">Twoodmand</option><option value="169">Hilfsesorbs</option><option value="170">Ezdaranit</option>
+		  <option value="171">Wiensanshe</option><option value="172">Ewheelonc</option><option value="173">Litzmantufa</option><option value="174">Emarmatosi</option><option value="175">Mufimbomacvi</option><option value="176">Wongquarum</option><option value="177">Hapirajua</option><option value="178">Igbinduina</option><option value="179">Wepaitvas</option><option value="180">Sthatigudi</option>
+		  <option value="181">Yekathsebehn</option><option value="182">Ebedeagurst</option><option value="183">Nolisonia</option><option value="184">Ulexovitab</option><option value="185">Iodhinxois</option><option value="186">Irroswitzs</option><option value="187">Bifredait</option><option value="188">Beiraghedwe</option><option value="189">Yeonatlak</option><option value="190">Cugnatachh</option>
+		  <option value="191">Nozoryenki</option><option value="192">Ebralduri</option><option value="193">Evcickcandj</option><option value="194">Ziybosswin</option><option value="195">Heperclait</option><option value="196">Sugiuniam</option><option value="197">Aaseertush</option><option value="198">Uglyestemaa</option><option value="199">Horeroedsh</option><option value="200">Drundemiso</option>
+		  <option value="201">Ityanianat</option><option value="202">Purneyrine</option><option value="203">Dokiessmat</option><option value="204">Nupiacheh</option><option value="205">Dihewsonj</option><option value="206">Rudrailhik</option><option value="207">Tweretnort</option><option value="208">Snatreetze</option><option value="209">Iwundaracos</option><option value="210">Digarlewena</option>
+		  <option value="211">Erquagsta</option><option value="212">Logovoloin</option><option value="213">Boyaghosganh</option><option value="214">Kuolungau</option><option value="215">Pehneldept</option><option value="216">Yevettiiqidcon</option><option value="217">Sahliacabru</option><option value="218">Noggalterpor</option><option value="219">Chmageaki</option><option value="220">Veticueca</option>
+		  <option value="221">Vittesbursul</option><option value="222">Nootanore</option><option value="223">Innebdjerah</option><option value="224">Kisvarcini</option><option value="225">Cuzcogipper</option><option value="226">Pamanhermonsu</option><option value="227">Brotoghek</option><option value="228">Mibittara</option><option value="229">Huruahili</option><option value="230">Raldwicarn</option>
+		  <option value="231">Ezdartlic</option><option value="232">Badesclema</option><option value="233">Isenkeyan</option><option value="234">Iadoitesu</option><option value="235">Yagrovoisi</option><option value="236">Ewcomechio</option><option value="237">Inunnunnoda</option><option value="238">Dischiutun</option><option value="239">Yuwarugha</option><option value="240">Ialmendra</option>
+		  <option value="241">Reponudrle</option><option value="242">Rinjanagrbo</option><option value="243">Zeziceloh</option><option value="244">Oeileutasc</option><option value="245">Zicniijinis</option><option value="246">Dugnowarilda</option><option value="247">Neuxoisan</option><option value="248">Ilmenhorn</option><option value="249">Rukwatsuku</option><option value="250">Nepitzaspru</option>
+  <option value="251">Chcehoemig</option><option value="252">Haffneyrin</option><option value="253">Uliciawai</option><option value="254">Tuhgrespod</option><option value="255">Iousongola</option><option value="256">Odyalutai</option>
+</select>
       <label>Region</label><input type="text" id="detailRegion" />
       <label>Układ planetarny</label><input type="text" id="detailSystem" />
       <label>Biom</label>
@@ -601,6 +629,7 @@ let myLocationPoint = null;
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
 let headerLock = true; // blokada na starcie celem zablokowania możliwości nadpisania nagłówka
+let defaultGalaxy = "Euclid";
   
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
@@ -816,7 +845,7 @@ function addNewPlanet() {
   
   // Dodaj pustą strukturę detali od razu:
   planetDetails[name] = {
-    galaxy: "",
+    galaxy: defaultGalaxy,
     region: "",
     system: "",
     biome: "",
@@ -1118,7 +1147,15 @@ function setButtonsDisabled(disabled) {
     btn.disabled = disabled;
   });
 }
-  
+
+function updateDefaultGalaxy(galaxy) {
+  defaultGalaxy = galaxy || "Euclid";
+  if (currentPlanet && planetDetails[currentPlanet]) {
+    planetDetails[currentPlanet].galaxy = defaultGalaxy;
+  }
+}
+
+	
 ////////////////////////////////////////////////////////////////////
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
 //////////////////////////////////////////////////////////////////// 
