@@ -502,12 +502,12 @@ button:disabled {
     </div>
     <!-- Zakładka DETALE PLANETY -->
     <div id="detale" class="tab-content">
-      <div class="galaxy-selector">
-  		<input type="text" id="galaxyInput" placeholder="Wybierz galaktykę...">
-  		<div id="galaxyDropdown" class="dropdown"></div>
-	  </div>
-		
-      <label>Region</label><input type="text" id="detailRegion" />
+      <label>Galaktyka</label>
+		<div class="galaxy-selector">
+  			<input type="text" id="galaxyInput" placeholder="Wybierz galaktykę...">
+  			<div id="galaxyDropdown" class="dropdown"></div>
+	    </div>
+	  <label>Region</label><input type="text" id="detailRegion" />
       <label>Układ planetarny</label><input type="text" id="detailSystem" />
       <label>Biom</label>
       <select id="detailBiome">
@@ -844,11 +844,16 @@ input.addEventListener("input", () => {
       input.value = g;
       currentGalaxy = g; // ustawiamy aktualną galaktykę
       dropdown.style.display = "none";
-      console.log("Wybrano galaktykę:", currentGalaxy);
-      // tu możesz np. przeładować listę planet z tej galaktyki
-    });
-    dropdown.appendChild(option);
-  });
+      option.addEventListener("click", () => {
+ 		input.value = g;
+ 		currentGalaxy = g; // ustawiamy aktualną galaktykę
+		dropdown.style.display = "none";
+
+		refreshPlanetSidebar();         // odśwież listę planet w sidebarze
+ 		updateCurrentPlanetHeader(); // jeśli masz nagłówek z aktualną galaktyką
+		});
+     	dropdown.appendChild(option);
+  	});
 
   dropdown.style.display = "block";
 });
