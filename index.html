@@ -157,6 +157,7 @@ button:disabled {
   gap: 0.3rem;
   transition: transform 0.4s ease-in-out;
   transform: translateX(0); /* widoczny */
+  max-height: calc(100% - 200px); /* zostawiamy miejsce na galaktyki */
 }
 
 /* Ukryty panel – chowamy w prawo */
@@ -348,6 +349,21 @@ button:disabled {
 .dropdown div:hover {
   background: #eee;
 }
+	
+/* Panel galaktyk */
+#galaxySidebar {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 250px;              /* ta sama szerokość co lista planet */
+  max-height: 150px;         /* niski panel */
+  overflow-y: auto;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+}	
 	
 </style>
 </head>
@@ -624,6 +640,12 @@ button:disabled {
     </div>
     <!-- Przycisk do pokazywania/ukrywania panelu -->
    <button id="togglePlanetSidebarBtn">▶</button>
+
+	<!-- Panel galaktyk -->
+	<div id="galaxySidebar" class="sidebar-panel">
+	  <h3>Galaktyki</h3>
+	  <ul id="galaxyList"></ul>
+	</div>
    </div>
 
 <script>
@@ -756,6 +778,7 @@ function savePlanetDetails(){
   refreshPlanetList();
   updateCurrentPlanetHeader();
   refreshPlanetSidebar();
+  refreshGalaxySidebar();
 }
 
 
@@ -832,6 +855,37 @@ function togglePlanetSidebar() {
 
 // Podłącz przycisk
 document.getElementById("togglePlanetSidebarBtn").addEventListener("click", togglePlanetSidebar);
+
+
+////////////////////////////////////////////////////////////////////
+//------------------- Sidebar galaktyk ----------------------------//
+////////////////////////////////////////////////////////////////////
+
+function refreshGalaxySidebar() {
+  const galaxyList = document.getElementById("galaxyList");
+  galaxyList.innerHTML = "";
+
+  // zbierz unikalne galaktyki z detali planet
+  const galaxies = [...new Set(Object.values(planetDetails)
+    .map(d => d.galaxy)
+    .filter(Boolean))];
+
+  // jeśli nic nie ma, pokaż Euclid jako domyślną
+  if (galaxies.length === 0) galaxies.push("Euclid");
+
+  galaxies.forEach(g => {
+    const li = document.createElement("li");
+    li.textContent = g;
+    li.style.cursor = "pointer";
+
+    li.onclick = () => {
+      currentGalaxy = g;          // ustawiamy globalną zmienną
+      refreshPlanetSidebar();     // odśwież listę planet dla tej galaktyki
+    };
+
+    galaxyList.appendChild(li);
+  });
+}
 
 // Selektor galaktyk
 const galaxies = [
@@ -1248,6 +1302,7 @@ function updateDefaultGalaxy(galaxy) {
 document.addEventListener("DOMContentLoaded", () => {
   const g = document.getElementById("galaxyInput");
   if (g) g.value = currentGalaxy;
+  refreshGalaxySidebar();
 });
 
 
@@ -1813,6 +1868,7 @@ function importAtlas(event){
       refreshGlobePoints();
       updateNoPlanetsMessage();
       refreshPlanetSidebar();
+	  refreshGalaxySidebar();
 
       alert("Import zakończony!");
     } catch(err){ 
