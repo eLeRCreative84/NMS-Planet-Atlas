@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+[<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8" />
@@ -355,8 +355,9 @@ button:disabled {
   position: absolute;
   right: 10px;
   bottom: 10px;
-  width: 250px;              /* ta sama szerokość co lista planet */
-  max-height: 150px;         /* niski panel */
+  width: 220px;            				   /* ta sama szerokość co lista planet */
+  max-height: 150px;      				   /* niski panel */
+  background-color: rgba(0, 0, 0, 0.6);	   /* półprzezroczyste jak sidebar */
   overflow-y: auto;
   background: rgba(0,0,0,0.7);
   color: white;
@@ -364,6 +365,17 @@ button:disabled {
   padding: 10px;
   font-size: 14px;
 }	
+
+/* Nagłówki zakotwiczone */
+.sidebar h3,
+.galaxy-sidebar h3 {
+  position: sticky;
+  top: 0;
+  background: rgba(0, 0, 0, 0.8);
+  margin: 0;
+  padding: 5px;
+  z-index: 1;
+}
 	
 </style>
 </head>
