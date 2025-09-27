@@ -138,7 +138,8 @@ button:disabled {
 /* Lista planet */
 
 #planetSidebar {
-  top: 0;
+  position: fixed;
+  top: 5px;  
   right: 0;
   height: 100%;
   width: 220px;
@@ -157,6 +158,7 @@ button:disabled {
   transition: transform 0.4s ease-in-out;
   transform: translateX(0); /* widoczny */
   max-height: calc(100% - 200px); /* zostawiamy miejsce na galaktyki */
+  margin-bottom: 5px;              /* odstęp od panelu galaktyk */
 }
 
 /* Ukryty panel – chowamy w prawo */
@@ -351,8 +353,9 @@ button:disabled {
 	
 /* Panel galaktyk */
 #galaxySidebar {
+  position: fixed;
   right: 0;
-  bottom: 0;
+  bottom: 5px;                     /* odstęp od dolnej krawędzi okna */
   height: 200px;                     /* trochę miejsca, ale spójny wygląd */
   width: 220px;                      /* ta sama szerokość */
   background: rgba(10, 30, 60, 0.9); /* to samo tło co planety */
@@ -369,44 +372,18 @@ button:disabled {
   gap: 0.3rem;
 }	
 
-/* Wrapper na oba panele */
-#sidebarWrapper {
-  position: fixed;
-  right: 0;
-  top: 5px;       /* odstęp od góry */
-  bottom: 5px;    /* odstęp od dołu */
-  width: 220px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;       /* odstęp między panelami */
-  z-index: 11;
-}
-
-/* Wspólny styl dla paneli */
-.sidebar-panel {
-  background: rgba(10, 30, 60, 0.9);
-  color: white;
-  padding: 0;
-  box-shadow: -2px 0 10px rgba(0,0,0,0.5);
-  border-left: 2px solid #102b56;
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  border-radius: 6px;
-  overflow: hidden; /* obcinamy wystające elementy */
-}
-
-/* Nagłówki przyklejone */
-.sidebar-panel h3 {
+/* Zakotwiczone nagłówki w panelach */
+#planetSidebar h3,
+#galaxySidebar h3 {
   position: sticky;
   top: 0;
   background: rgba(10, 30, 60, 0.95);
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   padding: 0.3rem;
   font-weight: bold;
   text-align: center;
-  border-bottom: 1px solid #102b56;
   z-index: 2;
+  border-bottom: 1px solid #102b56;
 }
 
 /* Lista wewnątrz paneli */
@@ -686,18 +663,16 @@ button:disabled {
     <div id="globeViz"></div>
     <!-- Panel z listą planet po prawej stronie -->
     
-   <div id="sidebarWrapper">
-  <!-- Panel planet -->
-  <div id="planetSidebar" class="sidebar-panel">
-    <h3>Lista planet</h3>
-    <div id="planetListSidebar" class="sidebar-content"></div>
-  </div>
+   <!-- Panel planet -->
+<div id="planetSidebar" class="sidebar-panel">
+  <h3>Lista planet</h3>
+  <div id="planetListSidebar" class="sidebar-content"></div>
+</div>
 
-  <!-- Panel galaktyk -->
-  <div id="galaxySidebar" class="sidebar-panel">
-    <h3>Galaktyki</h3>
-    <ul id="galaxyList" class="sidebar-content"></ul>
-  </div>
+<!-- Panel galaktyk -->
+<div id="galaxySidebar" class="sidebar-panel">
+  <h3>Galaktyki</h3>
+  <ul id="galaxyList" class="sidebar-content"></ul>
 </div>
    </div>
 
