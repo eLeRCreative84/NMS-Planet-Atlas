@@ -139,7 +139,7 @@ button:disabled {
 
 #planetSidebar {
   position: fixed;
-  top: 5px;  
+  top: 0;
   right: 0;
   height: 100%;
   width: 220px;
@@ -157,8 +157,6 @@ button:disabled {
   gap: 0.3rem;
   transition: transform 0.4s ease-in-out;
   transform: translateX(0); /* widoczny */
-  max-height: calc(100% - 200px); /* zostawiamy miejsce na galaktyki */
-  margin-bottom: 5px;              /* odstęp od panelu galaktyk */
 }
 
 /* Ukryty panel – chowamy w prawo */
@@ -349,49 +347,6 @@ button:disabled {
 
 .dropdown div:hover {
   background: #eee;
-}
-	
-/* Panel galaktyk */
-#galaxySidebar {
-  position: fixed;
-  right: 0;
-  bottom: 5px;                     /* odstęp od dolnej krawędzi okna */
-  height: 200px;                     /* trochę miejsca, ale spójny wygląd */
-  width: 220px;                      /* ta sama szerokość */
-  background: rgba(10, 30, 60, 0.9); /* to samo tło co planety */
-  color: white;
-  padding: 0.8rem;
-  box-shadow: -2px 0 10px rgba(0,0,0,0.5);
-  box-sizing: border-box;
-  overflow-y: auto;
-  z-index: 11;
-  border-left: 2px solid #102b56;
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}	
-
-/* Zakotwiczone nagłówki w panelach */
-#planetSidebar h3,
-#galaxySidebar h3 {
-  position: sticky;
-  top: 0;
-  background: rgba(10, 30, 60, 0.95);
-  margin: 0 0 0.5rem 0;
-  padding: 0.3rem;
-  font-weight: bold;
-  text-align: center;
-  z-index: 2;
-  border-bottom: 1px solid #102b56;
-}
-
-/* Lista wewnątrz paneli */
-.sidebar-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.5rem;
-  box-sizing: border-box;
 }
 	
 </style>
@@ -662,18 +617,14 @@ button:disabled {
     <!-- glob -->
     <div id="globeViz"></div>
     <!-- Panel z listą planet po prawej stronie -->
+    
+    <div id="planetSidebar">
+      <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
+      <div id="planetListSidebar"></div>
     </div>
-   <!-- Panel planet -->
-<div id="planetSidebar" class="sidebar-panel">
-  <h3>Lista planet</h3>
-  <div id="planetListSidebar" class="sidebar-content"></div>
-</div>
-
-<!-- Panel galaktyk -->
-<div id="galaxySidebar" class="sidebar-panel">
-  <h3>Galaktyki</h3>
-  <ul id="galaxyList" class="sidebar-content"></ul>
-</div>
+    <!-- Przycisk do pokazywania/ukrywania panelu -->
+   <button id="togglePlanetSidebarBtn">▶</button>
+   </div>
    
 
 <script>
