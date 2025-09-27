@@ -641,7 +641,7 @@ let myLocationPoint = null;
 let isEditing = false; // globalna flaga
 let highlightTimeout = null;
 let headerLock = true; // blokada na starcie celem zablokowania możliwości nadpisania nagłówka
-let defaultGalaxy = "Euclid";
+
 
 	
 ////////////////////////////////////////////////////////////////////
@@ -847,7 +847,7 @@ input.addEventListener("input", () => {
       currentGalaxy = g; // ustawiamy aktualną galaktykę
       dropdown.style.display = "none";
       console.log("Wybrano galaktykę:", currentGalaxy);
-      // tu możesz np. przeładować listę planet z tej galaktyki
+      
     });
     dropdown.appendChild(option);
   });
