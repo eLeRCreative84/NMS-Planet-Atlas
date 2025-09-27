@@ -1,4 +1,4 @@
-[<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8" />
@@ -353,28 +353,36 @@ button:disabled {
 /* Panel galaktyk */
 #galaxySidebar {
   position: fixed;
-  right: 10px;
-  bottom: 10px;
-  width: 220px;            				   /* ta sama szerokość co lista planet */
-  max-height: 150px;      				   /* niski panel */
-  background-color: rgba(0, 0, 0, 0.6);	   /* półprzezroczyste jak sidebar */
-  overflow-y: auto;
-  background: rgba(0,0,0,0.7);
+  right: 0;
+  bottom: 0;
+  height: 200px;                     /* trochę miejsca, ale spójny wygląd */
+  width: 220px;                      /* ta sama szerokość */
+  background: rgba(10, 30, 60, 0.9); /* to samo tło co planety */
   color: white;
-  border-radius: 8px;
-  padding: 10px;
+  padding: 0.8rem;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 11;
+  border-left: 2px solid #102b56;
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }	
 
 /* Nagłówki zakotwiczone */
-.planetSidebar h3,
-.galaxySidebar h3 {
+#planetSidebar h3,
+#galaxySidebar h3 {
   position: sticky;
   top: 0;
-  background: rgba(0, 0, 0, 0.8);
-  margin: 0;
-  padding: 5px;
-  z-index: 1;
+  background: rgba(10, 30, 60, 0.95); /* ten sam kolor co panel */
+  margin: 0 0 0.5rem 0;
+  padding: 0.3rem;
+  font-weight: bold;
+  text-align: center;
+  z-index: 2;
+  border-bottom: 1px solid #102b56;
 }
 	
 </style>
@@ -647,17 +655,17 @@ button:disabled {
     <!-- Panel z listą planet po prawej stronie -->
     
     <div id="planetSidebar">
-      <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
-      <div id="planetListSidebar"></div>
-    </div>
+  		<h3>Lista planet</h3>
+ 		 <div id="planetListSidebar"></div>
+	</div>
     <!-- Przycisk do pokazywania/ukrywania panelu -->
    <button id="togglePlanetSidebarBtn">▶</button>
 
 	<!-- Panel galaktyk -->
-	<div id="galaxySidebar" class="sidebar-panel">
-	  <h3>Galaktyki</h3>
-	  <ul id="galaxyList"></ul>
-	</div>
+	<div id="galaxySidebar">
+  <h3>Galaktyki</h3>
+  <ul id="galaxyList"></ul>
+</div>
    </div>
 
 <script>
