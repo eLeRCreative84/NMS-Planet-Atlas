@@ -139,7 +139,8 @@ button:disabled {
 
 #planetSidebar {
   position: fixed;
-  top: 0;
+  top: 5px;
+  bottom: 5px;
   right: 0;
   height: 100%;
   width: 220px;
@@ -347,6 +348,41 @@ button:disabled {
 
 .dropdown div:hover {
   background: #eee;
+}
+
+	/* Panel galaktyk – taki sam styl jak planetSidebar */
+#galaxySidebar {
+  position: fixed;
+  right: 0;
+  bottom: 5px;
+  height: 200px;                     /* trochę miejsca, ale spójny wygląd */
+  width: 220px;                      /* ta sama szerokość */
+  background: rgba(10, 30, 60, 0.9); /* to samo tło co planety */
+  color: white;
+  padding: 0.8rem;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 11;
+  border-left: 2px solid #102b56;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+/* Zakotwiczone nagłówki w obu panelach */
+#planetSidebar h3,
+#galaxySidebar h3 {
+  position: sticky;
+  top: 0;
+  background: rgba(10, 30, 60, 0.95); /* ten sam kolor co panel */
+  margin: 0 0 0.5rem 0;
+  padding: 0.3rem;
+  font-weight: bold;
+  text-align: center;
+  z-index: 2;
+  border-bottom: 1px solid #102b56;
 }
 	
 </style>
@@ -619,9 +655,14 @@ button:disabled {
     <!-- Panel z listą planet po prawej stronie -->
     
     <div id="planetSidebar">
-      <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
-      <div id="planetListSidebar"></div>
-    </div>
+  <h3>Lista planet</h3>
+  <div id="planetListSidebar"></div>
+</div>
+
+<div id="galaxySidebar">
+  <h3>Galaktyki</h3>
+  <ul id="galaxyList"></ul>
+</div>
     <!-- Przycisk do pokazywania/ukrywania panelu -->
    <button id="togglePlanetSidebarBtn">▶</button>
    </div>
