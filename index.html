@@ -931,7 +931,7 @@ function addNewPlanet() {
   
   // Dodaj pustą strukturę detali od razu:
   planetDetails[name] = {
-    galaxy: defaultGalaxy,
+    galaxy: currentGalaxy,
     region: "",
     system: "",
     biome: "",
@@ -1242,7 +1242,15 @@ function updateDefaultGalaxy(galaxy) {
     planetDetails[currentPlanet].galaxy = defaultGalaxy;
   }
 }
-	
+
+
+// ustaw domyślną galaktykę w input na starcie.	
+document.addEventListener("DOMContentLoaded", () => {
+  const g = document.getElementById("galaxyInput");
+  if (g) g.value = currentGalaxy;
+});
+
+
 ////////////////////////////////////////////////////////////////////
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
 //////////////////////////////////////////////////////////////////// 
