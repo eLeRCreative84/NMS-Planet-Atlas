@@ -700,58 +700,43 @@ function updateNoPlanetsMessage() {
 // Detale planety 
 function loadPlanetDetails(){
   if(!currentPlanet) return;
-  const details = planetDetails[currentPlanet] || {};
-
-  // ustaw galaktykę w nowym polu (galaxyInput), fallback do detailGalaxy jeśli istnieje
-  const galInput = document.getElementById("galaxyInput");
-  if (galInput) {
-    galInput.value = details.galaxy || "";
-  } else if (document.getElementById("detailGalaxy")) {
-    document.getElementById("detailGalaxy").value = details.galaxy || "";
-  }
-
-  document.getElementById("detailRegion").value = details.region || "";
-  document.getElementById("detailSystem").value = details.system || "";
-  document.getElementById("detailBiome").value = details.biome || "";
-  document.getElementById("detailWeather").value = details.weather || "";
-  document.getElementById("detailSentinels").value = details.sentinels || "";
-  document.getElementById("detailFlora").value = details.flora || "";
-  document.getElementById("detailFauna").value = details.fauna || "";
-  document.getElementById("detailDiscovered").value = details.discovered || "";
-  document.getElementById("detailMode").value = details.mode || "";
-  document.getElementById("detailUpdated").value = details.updated || "";
-  document.getElementById("detailCoords").value = details.coords || "";
-  document.getElementById("detailNotes").value = details.notes || "";
+  const details=planetDetails[currentPlanet]||{};
+  document.getElementById("detailGalaxy").value=details.galaxy||"";
+  document.getElementById("detailRegion").value=details.region||"";
+  document.getElementById("detailSystem").value=details.system||"";
+  document.getElementById("detailBiome").value=details.biome||"";
+  document.getElementById("detailWeather").value=details.weather||"";
+  document.getElementById("detailSentinels").value=details.sentinels||"";
+  document.getElementById("detailFlora").value=details.flora||"";
+  document.getElementById("detailFauna").value=details.fauna||"";
+  document.getElementById("detailDiscovered").value=details.discovered||"";
+  document.getElementById("detailMode").value=details.mode||"";
+  document.getElementById("detailUpdated").value=details.updated||"";
+  document.getElementById("detailCoords").value=details.coords||"";
+  document.getElementById("detailNotes").value=details.notes||"";
 }
 
 function savePlanetDetails(){
   if(!currentPlanet) return;
-
-  // weź wartość galaktyki z galaxyInput (jeśli jest), inaczej z detailGalaxy (fallback)
-  const galEl = document.getElementById("galaxyInput") || document.getElementById("detailGalaxy");
-  const galaxyVal = galEl ? (galEl.value || "") : (planetDetails[currentPlanet]?.galaxy || defaultGalaxy || "");
-
-  planetDetails[currentPlanet] = {
-    galaxy: galaxyVal,
-    region: document.getElementById("detailRegion").value,
-    system: document.getElementById("detailSystem").value,
-    biome: document.getElementById("detailBiome").value,
-    weather: document.getElementById("detailWeather").value,
-    sentinels: document.getElementById("detailSentinels").value,
-    flora: document.getElementById("detailFlora").value,
-    fauna: document.getElementById("detailFauna").value,
-    discovered: document.getElementById("detailDiscovered").value,
-    mode: document.getElementById("detailMode").value,
-    updated: document.getElementById("detailUpdated").value,
-    coords: document.getElementById("detailCoords").value,
-    notes: document.getElementById("detailNotes").value
+  planetDetails[currentPlanet]={
+    galaxy:document.getElementById("detailGalaxy").value,
+    region:document.getElementById("detailRegion").value,
+    system:document.getElementById("detailSystem").value,
+    biome:document.getElementById("detailBiome").value,
+    weather:document.getElementById("detailWeather").value,
+    sentinels:document.getElementById("detailSentinels").value,
+    flora:document.getElementById("detailFlora").value,
+    fauna:document.getElementById("detailFauna").value,
+    discovered:document.getElementById("detailDiscovered").value,
+    mode:document.getElementById("detailMode").value,
+    updated:document.getElementById("detailUpdated").value,
+    coords:document.getElementById("detailCoords").value,
+    notes:document.getElementById("detailNotes").value
   };
-
   alert("Opis zapisany!");
   refreshPlanetList();
   updateCurrentPlanetHeader();
-  refreshPlanetSidebar();
-}
+  }
 
   // Renderowanie list planet na wizualizacji globu
   function refreshPlanetSidebar() {
@@ -858,26 +843,19 @@ input.addEventListener("input", () => {
     const option = document.createElement("div");
     option.textContent = g;
     option.addEventListener("click", () => {
-  input.value = g;
-  currentGalaxy = g;
-  dropdown.style.display = "none";
-
-  // jeśli jest wybrana planeta, zapisz też galaktykę do jej detali
-  if (currentPlanet) {
-    planetDetails[currentPlanet] = planetDetails[currentPlanet] || {};
-    planetDetails[currentPlanet].galaxy = g;
-  }
-
-  refreshPlanetList();
-  updateCurrentPlanetHeader();
-  refreshPlanetSidebar(); // od razu przeładuj sidebar
-});
+      input.value = g;
+      currentGalaxy = g; // ustawiamy aktualną galaktykę
+      dropdown.style.display = "none";
+      console.log("Wybrano galaktykę:", currentGalaxy);
+      // tu możesz np. przeładować listę planet z tej galaktyki
+    });
     dropdown.appendChild(option);
   });
 
   dropdown.style.display = "block";
 });
 
+// zamknięcie dropdownu po kliknięciu poza
 document.addEventListener("click", e => {
   if (!e.target.closest(".galaxy-selector")) {
     dropdown.style.display = "none";
