@@ -842,8 +842,11 @@ function refreshPlanetSidebar() {
     header.style.color = system.name === "Nieznany" ? "#aaa" : "#ffcc00";
     listContainer.appendChild(header);
 
-    // planety w systemie (tylko te z wybranej galaktyki)
-    planetsInGalaxy.forEach(planetName => {
+      // planety w systemie
+    system.planets.forEach(planetName => {
+      // 🔑 filtruj po galaktyce – pokazuj tylko planety przypisane do currentGalaxy
+      if (currentGalaxy && !atlas[planetName].some(p => p.galaxy === currentGalaxy)) return;
+
       const li = document.createElement("li");
       li.style.cursor = "pointer";
       li.style.padding = "2px 0";
