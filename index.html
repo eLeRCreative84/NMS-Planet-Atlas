@@ -851,7 +851,9 @@ function refreshPlanetSidebar() {
     starHeader.textContent = starGroup.StarSystem === "Nieznany"
       ? "Nieznany układ gwiezdny"
       : starGroup.StarSystem;
-    starHeader.style.margin = "0.81rem 0 0.4rem";
+    
+	  starHeader.style.fontSize = "1rem";
+	  starHeader.style.margin = "0.81rem 0 0.4rem";
     starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "#ffcc00";
     listContainer.appendChild(starHeader);
 
@@ -870,7 +872,9 @@ function refreshPlanetSidebar() {
       header.textContent = System.name === "Nieznany"
         ? "Nieznany układ planetarny"
         : System.name;
-      header.style.margin = "0.5rem 0";
+     
+		header.style.fontSize = "0.9rem";
+		header.style.margin = "0.5rem 0";
       header.style.color = System.name === "Nieznany" ? "#aaa" : "#ccc";
       listContainer.appendChild(header);
 
