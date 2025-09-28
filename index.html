@@ -152,13 +152,19 @@ button:disabled {
   z-index: 11;
   border-left: 2px solid #102b56;
   font-size: 14px;
-  display: block;
+  display: flex;
   flex-direction: column;
   gap: 0.3rem;
   transition: transform 0.4s ease-in-out;
   transform: translateX(0); /* widoczny */
   max-height: calc(100% - 215px); /* zostawiamy miejsce na galaktyki */
   padding-top: 0; /* nie zostawiaj odstępu nad h3 */
+}
+
+/* scroll dotyczy tylko listy planet */
+.sidebar-scroll {
+  overflow-y: auto;
+  flex: 1;
 }
 
 /* Ukryty panel – chowamy w prawo */
@@ -376,10 +382,8 @@ button:disabled {
   transform: translateX(0);
 }
 
-/* Zakotwiczone nagłówki w obu panelach */
 #planetSidebar h3,
 #galaxySidebar h3 {
-  position: sticky;
   top: 0;
   background: rgba(10, 30, 70); /* ten sam kolor co panel */
   margin: 0;
@@ -660,9 +664,11 @@ button:disabled {
     <!-- Panel z listą planet po prawej stronie -->
     
     <div id="planetSidebar">
-  <h3>Lista planet</h3>
-  <div id="planetListSidebar"></div>
-</div>
+  		<h3>Lista planet</h3>
+  		<div class="sidebar-scroll">
+			<ul id="planetListSidebar"></ul>
+		</div>
+	</div>
 
 <div id="galaxySidebar">
   <h3>Galaktyki</h3>
