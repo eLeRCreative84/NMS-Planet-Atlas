@@ -843,11 +843,6 @@ function savePlanetDetails(){
   // Jeśli panel jest ukryty, nic nie rób aby nie blokować pokaż / ukryj listy planet
   if (sidebar.classList.contains("hidden")) return;
 
-  sidebar.innerHTML = `
-    <div style="font-weight:bold; margin-bottom:0.5rem; text-align:center;">Lista planet</div>
-    <div id="planetListSidebar"></div>
-  `;
-
   if (!atlas) return;
 
   const listContainer = document.getElementById("planetListSidebar");
