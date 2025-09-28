@@ -880,16 +880,9 @@ function refreshPlanetSidebar() {
 
       // nagłówek systemu
       const header = document.createElement("h4");
-     if (system.name === "Nieznany") {
-  header.textContent = "Nieznany układ planetarny";
-  header.style.color = "#aaa";
-  header.style.textAlign = "center";   // <--- wyśrodkowanie tylko dla nieznanych
-} else {
-  header.textContent = system.name;    // już bez "Układ planetarny:"
-  header.style.color = "#daa520";      // ciemnozłoty
-}
-
+header.textContent = system.name === "Nieznany" ? "Nieznany układ" : system.name;
 header.style.margin = "0.5rem 0";
+header.style.color = system.name === "Nieznany" ? "#aaa" : "#daa520";
 listContainer.appendChild(header);
 
       // planety w systemie (już przefiltrowane)
