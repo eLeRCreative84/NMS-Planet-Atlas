@@ -850,9 +850,9 @@ function refreshPlanetSidebar() {
     const starHeader = document.createElement("h3");
     starHeader.textContent = starGroup.StarSystem === "Nieznany"
       ? "Nieznany układ gwiezdny"
-      : "Układ gwiezdny: " + starGroup.StarSystem;
-    starHeader.style.margin = "0.8rem 0 0.4rem";
-    starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "#ff6600";
+      : starGroup.StarSystem;
+    starHeader.style.margin = "1.1rem";
+    starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "#ffcc00";
     listContainer.appendChild(starHeader);
 
     // teraz iteracja po systemach planetarnych wewnątrz tego układu gwiezdnego
@@ -869,9 +869,9 @@ function refreshPlanetSidebar() {
       const header = document.createElement("h4");
       header.textContent = System.name === "Nieznany"
         ? "Nieznany układ planetarny"
-        : "Układ planetarny: " + System.name;
-      header.style.margin = "0.5rem 0";
-      header.style.color = System.name === "Nieznany" ? "#aaa" : "#ffcc00";
+        : System.name;
+      header.style.margin = "1.0rem";
+      header.style.color = System.name === "Nieznany" ? "#aaa" : "#ccc";
       listContainer.appendChild(header);
 
       // planety w systemie (już przefiltrowane)
@@ -1167,14 +1167,14 @@ function refreshPlanetList() {
 
   grouped.forEach(starGroup => {
   const starHeader = document.createElement("h2");
-  starHeader.textContent = "Układ gwiezdny: " + starGroup.StarSystem;
-  starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "#ff6600";
+  starHeader.textContent = starGroup.StarSystem;
+  starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "##ffcc00";
   frag.appendChild(starHeader);
 
   starGroup.Systems.forEach(System => {
     const header = document.createElement("h3");
-    header.textContent = "Układ planetarny: " + System.name;
-    header.style.color = System.name === "Nieznany" ? "#aaa" : "#ffcc00";
+    header.textContent = System.name;
+    header.style.color = System.name === "Nieznany" ? "#aaa" : "#ccc";
     frag.appendChild(header);
 
     System.planets.forEach(p => {
