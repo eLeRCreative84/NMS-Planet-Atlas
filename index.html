@@ -812,9 +812,10 @@ function savePlanetDetails(){
 }
 
 
-  // Renderowanie list planet na wizualizacji globu
+// Renderowanie list planet na wizualizacji globu
 function refreshPlanetSidebar() {
   const sidebar = document.getElementById("planetSidebar");
+  if (!sidebar) return;
 
   // Jeśli panel jest ukryty, nic nie rób aby nie blokować pokaż / ukryj listy planet
   if (sidebar.classList.contains("hidden")) return;
@@ -822,15 +823,16 @@ function refreshPlanetSidebar() {
   if (!atlas) return;
 
   const listContainer = document.getElementById("planetListSidebar");
+  if (!listContainer) return;
   listContainer.innerHTML = ""; // WAŻNE: czyścimy listę przed ponownym renderowaniem
 
   const grouped = getGroupedPlanets(); // zachowuje systemy
 
   grouped.forEach(system => {
-    // sprawdź, czy w tym systemie są planety z wybranej galaktyki
+    // filtrujemy planety tego systemu wg planetDetails (GALAKTYKA)
     const planetsInGalaxy = system.planets.filter(planetName => {
       if (!currentGalaxy) return true; // jeśli nic nie wybrano, pokaż wszystkie
-      return atlas[planetName]?.some(p => p.galaxy === currentGalaxy);
+      return planetDetails[planetName]?.galaxy === currentGalaxy;
     });
 
     if (planetsInGalaxy.length === 0) return; // pomiń system, jeśli nie ma pasujących planet
@@ -842,11 +844,8 @@ function refreshPlanetSidebar() {
     header.style.color = system.name === "Nieznany" ? "#aaa" : "#ffcc00";
     listContainer.appendChild(header);
 
-      // planety w systemie
-    system.planets.forEach(planetName => {
-      // 🔑 filtruj po galaktyce – pokazuj tylko planety przypisane do currentGalaxy
-      if (currentGalaxy && planetDetails[planetName]?.galaxy !== currentGalaxy) return;
-
+    // planety w systemie (już przefiltrowane)
+    planetsInGalaxy.forEach(planetName => {
       const li = document.createElement("li");
       li.style.cursor = "pointer";
       li.style.padding = "2px 0";
@@ -935,48 +934,60 @@ const galaxies = [
 
 let currentGalaxy = "Euclid"; // domyślna
 
-const input = document.getElementById("galaxyInput");
-const dropdown = document.getElementById("galaxyDropdown");
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("galaxyInput");
+  const dropdown = document.getElementById("galaxyDropdown");
 
-// pokazanie listy przy wpisywaniu
-input.addEventListener("input", () => {
-  const val = input.value.toLowerCase();
-  dropdown.innerHTML = "";
+  // ustaw wartość inputa i odśwież sidebary na starcie
+  if (input) input.value = currentGalaxy || "";
+  refreshGalaxySidebar();
+  refreshPlanetSidebar();
 
-  if (!val) {
-    dropdown.style.display = "none";
-    return;
-  }
+  if (!input || !dropdown) return;
 
-  const filtered = galaxies.filter(g => g.toLowerCase().includes(val));
+  // pokazanie listy przy wpisywaniu
+  input.addEventListener("input", () => {
+    const val = input.value.toLowerCase();
+    dropdown.innerHTML = "";
 
-  if (filtered.length === 0) {
-    dropdown.style.display = "none";
-    return;
-  }
-
-  filtered.forEach(g => {
-    const option = document.createElement("div");
-    option.textContent = g;
-    option.addEventListener("click", () => {
-      input.value = g;
-      currentGalaxy = g; // ustawiamy aktualną galaktykę
+    if (!val) {
       dropdown.style.display = "none";
-      console.log("Wybrano galaktykę:", currentGalaxy);
-      
+      return;
+    }
+
+    const filtered = galaxies.filter(g => g.toLowerCase().includes(val));
+
+    if (filtered.length === 0) {
+      dropdown.style.display = "none";
+      return;
+    }
+
+    filtered.forEach(g => {
+      const option = document.createElement("div");
+      option.textContent = g;
+      option.addEventListener("click", () => {
+        input.value = g;
+        currentGalaxy = g; // ustawiamy aktualną galaktykę
+        dropdown.style.display = "none";
+        // od razu odświeżamy listy aby widać było filtrację
+        refreshGalaxySidebar();
+        refreshPlanetSidebar();
+        console.log("Wybrano galaktykę:", currentGalaxy);
+      });
+      dropdown.appendChild(option);
     });
-    dropdown.appendChild(option);
+
+    dropdown.style.display = "block";
   });
 
-  dropdown.style.display = "block";
+  // zamknięcie dropdownu po kliknięciu poza
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".galaxy-selector")) {
+      dropdown.style.display = "none";
+    }
+  });
 });
 
-// zamknięcie dropdownu po kliknięciu poza
-document.addEventListener("click", e => {
-  if (!e.target.closest(".galaxy-selector")) {
-    dropdown.style.display = "none";
-  }
-});
  
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
