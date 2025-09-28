@@ -159,6 +159,7 @@ button:disabled {
   transition: transform 0.4s ease-in-out;
   transform: translateX(0); /* widoczny */
   max-height: calc(100% - 215px); /* zostawiamy miejsce na galaktyki */
+  padding-top: 0; /* nie zostawiaj odstępu nad h3 */
 }
 
 /* Ukryty panel – chowamy w prawo */
@@ -185,7 +186,7 @@ button:disabled {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   transition: right 0.4s ease-in-out; /* animacja przesunięcia przycisku */
-  padding-top: 0; /* nie zostawiaj odstępu nad h3 */
+  
 }
   
 #togglePlanetSidebarBtn:hover {
@@ -357,8 +358,8 @@ button:disabled {
   position: fixed;
   right: 0;
   bottom: 5px;
-  height: 180px;                     /* trochę miejsca, ale spójny wygląd */
-  width: 200px;                      /* ta sama szerokość */
+  height: 200px;                     /* trochę miejsca, ale spójny wygląd */
+  width: 220px;                      /* ta sama szerokość */
   background: rgba(10, 30, 60, 0.9); /* to samo tło co planety */
   color: white;
   padding: 0.8rem;
@@ -385,7 +386,7 @@ button:disabled {
   font-weight: bold;
   text-align: center;
   z-index: 2;
-  border-bottom: 1px solid #102b56;
+  border-bottom: 2px solid #102b56;
 }
 	
 </style>
