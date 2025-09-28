@@ -16,6 +16,9 @@
   input, select, textarea, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
   button { cursor: pointer; }
 
+  ul { padding: 0; list-style: none; }
+  li { margin: 0.3rem 0; background: #1a2b4d; padding: 0.3rem; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+  li div { display: flex; gap: 0.5rem; align-items: center; }
   li button { padding: 0.2rem 0.5rem; border: none; border-radius: 4px; cursor: pointer; }
   li button.edit { background: #0277bd; color: white; }
   li button.del { background: #c62828; color: white; }
@@ -28,33 +31,6 @@
   #tabs button.active { background: #1976d2; }
   .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
   .tab-content.active { display: block; }
-
-	h3 {
-  margin: 0.5rem 0;           /* odstęp nad i pod nagłówkiem */
-  padding: 0.5rem;            /* wewnętrzny odstęp */
-  font-size: 1.2rem;           /* rozmiar czcionki */
-  font-weight: bold;           /* pogrubienie */
-  text-align: center;          /* wyśrodkowanie */
-  background-color: #1976d2;  /* kolor tła */
-  color: white;                /* kolor tekstu */
-  border-radius: 4px;          /* zaokrąglone rogi */
-}
-
-#form ul { padding: 0; list-style: none; }
-#form li { 
-  margin: 0.3rem 0; 
-  background: #1a2b4d; 
-  padding: 0.3rem; 
-  border-radius: 5px; 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-}
-#form li div { 
-  display: flex; 
-  gap: 0.5rem; 
-  align-items: center; 
-}
 
 /* Nagłówek aktualnej planety */
 .currentPlanetHeader {
@@ -93,7 +69,8 @@
   width: 100%;               /* na całą szerokość okna */
   height: 100%;              /* na całą wysokość okna */
   display: flex;             /* flexbox włączony */
-
+  justify-content: center;   /* dzieci flexa wyśrodkowane poziomo */
+  align-items: center;       /* dzieci flexa wyśrodkowane pionowo */
   overflow: hidden;          /* elementy wystające poza wrapper są ucinane */
   
 }
@@ -165,6 +142,7 @@ button:disabled {
   top: 5px;
   bottom: 5px;
   right: 0;
+  height: 100%;
   width: 220px;
   background: rgba(10, 30, 60, 0.9);
   color: white;
@@ -184,14 +162,8 @@ button:disabled {
   padding-top: 0; /* nie zostawiaj odstępu nad h3 */
 }
 
-/* scroll dotyczy tylko listy planet */
-.sidebar-scroll {
-  overflow-y: auto;
-  flex: 1;
-}
-
 /* Ukryty panel – chowamy w prawo */
-#planetSidebar.hidden, #galaxySidebar.hidden {
+#planetSidebar.hidden {
   transform: translateX(100%);
 }
 
@@ -401,20 +373,20 @@ button:disabled {
   flex-direction: column;
   gap: 0.3rem;
   padding-top: 0; /* nie zostawiaj odstępu nad h3 */
-  transition: transform 0.4s ease-in-out;
-  transform: translateX(0);
 }
 
+/* Zakotwiczone nagłówki w obu panelach */
 #planetSidebar h3,
 #galaxySidebar h3 {
-  margin: 0;          					  /* usuń marginesy globalne */
-  padding: 0.5rem;    					  /* własny odstęp wewnętrzny */
-  text-align: center;   				  /* zawsze wyśrodkowany */
-  font-size: 1rem;     					  /* wymuś rozmiar */
-  font-weight: bold;   					  /* pogrubienie */
-  background: #1976d2;  				  /* pełne tło */
+  position: sticky;
+  top: 0;
+  background-color: rgba(25, 118, 210, 1);
+  margin: 0;
+  padding: 0.3rem;
+  font-weight: bold;
+  text-align: center;
+  z-index: 2;
   border-bottom: 2px solid #102b56;
-  color: white;       					  /* żeby zawsze było czytelne */
 }
 	
 </style>
@@ -687,11 +659,9 @@ button:disabled {
     <!-- Panel z listą planet po prawej stronie -->
     
     <div id="planetSidebar">
-  		<h3>Lista planet</h3>
-  		<div class="sidebar-scroll">
-			<ul id="planetListSidebar"></ul>
-		</div>
-	</div>
+  <h3>Lista planet</h3>
+  <div id="planetListSidebar"></div>
+</div>
 
 <div id="galaxySidebar">
   <h3>Galaktyki</h3>
@@ -890,15 +860,18 @@ function savePlanetDetails(){
 // Funkcja do toggle panelu
 function togglePlanetSidebar() {
   const sidebar = document.getElementById("planetSidebar");
+  const galaxySidebar = document.getElementById("galaxySidebar"); // panel galaktyk
   const btn = document.getElementById("togglePlanetSidebarBtn");
 
   sidebar.classList.toggle("hidden");
+  galaxySidebar.classList.toggle("hidden");
 
   if (sidebar.classList.contains("hidden")) {
     btn.textContent = "◀"; // panel ukryty → strzałka w prawo
   } else {
     btn.textContent = "▶"; // panel widoczny → strzałka w lewo
     refreshPlanetSidebar();
+	refreshGalaxySidebar();
   }
 }
 
