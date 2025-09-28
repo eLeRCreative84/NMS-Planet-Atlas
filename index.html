@@ -185,6 +185,7 @@ button:disabled {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   transition: right 0.4s ease-in-out; /* animacja przesunięcia przycisku */
+  padding-top: 0; /* nie zostawiaj odstępu nad h3 */
 }
   
 #togglePlanetSidebarBtn:hover {
@@ -357,7 +358,7 @@ button:disabled {
   right: 0;
   bottom: 5px;
   height: 180px;                     /* trochę miejsca, ale spójny wygląd */
-  width: 220px;                      /* ta sama szerokość */
+  width: 200px;                      /* ta sama szerokość */
   background: rgba(10, 30, 60, 0.9); /* to samo tło co planety */
   color: white;
   padding: 0.8rem;
@@ -370,6 +371,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  padding-top: 0; /* nie zostawiaj odstępu nad h3 */
 }
 
 /* Zakotwiczone nagłówki w obu panelach */
@@ -377,8 +379,8 @@ button:disabled {
 #galaxySidebar h3 {
   position: sticky;
   top: 0;
-  background: rgba(10, 30, 60); /* ten sam kolor co panel */
-  margin: 0 0 0.5rem 0;
+  background: rgba(10, 30, 70); /* ten sam kolor co panel */
+  margin: 0;
   padding: 0.3rem;
   font-weight: bold;
   text-align: center;
