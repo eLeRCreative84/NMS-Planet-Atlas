@@ -813,7 +813,7 @@ function savePlanetDetails(){
 
 
   // Renderowanie list planet na wizualizacji globu
-  function refreshPlanetSidebar() {
+function refreshPlanetSidebar() {
   const sidebar = document.getElementById("planetSidebar");
 
   // Jeśli panel jest ukryty, nic nie rób aby nie blokować pokaż / ukryj listy planet
@@ -822,9 +822,19 @@ function savePlanetDetails(){
   if (!atlas) return;
 
   const listContainer = document.getElementById("planetListSidebar");
+  listContainer.innerHTML = ""; // WAŻNE: czyścimy listę przed ponownym renderowaniem
+
   const grouped = getGroupedPlanets(); // zachowuje systemy
 
   grouped.forEach(system => {
+    // sprawdź, czy w tym systemie są planety z wybranej galaktyki
+    const planetsInGalaxy = system.planets.filter(planetName => {
+      if (!currentGalaxy) return true; // jeśli nic nie wybrano, pokaż wszystkie
+      return atlas[planetName]?.some(p => p.galaxy === currentGalaxy);
+    });
+
+    if (planetsInGalaxy.length === 0) return; // pomiń system, jeśli nie ma pasujących planet
+
     // nagłówek systemu
     const header = document.createElement("h4");
     header.textContent = system.name === "Nieznany" ? "Nieznany układ" : "Układ: " + system.name;
@@ -832,8 +842,8 @@ function savePlanetDetails(){
     header.style.color = system.name === "Nieznany" ? "#aaa" : "#ffcc00";
     listContainer.appendChild(header);
 
-    // planety w systemie
-    system.planets.forEach(planetName => {
+    // planety w systemie (tylko te z wybranej galaktyki)
+    planetsInGalaxy.forEach(planetName => {
       const li = document.createElement("li");
       li.style.cursor = "pointer";
       li.style.padding = "2px 0";
@@ -855,7 +865,7 @@ function savePlanetDetails(){
         selectPlanet(planetName);
         updateSelectedPlanetButtons();
         refreshPlanetSidebar(); // odświeżamy sidebar, żeby podświetlenie działało
-		loadPlanetDetails()
+        loadPlanetDetails();
       };
 
       listContainer.appendChild(li);
