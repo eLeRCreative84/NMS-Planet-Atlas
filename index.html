@@ -845,7 +845,7 @@ function refreshPlanetSidebar() {
       // planety w systemie
     system.planets.forEach(planetName => {
       // 🔑 filtruj po galaktyce – pokazuj tylko planety przypisane do currentGalaxy
-      if (currentGalaxy && !atlas[planetName].some(p => p.galaxy === currentGalaxy)) return;
+      if (currentGalaxy && planetDetails[planetName]?.galaxy !== currentGalaxy) return;
 
       const li = document.createElement("li");
       li.style.cursor = "pointer";
