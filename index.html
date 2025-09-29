@@ -1475,15 +1475,16 @@ function renderPlanetResourcesPanel() {
     checkbox.checked = currentPlanet && planetDetails[currentPlanet]?.resources?.includes(res.name);
 
     checkbox.addEventListener("change", () => {
-      if (!currentPlanet) return; // brak wybranej planety
-      const planet = planetDetails[currentPlanet];
-      if (!planet.resources) planet.resources = [];
-      if (checkbox.checked) {
-        if (!planet.resources.includes(res.name)) planet.resources.push(res.name);
-      } else {
-        planet.resources = planet.resources.filter(r => r !== res.name);
-      }
-    });
+  if (!currentPlanet) return;
+  const planet = planetDetails[currentPlanet];
+  if (!planet.resources) planet.resources = [];
+  
+  if (checkbox.checked) {
+    if (!planet.resources.includes(res.name)) planet.resources.push(res.name);
+  } else {
+    planet.resources = planet.resources.filter(r => r !== res.name);
+  }
+});
 
     wrapper.appendChild(img);
     wrapper.appendChild(checkbox);
