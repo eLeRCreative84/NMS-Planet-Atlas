@@ -1,0 +1,388 @@
+body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
+  #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
+  #globeViz { flex: 1; background: black; position: relative; }
+  /* upewniamy się że canvas zajmuje cały obszar kontenera */
+  #globeViz canvas { width: 100% !important; height: 100% !important; display: block; background: transparent; }
+
+  h2 { margin-top: 1rem; margin-bottom: 0.5rem; }
+  input, select, textarea, button { width: 100%; margin: 0.3rem 0; padding: 0.4rem; box-sizing: border-box; }
+  button { cursor: pointer; }
+
+  ul { padding: 0; list-style: none; }
+  li { margin: 0.3rem 0; background: #1a2b4d; padding: 0.3rem; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+  li div { display: flex; gap: 0.5rem; align-items: center; }
+  li button { padding: 0.2rem 0.5rem; border: none; border-radius: 4px; cursor: pointer; }
+  li button.edit { background: #0277bd; color: white; }
+  li button.del { background: #c62828; color: white; }
+  label { display: block; margin-top: 0.5rem; font-weight: bold; }
+  .xy-inputs { display: flex; gap: 0.3rem; }
+  .xy-inputs input { width: 50%; }
+
+  #tabs { display: flex; background: #102b56; margin-bottom: 0.5rem; }
+  #tabs button { flex: 1; padding: 0.5rem; border: none; background: #102b56; color: white; cursor: pointer; font-weight: bold; }
+  #tabs button.active { background: #1976d2; }
+  .tab-content { display: none; padding: 1rem 0 0 0; overflow-y: auto; }
+  .tab-content.active { display: block; }
+
+/* Nagłówek aktualnej planety */
+.currentPlanetHeader {
+  margin: 0.2rem 0 0.5rem 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  background-color: #1a3a6a; /* jasny granat, pasuje do zakładek */
+  padding: 0.3rem 0;
+  border-radius: 4px;
+  color: white;
+}
+
+/* Pola współrzędnych X i Y */
+.xy-inputs {
+  display: flex;
+  gap: 1cm; /* większy odstęp między polami */
+}
+.xy-inputs div {
+  display: flex;
+  flex-direction: column;
+  width: max-content; /* szerokość dopasowana do napisu */
+}
+
+.xy-inputs input {
+  width: 100%; /* dopasowuje się do szerokości rodzica */
+}
+
+.tab-content h2 {
+  text-align: center;
+}
+  
+/* Ustawienia głównego kontenera wizualizacji globu w którym znajduje się m.in. glob, nagłówek, moja lokalizacja, panel boczny */
+#globeWrapper {
+  position: relative;        /* kluczowe: wszystko z position:absolute (np. panel, przycisk) liczy się względem tego kontenera */
+  width: 100%;               /* na całą szerokość okna */
+  height: 100%;              /* na całą wysokość okna */
+  display: flex;             /* flexbox włączony */
+  justify-content: center;   /* dzieci flexa wyśrodkowane poziomo */
+  align-items: center;       /* dzieci flexa wyśrodkowane pionowo */
+  overflow: hidden;          /* elementy wystające poza wrapper są ucinane */
+  
+}
+/* Stylowanie dla całego kontenera #globeViz */
+#globeViz {
+  position: relative;        /* umożliwia pozycjonowanie absolutne elementów wewnątrz (np. overlayów) */
+  width: 100%;               /* pełna szerokość rodzica (#globeWrapper) */
+  height: 100%;              /* pełna wysokość rodzica (#globeWrapper) */
+  display: flex;             /* włącza Flexbox */
+  justify-content: center;   /* poziome centrowanie dzieci (canvas) */
+  align-items: center;       /* pionowe centrowanie dzieci (canvas) */
+}
+  
+/* Definiowanie kontenera w którym renderuje się glob (globe.gl / three.js). */
+#globeViz canvas {
+  display: block;   /* zmienia canvas z inline na block – dzięki temu zachowuje się jak div i nie ma "spacji" obok */
+  margin: 0 auto;   /* ustawia automatyczne marginesy poziome → efekt: wycentrowanie canvasa w kontenerze */
+}
+
+/* Nagłówek nad wizualizacją planety */
+#planetOverlayHeader {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(26, 58, 106, 0.85);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  pointer-events: none;
+  z-index: 10; 
+}
+ 
+/* Ustaw przycisk Tekstury i Koloru razem */
+.planet-buttons-row {
+  display: flex;
+  gap: 0.5rem; /* odstęp między przyciskami */
+}
+
+.planet-buttons-row button {
+  flex: 1;             /* równomierna szerokość */
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#setTextureBtn { background: #1976d2; color: white; }
+#setColorBtn   { background: #1976d2; color: white; }
+  
+  /* Wyszarzanie niekatywnych pyrzycisków */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+  /* Wymuś kursor (przekreślone kółko) dla przycisków z klasą lock-while-edit */
+  .lock-while-edit:disabled {
+  cursor: not-allowed !important;
+  }
+  
+/* Lista planet */
+
+#planetSidebar {
+  position: fixed;
+  top: 5px;
+  bottom: 5px;
+  right: 0;
+  height: 100%;
+  width: 220px;
+  background: rgba(10, 30, 60, 0.9);
+  color: white;
+  padding: 0.8rem;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 11;
+  border-left: 2px solid #102b56;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  transition: transform 0.4s ease-in-out;
+  transform: translateX(0); /* widoczny */
+  max-height: calc(100% - 215px); /* zostawiamy miejsce na galaktyki */
+  padding-top: 0; /* nie zostawiaj odstępu nad h3 */
+}
+
+/* Ukryty panel – chowamy w prawo */
+#planetSidebar.hidden {
+  transform: translateX(100%);
+}
+
+/* Przycisk do pokazywania/ukrywania panelu */
+#togglePlanetSidebarBtn {
+  position: absolute; 
+  top: 1rem;
+  right: 230px; /* szerokość panelu +10 */
+  z-index: 1000;
+  width: 40px;        /* kwadratowy przycisk */
+  height: 40px;
+  display: flex;      /* wyśrodkowanie strzałki */
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;    /* wielkość strzałki */
+  background: linear-gradient(135deg, #1976d2, #42a5f5);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: right 0.4s ease-in-out; /* animacja przesunięcia przycisku */
+  
+}
+  
+#togglePlanetSidebarBtn:hover {
+  background: linear-gradient(135deg, #1565c0, #1e88e5);
+  transform: scale(1.1);
+}
+
+#planetSidebar:not(.hidden) ~ #togglePlanetSidebarBtn {
+  right: 230px; /* przy panelu */
+}
+
+#planetSidebar.hidden ~ #togglePlanetSidebarBtn {
+  right: 0.5rem; /* przy krawędzi */
+}
+  
+/* Reset stylów listy <ul> w panelu z planetami */
+#planetListSidebar ul {
+  list-style: none;       /* usuwa domyślne "kropki" (•) z listy */
+  padding: 0;             /* usuwa domyślny wewnętrzny odstęp od lewej strony */
+  margin: 0;              /* usuwa domyślny zewnętrzny odstęp wokół listy */
+}
+
+/* Wygląd pojedynczych planet w liście planet */
+#planetListSidebar li {
+  background: #1a2b4d;   /* ciemnoniebieskie tło każdego elementu listy */
+  margin: 0.3rem 0;      /* odstęp góra/dół między elementami */
+  padding: 0.3rem;       /* wewnętrzny odstęp tekstu od krawędzi */
+  border-radius: 5px;    /* zaokrąglenie rogów */
+  cursor: pointer;       /* zmiana kursora na "rączkę" przy najechaniu (klikalne) */
+}
+
+  /*efekt podświetlenia pozycji w liście planet*/
+#planetListSidebar li:hover {
+  background: #27407a;
+}
+
+/* Filtry punktów */
+#pointFilters {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto; /* opis–checkbox | opis–checkbox */
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  align-items: center; /* pionowe wyrównanie */
+}
+
+#pointFilters label {
+  display: contents; /* pozwala tekst i input wpisać się w siatkę */
+  cursor: pointer;
+}
+
+#pointFilters input[type="checkbox"] {
+  margin: 0 auto; /* wyśrodkowanie checkboxów w swojej kolumnie */
+}
+
+/* Dodatkowe filtry */
+#extraFilters {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto; /* opis–checkbox | opis–checkbox */
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+#extraFilters label {
+  display: contents;
+  cursor: pointer;
+}
+
+#extraFilters input[type="checkbox"] {
+  margin: 0 auto;
+}
+
+/* Minigaleria */
+#textureGalleryContainer {
+  background: #1a2b4d;
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: max-content;
+  margin: 0 auto;
+}
+
+#textureGallery {
+  display: grid;
+  grid-template-columns: repeat(6, 60px); /* 6 kolumn */
+  grid-template-rows: repeat(2, 60px);    /* 2 wiersze */
+  gap: 0.3rem;
+  overflow: hidden;
+  padding-right: 0.2rem; /* dodatkowe zabezpieczenie przed ucinaniem po prawej */
+  padding-bottom: 0.2rem; /* zabezpieczenie przed ucinaniem od dołu */
+}
+
+.texture-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 4px;
+}
+
+.texture-thumb:hover {
+  border-color: #42a5f5;
+}
+
+#textureGalleryControls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+#prevTexturePage, #nextTexturePage {
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+#prevTexturePage:disabled,
+#nextTexturePage:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+	
+/* Selektor galaktyk */
+.galaxy-selector {
+  position: relative;
+  width: 250px;
+}
+
+#galaxyInput {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  color: black;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  display: none;
+  z-index: 10;
+  color: black;
+}
+
+.dropdown div {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.dropdown div:hover {
+  background: #eee;
+}
+
+	/* Panel galaktyk – taki sam styl jak planetSidebar */
+#galaxySidebar {
+  position: fixed;
+  right: 0;
+  bottom: 5px;
+  height: 200px;                     /* trochę miejsca, ale spójny wygląd */
+  width: 220px;                      /* ta sama szerokość */
+  background: rgba(10, 30, 60, 0.9); /* to samo tło co planety */
+  color: white;
+  padding: 0.8rem;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 11;
+  border-left: 2px solid #102b56;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding-top: 0; /* nie zostawiaj odstępu nad h3 */
+	transition: transform 0.4s ease-in-out;
+  transform: translateX(0); /* widoczny */
+}
+
+	#galaxySidebar.hidden {
+  transform: translateX(100%);
+}
+
+/* Zakotwiczone nagłówki w obu panelach */
+#planetSidebar h3,
+#galaxySidebar h3 {
+  position: sticky;
+  top: 0;
+  background-color: rgba(25, 118, 210, 1);
+  margin: 0;
+  padding: 0.3rem;
+  font-weight: bold;
+  text-align: center;
+  z-index: 2;
+  border-bottom: 2px solid #102b56;
+}
