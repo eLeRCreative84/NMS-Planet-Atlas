@@ -553,7 +553,7 @@ button:disabled {
   			<input type="text" id="galaxyInput" placeholder="Wybierz galaktykę...">
   			<div id="galaxyDropdown" class="dropdown"></div>
 	    </div>
-	  <label>Układ gwiezdy</label><input type="text" id="detailStarSystem" />
+	  <label>Układ gwiezdy</label><input type="text" id="StarSystem" />
       <label>Układ planetarny</label><input type="text" id="detailSystem" />
       <label>Biom</label>
       <select id="detailBiome">
@@ -850,11 +850,9 @@ function refreshPlanetSidebar() {
     const starHeader = document.createElement("h3");
     starHeader.textContent = starGroup.StarSystem === "Nieznany"
       ? "Nieznany układ gwiezdny"
-      : starGroup.StarSystem;
-    
-	  starHeader.style.fontSize = "0.9rem";
-	  starHeader.style.margin = "0.8rem 0 0.4rem";
-    starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "#ffcc00";
+      : "Układ gwiezdny: " + starGroup.StarSystem;
+    starHeader.style.margin = "0.8rem 0 0.4rem";
+    starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "#ff6600";
     listContainer.appendChild(starHeader);
 
     // teraz iteracja po systemach planetarnych wewnątrz tego układu gwiezdnego
@@ -868,11 +866,13 @@ function refreshPlanetSidebar() {
       if (planetsInGalaxy.length === 0) return; // pomiń system, jeśli nie ma pasujących planet
 
       // nagłówek systemu
-		const header = document.createElement("h4");
-		header.textContent = system.name === "Nieznany" ? "Nieznany układ" : system.name;
-		header.style.margin = "0.5rem 0";
-		header.style.color = System.name === "Nieznany" ? "#aaa" : "#daa520";
-		listContainer.appendChild(header);
+      const header = document.createElement("h4");
+      header.textContent = System.name === "Nieznany"
+        ? "Nieznany układ planetarny"
+        : "Układ planetarny: " + System.name;
+      header.style.margin = "0.5rem 0";
+      header.style.color = System.name === "Nieznany" ? "#aaa" : "#ffcc00";
+      listContainer.appendChild(header);
 
       // planety w systemie (już przefiltrowane)
       planetsInGalaxy.forEach(planetName => {
