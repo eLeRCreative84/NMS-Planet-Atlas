@@ -290,9 +290,20 @@
 </div>
     <!-- Przycisk do pokazywania/ukrywania panelu -->
    <button id="togglePlanetSidebarBtn">▶</button>
+
+	  <!-- Player -->
+		<audio id="nmsAudio" loop>
+		    <source src="nms_theme.mp3" type="audio/mpeg">
+		    Twoja przeglądarka nie wspiera odtwarzania audio.
+		</audio>
+		
+		<div id="audioControls">
+		    <button id="playBtn">▶️</button>
+		    <button id="stopBtn">⏹</button>
+		</div>
+	  
    </div>
    
-
 <script>
 let atlas = {};
 let planetDetails = {}; // szczegóły każdej planety
@@ -1849,7 +1860,19 @@ window.onload = () => {
   updateNoPlanetsMessage();
   checkNewPlanetInput();
   updateCurrentPlanetHeader();
+
+const audio = document.getElementById("nmsAudio");
+const playBtn = document.getElementById("playBtn");
+const stopBtn = document.getElementById("stopBtn");
+
+	playBtn.addEventListener("click", () => {
+	    audio.play();
+	});
 	
+	stopBtn.addEventListener("click", () => {
+	    audio.pause();
+	    audio.currentTime = 0; // reset do początku
+	});
 }
   
 </script>
