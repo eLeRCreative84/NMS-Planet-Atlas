@@ -784,8 +784,8 @@ function savePlanetDetails(){
   // pobierz galaktykę z inputa (fallback na currentGalaxy)
   const galaxyEl = document.getElementById("galaxyInput");
   const galaxyVal = (galaxyEl && galaxyEl.value) ? galaxyEl.value : (currentGalaxy || "");
-  let StarSystemVal = document.getElementById("detailStarSystem").value.trim();
-  let SystemVal = document.getElementById("detailSystem").value.trim();
+  const StarSystemVal = document.getElementById("detailStarSystem").value.trim();
+  const SystemVal = document.getElementById("detailSystem").value.trim();
 
 // jeśli podano system, ale nie podano układu gwiezdnego
   if (!StarSystemVal && SystemVal) {
@@ -880,10 +880,17 @@ function refreshPlanetSidebar() {
 
       // nagłówek systemu
       const header = document.createElement("h4");
-header.textContent = system.name === "Nieznany" ? "Nieznany układ" : system.name;
-header.style.margin = "0.5rem 0";
-header.style.color = system.name === "Nieznany" ? "#aaa" : "#daa520";
-listContainer.appendChild(header);
+		if (system.name === "Nieznany") {
+		  header.textContent = "Nieznany układ planetarny";
+		  header.style.color = "#aaa";
+		  header.style.textAlign = "center";   // <--- wyśrodkowanie tylko dla nieznanych
+		} else {
+		  header.textContent = system.name;    // już bez "Układ planetarny:"
+		  header.style.color = "#daa520";      // ciemnozłoty
+		}
+		
+		header.style.margin = "0.5rem 0";
+		listContainer.appendChild(header);
 
       // planety w systemie (już przefiltrowane)
       planetsInGalaxy.forEach(planetName => {
