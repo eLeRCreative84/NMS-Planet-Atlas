@@ -862,6 +862,7 @@ function refreshPlanetSidebar() {
     starHeader.textContent = starGroup.starSystem === "Nieznany"
   ? "Nieznany układ gwiezdny"
   : starGroup.starSystem;
+	header.style.fontSize = "0.9rem";
     starHeader.style.margin = "0.8rem 0 0.4rem";
     starHeader.style.color = starGroup.starSystem === "Nieznany" ? "#aaa" : "#ffcc00";
     listContainer.appendChild(starHeader);
@@ -877,13 +878,20 @@ function refreshPlanetSidebar() {
       if (planetsInGalaxy.length === 0) return; // pomiń system, jeśli nie ma pasujących planet
 
       // nagłówek systemu
-      const header = document.createElement("h4");
-      header.textContent = planetSystem.name === "Nieznany"
-  ? "Nieznany układ planetarny"
-  : planetSystem.name;
-      header.style.margin = "0.5rem 0";
-      header.style.color = planetSystem.name === "Nieznany" ? "#aaa" : "#ffcc00";
-      listContainer.appendChild(header);
+		const header = document.createElement("h4");
+		header.textContent = planetSystem.name === "Nieznany"
+		  ? "Nieznany układ planetarny"
+		  : planetSystem.name;
+		header.style.fontSize = "0.9rem";
+		header.style.margin = "0.5rem 0";
+		header.style.color = planetSystem.name === "Nieznany" ? "#aaa" : "#ffcc00";
+		
+		// WYŚRODKUJ tylko jeśli to "Nieznany układ planetarny"
+		if (planetSystem.name === "Nieznany") {
+		  header.style.textAlign = "center";
+		}
+		
+		listContainer.appendChild(header);
 
       // planety w systemie (już przefiltrowane)
       planetsInGalaxy.forEach(planetName => {
@@ -1184,10 +1192,18 @@ function refreshPlanetList() {
     starHeader.style.color = starGroup.starSystem === "Nieznany" ? "#aaa" : "#ffcc00";
     frag.appendChild(starHeader);
 
-    starGroup.planetSystems.forEach(planetSystem => {
+   starGroup.planetSystems.forEach(planetSystem => {
       const header = document.createElement("h3");
-      header.textContent = planetSystem.name === "Nieznany" ? "Nieznany układ planetarny" : planetSystem.name;
+      header.textContent = planetSystem.name === "Nieznany"
+        ? "Nieznany układ planetarny"
+        : planetSystem.name;
       header.style.color = planetSystem.name === "Nieznany" ? "#aaa" : "#ffcc00";
+
+      // WYŚRODKUJ tylko jeśli to "Nieznany układ planetarny"
+      if (planetSystem.name === "Nieznany") {
+        header.style.textAlign = "center";
+      }
+
       frag.appendChild(header);
 
       planetSystem.planets.forEach(p => {
