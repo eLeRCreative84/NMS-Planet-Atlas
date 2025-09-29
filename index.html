@@ -784,12 +784,23 @@ function savePlanetDetails(){
   // pobierz galaktykę z inputa (fallback na currentGalaxy)
   const galaxyEl = document.getElementById("galaxyInput");
   const galaxyVal = (galaxyEl && galaxyEl.value) ? galaxyEl.value : (currentGalaxy || "");
-  const starSystemVal = document.getElementById("detailStarSystem").value.trim();
-  const planetSystemVal = document.getElementById("detailPlanetSystem").value.trim();
+  let starSystemVal = document.getElementById("detailStarSystem").value.trim();
+  let planetSystemVal = document.getElementById("detailPlanetSystem").value.trim();
 
+  // Jeśli podano tylko planetSystem, spróbuj odnaleźć istniejący starSystem, gdzie ten planetSystem już występuje
+  if (!starSystemVal && planetSystemVal) {
+    for (const details of Object.values(planetDetails)) {
+      if (details.planetSystem === planetSystemVal && details.starSystem) {
+        starSystemVal = details.starSystem;
+        break;
+      }
+    }
+  }
+
+  // Jeśli podano starSystem ale nie planetSystem — blokujemy zapisu (zgodnie z regułą)
   if (starSystemVal && !planetSystemVal) {
     alert("Wprowadź nazwę układu planetarnego aby poprawnie wyświetlić planetę na liście!");
-    return; 
+    return;
   }
 
   planetDetails[currentPlanet] = {
@@ -1176,7 +1187,7 @@ function refreshPlanetList() {
     starGroup.planetSystems.forEach(planetSystem => {
       const header = document.createElement("h3");
       header.textContent = planetSystem.name === "Nieznany" ? "Nieznany układ planetarny" : planetSystem.name;
-      header.style.color = planetSystem.name === "Nieznany" ? "#aaa" : "#d3d3d3";
+      header.style.color = planetSystem.name === "Nieznany" ? "#aaa" : "#ffcc00";
       frag.appendChild(header);
 
       planetSystem.planets.forEach(p => {
