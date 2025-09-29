@@ -387,26 +387,3 @@ button:disabled {
   border-bottom: 2px solid #102b56;
 
 }
-/* Player */
-#audioControls {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    display: flex;
-    gap: 5px;
-    background: rgba(0,0,0,0.5);
-    padding: 5px;
-    border-radius: 4px;
-    z-index: 1000;
-}
-
-#audioControls button {
-    background: none;
-    border: 1px solid white;
-    color: white;
-    font-size: 18px;
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    border-radius: 4px;
-}
