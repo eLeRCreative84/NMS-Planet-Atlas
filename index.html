@@ -514,7 +514,8 @@ button:disabled {
 
 		<!-- Pierwiastki planety -->
 		<div id="planet-resources"></div>
-		  
+		  <!-- Przycisk do zapisania zasobów -->
+		<button id="save-resources-btn">Zapisz surowce</button>
 		
 		
     </div>
@@ -1507,6 +1508,26 @@ function renderPlanetResourcesPanel() {
   });
 }
 
+// Funkcja do zapisania zaznaczonych surowców dla aktualnej planety
+function savePlanetResources() {
+  if (!currentPlanet) return;
+
+  const container = document.getElementById("planet-resources");
+  const checkboxes = container.querySelectorAll("input[type='checkbox']");
+  planetDetails[currentPlanet].resources = [];
+
+  checkboxes.forEach((checkbox, i) => {
+    if (checkbox.checked) {
+      planetDetails[currentPlanet].resources.push(icons[i].name);
+    }
+  });
+
+  console.log(`Zapisano zasoby dla planety ${currentPlanet}:`, planetDetails[currentPlanet].resources);
+}
+
+// Podpięcie przycisku
+document.getElementById("save-resources-btn").addEventListener("click", savePlanetResources);
+	
 ////////////////////////////////////////////////////////////////////
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
 //////////////////////////////////////////////////////////////////// 
