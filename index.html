@@ -783,21 +783,10 @@ function savePlanetDetails() {
 
   const galaxyEl = document.getElementById("galaxyInput");
   const galaxyVal = (galaxyEl && galaxyEl.value) ? galaxyEl.value : (currentGalaxy || "");
-  let StarSystemVal = document.getElementById("detailStarSystem").value.trim();
+  const StarSystemVal = document.getElementById("detailStarSystem").value.trim();
   const SystemVal = document.getElementById("detailSystem").value.trim();
 
-  // jeśli podano system, ale nie podano układu gwiezdnego
-  if (!StarSystemVal && SystemVal) {
-    // spróbuj znaleźć istniejący układ gwiezdny, w którym ten system już istnieje
-    for (const [planet, details] of Object.entries(planetDetails)) {
-      if (details.System === SystemVal && details.StarSystem) {
-        StarSystemVal = details.StarSystem; 
-        break;
-      }
-    }
-  }
-	
-  if (StarSystemVal && !SystemVal) {
+    if (StarSystemVal && !SystemVal) {
     alert("Wprowadź nazwę układu planetarnego aby poprawnie wyświetlić planetę na liście!");
     return; 
   }
