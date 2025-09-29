@@ -290,19 +290,7 @@
 </div>
     <!-- Przycisk do pokazywania/ukrywania panelu -->
    <button id="togglePlanetSidebarBtn">▶</button>
-
-	  <!-- Player -->
-		<audio id="nmsAudio" loop>
-		    <source src="nms_theme.mp3" type="audio/mpeg">
-		    Twoja przeglądarka nie wspiera odtwarzania audio.
-		</audio>
-		
-		<div id="audioControls" style="position:absolute; bottom:10px; left:10px;">
-		  <button id="playBtn">▶</button>
- 		 <button id="stopBtn">■</button>
 </div>
-	  
-   </div>
    
 <script>
 let atlas = {};
@@ -1850,20 +1838,6 @@ if(sortSelect) {
   
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
-	//player
-const audio = document.getElementById("nmsAudio");
-const playBtn = document.getElementById("playBtn");
-const stopBtn = document.getElementById("stopBtn");
-
-playBtn.onclick = () => {
-  audio.play().catch(e => console.log("Kliknij stronę lub przycisk, aby odtworzyć audio."));
-};
-
-stopBtn.onclick = () => {
-  audio.pause();
-  audio.currentTime = 0;
-};
-	
 // start
 window.onload = () => {
   openTab("start"); // aktywuj pierwszą zakładkę
