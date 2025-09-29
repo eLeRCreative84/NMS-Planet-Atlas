@@ -297,10 +297,10 @@
 		    Twoja przeglądarka nie wspiera odtwarzania audio.
 		</audio>
 		
-		<div id="audioControls">
-		    <button id="playBtn">▶️</button>
-		    <button id="stopBtn">⏹</button>
-		</div>
+		<div id="audioControls" style="position:absolute; bottom:10px; left:10px;">
+		  <button id="playBtn">▶</button>
+ 		 <button id="stopBtn">■</button>
+</div>
 	  
    </div>
    
@@ -1850,7 +1850,19 @@ if(sortSelect) {
   
 globe.showGraticules(true).graticuleLineWidth(0.5);
 
+	//player
+const audio = document.getElementById("nmsAudio");
+const playBtn = document.getElementById("playBtn");
+const stopBtn = document.getElementById("stopBtn");
 
+playBtn.onclick = () => {
+  audio.play().catch(e => console.log("Kliknij stronę lub przycisk, aby odtworzyć audio."));
+};
+
+stopBtn.onclick = () => {
+  audio.pause();
+  audio.currentTime = 0;
+};
 	
 // start
 window.onload = () => {
@@ -1860,19 +1872,6 @@ window.onload = () => {
   updateNoPlanetsMessage();
   checkNewPlanetInput();
   updateCurrentPlanetHeader();
-
-const audio = document.getElementById("nmsAudio");
-const playBtn = document.getElementById("playBtn");
-const stopBtn = document.getElementById("stopBtn");
-
-	playBtn.addEventListener("click", () => {
-	    audio.play();
-	});
-	
-	stopBtn.addEventListener("click", () => {
-	    audio.pause();
-	    audio.currentTime = 0; // reset do początku
-	});
 }
   
 </script>
