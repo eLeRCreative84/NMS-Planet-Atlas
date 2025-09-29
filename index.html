@@ -1522,7 +1522,7 @@ function savePlanetResources() {
     }
   });
 
-  console.log(`Zapisano zasoby dla planety ${currentPlanet}:`, planetDetails[currentPlanet].resources);
+  alert(`Zapisano zasoby dla planety ${currentPlanet}: ${planetDetails[currentPlanet].resources.join(", ")}`);
 }
 
 // Podpięcie przycisku
