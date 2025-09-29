@@ -1167,14 +1167,14 @@ function refreshPlanetList() {
 
   grouped.forEach(starGroup => {
   const starHeader = document.createElement("h2");
-  starHeader.textContent = starGroup.StarSystem;
-  starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "##ffcc00";
+  starHeader.textContent = "Układ gwiezdny: " + starGroup.StarSystem;
+  starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "#ff6600";
   frag.appendChild(starHeader);
 
   starGroup.Systems.forEach(System => {
     const header = document.createElement("h3");
-    header.textContent = System.name;
-    header.style.color = System.name === "Nieznany" ? "#aaa" : "#ccc";
+    header.textContent = "Układ planetarny: " + System.name;
+    header.style.color = System.name === "Nieznany" ? "#aaa" : "#ffcc00";
     frag.appendChild(header);
 
     System.planets.forEach(p => {
