@@ -553,8 +553,8 @@ button:disabled {
   			<input type="text" id="galaxyInput" placeholder="Wybierz galaktykę...">
   			<div id="galaxyDropdown" class="dropdown"></div>
 	    </div>
-	  <label>Układ gwiezdy</label><input type="text" id="StarSystem" />
-      <label>Układ planetarny</label><input type="text" id="detailSystem" />
+	  <label>Układ gwiezdy</label><input type="text" id="detailStarSystem" />
+      <label>Układ planetarny</label><input type="text" id="detailPlanetSystem" />
       <label>Biom</label>
       <select id="detailBiome">
         <option value="">-- wybierz --</option>
@@ -763,8 +763,8 @@ function loadPlanetDetails(){
     currentGalaxy = details.galaxy || currentGalaxy;
   }
 
-  document.getElementById("detailStarSystem").value = details.StarSystem || "";
-  document.getElementById("detailSystem").value = details.System || "";
+  document.getElementById("detailStarSystem").value = details.starSystem || "";
+  document.getElementById("detailPlanetSystem").value = details.planetSystem || "";
   document.getElementById("detailBiome").value = details.biome || "";
   document.getElementById("detailWeather").value = details.weather || "";
   document.getElementById("detailSentinels").value = details.sentinels || "";
@@ -784,18 +784,18 @@ function savePlanetDetails(){
   // pobierz galaktykę z inputa (fallback na currentGalaxy)
   const galaxyEl = document.getElementById("galaxyInput");
   const galaxyVal = (galaxyEl && galaxyEl.value) ? galaxyEl.value : (currentGalaxy || "");
-  const StarSystemVal = document.getElementById("detailStarSystem").value.trim();
-  const SystemVal = document.getElementById("detailSystem").value.trim();
+  const starSystemVal = document.getElementById("detailStarSystem").value.trim();
+  const planetSystemVal = document.getElementById("detailPlanetSystem").value.trim();
 
-  if (StarSystemVal && !SystemVal) {
+  if (starSystemVal && !planetSystemVal) {
     alert("Wprowadź nazwę układu planetarnego aby poprawnie wyświetlić planetę na liście!");
     return; 
   }
 
   planetDetails[currentPlanet] = {
     galaxy: galaxyVal,
-    StarSystem: StarSystemVal,
-    System: SystemVal || "Nieznany", // jeśli brak – ląduje w „Nieznany”
+    starSystem: starSystemVal,
+    planetSystem: planetSystemVal || "Nieznany", // jeśli brak – ląduje w „Nieznany”
     biome: document.getElementById("detailBiome").value,
     weather: document.getElementById("detailWeather").value,
     sentinels: document.getElementById("detailSentinels").value,
@@ -837,7 +837,7 @@ function refreshPlanetSidebar() {
 
   grouped.forEach(starGroup => {
     // filtrujemy całe układy gwiezdne wg wybranej galaktyki
-    const hasPlanetsInGalaxy = starGroup.Systems.some(sys =>
+    const hasPlanetsInGalaxy = starGroup.planetSystems.some(sys =>
       sys.planets.some(planetName => {
         if (!currentGalaxy) return true; // jeśli nic nie wybrano, pokaż wszystkie
         return planetDetails[planetName]?.galaxy === currentGalaxy;
@@ -848,17 +848,17 @@ function refreshPlanetSidebar() {
 
     // nagłówek układu gwiezdnego
     const starHeader = document.createElement("h3");
-    starHeader.textContent = starGroup.StarSystem === "Nieznany"
-      ? "Nieznany układ gwiezdny"
-      : "Układ gwiezdny: " + starGroup.StarSystem;
+    starHeader.textContent = starGroup.starSystem === "Nieznany"
+  ? "Nieznany układ gwiezdny"
+  : starGroup.starSystem;
     starHeader.style.margin = "0.8rem 0 0.4rem";
-    starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "#ff6600";
+    starHeader.style.color = starGroup.starSystem === "Nieznany" ? "#aaa" : "#ffcc00";
     listContainer.appendChild(starHeader);
 
     // teraz iteracja po systemach planetarnych wewnątrz tego układu gwiezdnego
-    starGroup.Systems.forEach(System => {
+    starGroup.planetSystems.forEach(planetSystem => {
       // filtrujemy planety tego systemu wg planetDetails (GALAKTYKA)
-      const planetsInGalaxy = System.planets.filter(planetName => {
+      const planetsInGalaxy = planetSystem.planets.filter(planetName => {
         if (!currentGalaxy) return true; // jeśli nic nie wybrano, pokaż wszystkie
         return planetDetails[planetName]?.galaxy === currentGalaxy;
       });
@@ -867,11 +867,11 @@ function refreshPlanetSidebar() {
 
       // nagłówek systemu
       const header = document.createElement("h4");
-      header.textContent = System.name === "Nieznany"
-        ? "Nieznany układ planetarny"
-        : "Układ planetarny: " + System.name;
+      header.textContent = planetSystem.name === "Nieznany"
+  ? "Nieznany układ planetarny"
+  : planetSystem.name;
       header.style.margin = "0.5rem 0";
-      header.style.color = System.name === "Nieznany" ? "#aaa" : "#ffcc00";
+      header.style.color = planetSystem.name === "Nieznany" ? "#aaa" : "#ffcc00";
       listContainer.appendChild(header);
 
       // planety w systemie (już przefiltrowane)
@@ -1069,8 +1069,8 @@ function addNewPlanet() {
   // Dodaj pustą strukturę detali od razu:
   planetDetails[name] = {
     galaxy: currentGalaxy,
-    StarSystem: "",
-    System: "",
+    starSystem: "",
+    planetSystem: "",
     biome: "",
     weather: "",
     sentinels: "",
@@ -1117,36 +1117,36 @@ function getGroupedPlanets() {
   const structure = { "Nieznany": { "Nieznany": [] } };
 
   Object.keys(atlas).forEach(p => {
-    const StarSystem = (planetDetails[p]?.StarSystem || "").trim() || "Nieznany";
-    const System = (planetDetails[p]?.System || "").trim() || "Nieznany";
+    const starSystem = (planetDetails[p]?.starSystem || "").trim() || "Nieznany";
+    const planetSystem = (planetDetails[p]?.planetSystem || "").trim() || "Nieznany";
 
-    if (!structure[StarSystem]) structure[StarSystem] = {};
-    if (!structure[StarSystem][System]) structure[StarSystem][System] = [];
-    structure[StarSystem][System].push(p);
+    if (!structure[starSystem]) structure[starSystem] = {};
+    if (!structure[starSystem][planetSystem]) structure[starSystem][planetSystem] = [];
+    structure[starSystem][planetSystem].push(p);
   });
 
   // Sortowanie wg daty utworzenia (zagnieżdżone)
   const INF = Number.MAX_SAFE_INTEGER;
 
-  const sortedStarSystems = Object.keys(structure).sort((a, b) => {
+  const sortedstarSystems = Object.keys(structure).sort((a, b) => {
     if (a === "Nieznany") return -1;
     if (b === "Nieznany") return 1;
     return a.localeCompare(b);
   });
 
-  return sortedStarSystems.map(StarSystem => {
-    const Systems = structure[StarSystem];
-    const sortedSystems = Object.keys(Systems).sort((a, b) => {
+  return sortedstarSystems.map(starSystem => {
+    const planetSystemsObj = structure[starSystem];
+    const sortedplanetSystems = Object.keys(planetSystemsObj).sort((a, b) => {
       if (a === "Nieznany") return -1;
       if (b === "Nieznany") return 1;
       return a.localeCompare(b);
     });
 //Zwracamy gotową strukturę do wyrenderowania
     return {
-      StarSystem,
-      Systems: sortedSystems.map(sys => ({
+      starSystem,
+      planetSystems: sortedplanetSystems.map(sys => ({
         name: sys,
-        planets: Systems[sys].sort((p1, p2) =>
+        planets: planetSystemsObj[sys].sort((p1, p2) =>
           (createdAtMap[p1] || INF) - (createdAtMap[p2] || INF)
         )
       }))
@@ -1166,22 +1166,24 @@ function refreshPlanetList() {
   const frag = document.createDocumentFragment();
 
   grouped.forEach(starGroup => {
-  const starHeader = document.createElement("h2");
-  starHeader.textContent = "Układ gwiezdny: " + starGroup.StarSystem;
-  starHeader.style.color = starGroup.StarSystem === "Nieznany" ? "#aaa" : "#ff6600";
-  frag.appendChild(starHeader);
+    const starHeader = document.createElement("h2");
+    starHeader.textContent = starGroup.starSystem === "Nieznany"
+  ? "Nieznany układ gwiezdny"
+  : starGroup.starSystem;
+    starHeader.style.color = starGroup.starSystem === "Nieznany" ? "#aaa" : "#ffcc00";
+    frag.appendChild(starHeader);
 
-  starGroup.Systems.forEach(System => {
-    const header = document.createElement("h3");
-    header.textContent = "Układ planetarny: " + System.name;
-    header.style.color = System.name === "Nieznany" ? "#aaa" : "#ffcc00";
-    frag.appendChild(header);
+    starGroup.planetSystems.forEach(planetSystem => {
+      const header = document.createElement("h3");
+      header.textContent = planetSystem.name === "Nieznany" ? "Nieznany układ planetarny" : planetSystem.name;
+      header.style.color = planetSystem.name === "Nieznany" ? "#aaa" : "#d3d3d3";
+      frag.appendChild(header);
 
-    System.planets.forEach(p => {
-      frag.appendChild(renderPlanetRow(p));
+      planetSystem.planets.forEach(p => {
+        frag.appendChild(renderPlanetRow(p));
+      });
     });
   });
-});
 
   list.appendChild(frag);
   updateNoPlanetsMessage();
