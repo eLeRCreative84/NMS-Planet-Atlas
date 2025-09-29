@@ -778,15 +778,16 @@ function loadPlanetDetails(){
 }
 
 
-function savePlanetDetails() {
+function savePlanetDetails(){
   if(!currentPlanet) return;
 
+  // pobierz galaktykę z inputa (fallback na currentGalaxy)
   const galaxyEl = document.getElementById("galaxyInput");
   const galaxyVal = (galaxyEl && galaxyEl.value) ? galaxyEl.value : (currentGalaxy || "");
   const StarSystemVal = document.getElementById("detailStarSystem").value.trim();
   const SystemVal = document.getElementById("detailSystem").value.trim();
 
-    if (StarSystemVal && !SystemVal) {
+  if (StarSystemVal && !SystemVal) {
     alert("Wprowadź nazwę układu planetarnego aby poprawnie wyświetlić planetę na liście!");
     return; 
   }
