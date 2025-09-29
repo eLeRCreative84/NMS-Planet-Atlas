@@ -1489,10 +1489,35 @@ function renderPlanetResourcesPanel() {
   });
 }
 
+// render do panelu
+function renderIcons() {
+  const container = document.getElementById("planet-icons");
+  container.innerHTML = ""; // wyczyść na wszelki wypadek
 
+  icon.forEach(el => {
+    let wrapper = document.createElement("label");
+    wrapper.style.display = "inline-block";
+    wrapper.style.margin = "5px";
 
+    let checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = el.name;
+
+    let img = document.createElement("img");
+    img.src = el.icon;
+    img.alt = el.name;
+    img.style.width = "32px";
+    img.style.height = "32px";
+    img.style.verticalAlign = "middle";
+    img.style.marginLeft = "5px";
+
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(img);
+
+    container.appendChild(wrapper);
+  });
+}
 	
-
 
 ////////////////////////////////////////////////////////////////////
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
@@ -2242,6 +2267,7 @@ window.onload = () => {
   updateNoPlanetsMessage();
   checkNewPlanetInput();
   updateCurrentPlanetHeader();
+	renderIcons();
 	renderPlanetResourcesPanel();
 }
   
