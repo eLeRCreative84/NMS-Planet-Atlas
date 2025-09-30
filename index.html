@@ -406,11 +406,32 @@ function updatePlanetMiniPanel() {
   panel.innerHTML = "";
 
   const details = planetDetails[currentPlanet] || {};
+ 
+  // USTAWIENIA GLOBALNE dla minipanelu
+  const ICON_SIZE = 40;   // x2 (wcześniej było 20px)
+  const FONT_SIZE = "18px"; // x2 (wcześniej ~9px)
+ 
+	// === BIOM (ikona + tekst) ===
+  const biomeRow = document.createElement("div");
+  biomeRow.style.display = "flex";
+  biomeRow.style.alignItems = "center";
+  biomeRow.style.gap = "4px";
 
-  // biom
-  const biomeLine = document.createElement("div");
-  biomeLine.textContent = `Biom: ${details.biome || "Nieznany"}`;
-  panel.appendChild(biomeLine);
+  const biomeIcon = icons.find(i => i.type === "ui" && i.name === "Planet");
+  if (biomeIcon) {
+    const img = document.createElement("img");
+    img.src = biomeIcon.icon;
+    img.alt = "Biom";
+    img.style.width = "20px";
+    img.style.height = "20px";
+    biomeRow.appendChild(img);
+  }
+
+  const biomeText = document.createElement("span");
+  biomeText.textContent = details.biome || "Nieznany";
+  biomeRow.appendChild(biomeText);
+
+  panel.appendChild(biomeRow);
 
   // strażnicy -> ikona + opis
   const sentinelsRow = document.createElement("div");
