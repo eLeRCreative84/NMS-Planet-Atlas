@@ -426,7 +426,7 @@ button:disabled {
   font-size: 14px;
   display: flex;
   flex-direction: column; /* treść w pionie */
-  gap: 4px; /* odstęp między wierszami */
+  gap: 1px; /* odstęp między wierszami */
   max-width: 220px;
   z-index: 1000;
 }
@@ -436,7 +436,7 @@ button:disabled {
   display: flex;
   flex-wrap: wrap;
   align-items: left;
-  margin-bottom: 4px;
+  margin-bottom: 1px;
 }
 
 #planetMiniPanel img {
@@ -448,6 +448,7 @@ button:disabled {
 #planetMiniPanel span {
   margin-right: 8px;
 }
+
 
 
 
