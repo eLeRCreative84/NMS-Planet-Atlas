@@ -478,14 +478,15 @@ button:disabled {
   transition: transform 0.4s ease-in-out;
 }
 
-#planetMiniPanel.hidden #toggleMiniPanelBtn {
-  transform: translateY(100%);
+#planetMiniPanel.hidden ~ #toggleMiniPanelBtn {
+  top: -25px; /* przy panelu ukrytym */
 }
 
 #toggleMiniPanelBtn:hover {
   background: linear-gradient(135deg, #1565c0, #1e88e5);
   transform: scale(1.1);
 }
+
 
 
 
