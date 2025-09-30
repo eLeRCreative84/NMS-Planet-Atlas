@@ -398,45 +398,57 @@ document.getElementById("togglePlanetSidebarBtn").addEventListener("click", togg
 
 	
 // Mini panel z inofo o planecie
-  function updatePlanetMiniPanel() {
+function updatePlanetMiniPanel() {
   const panel = document.getElementById("planetMiniPanel");
   if (!panel || !currentPlanet) return;
 
-  const details = planetDetails[currentPlanet];
-  if (!details) return;
+  // reset zawartości panelu
+  panel.innerHTML = "";
 
-  // Biome
-  const biomeDiv = document.getElementById("miniPanelBiome");
-  biomeDiv.textContent = details.biome ? `Biome: ${details.biome}` : "Biome: Nieznany";
+  const details = planetDetails[currentPlanet] || {};
 
-  // Strażnicy
-  const sentinelsDiv = document.getElementById("miniPanelSentinels");
-  sentinelsDiv.textContent = details.sentinels ? `Strażnicy: ${details.sentinels}` : "Strażnicy: Nieznany";
+  // biom
+  const biomeLine = document.createElement("div");
+  biomeLine.textContent = `Biom: ${details.biome || "Nieznany"}`;
+  panel.appendChild(biomeLine);
 
-  // Zasoby / pierwiastki (na podstawie checkboxów)
-  const resourcesDiv = document.getElementById("miniPanelResources");
-  resourcesDiv.innerHTML = ""; // czyścimy panel
+  // strażnicy
+  const sentinelsLine = document.createElement("div");
+  sentinelsLine.textContent = `Strażnicy: ${details.sentinels || "Nieznany"}`;
+  panel.appendChild(sentinelsLine);
 
-  if (icons && Array.isArray(icons)) {
-    icons.forEach(res => {
-      if (details.resources && details.resources.includes(res.name)) {
-        const wrapper = document.createElement("div");
-        wrapper.style.display = "flex";
-        wrapper.style.alignItems = "center";
+  // kontener na pierwiastki
+  const resourcesContainer = document.createElement("div");
+  resourcesContainer.style.marginTop = "6px";
+  resourcesContainer.style.display = "flex";
+  resourcesContainer.style.flexDirection = "column";
+  resourcesContainer.style.gap = "4px";
 
-        const img = document.createElement("img");
-        img.src = res.icon;
-        img.alt = res.name;
+  const resources = details.resources || [];
+  resources.forEach(resName => {
+    const resObj = icons.find(r => r.name === resName);
+    if (!resObj) return;
 
-        const span = document.createElement("span");
-        span.textContent = res.name;
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.alignItems = "center";
+    row.style.gap = "4px";
 
-        wrapper.appendChild(img);
-        wrapper.appendChild(span);
-        resourcesDiv.appendChild(wrapper);
-      }
-    });
-  }
+    const img = document.createElement("img");
+    img.src = resObj.icon;
+    img.alt = resObj.name;
+    img.style.width = "20px";
+    img.style.height = "20px";
+
+    const label = document.createElement("span");
+    label.textContent = resObj.name;
+
+    row.appendChild(img);
+    row.appendChild(label);
+    resourcesContainer.appendChild(row);
+  });
+
+  panel.appendChild(resourcesContainer);
 }
 
 ////////////////////////////////////////////////////////////////////
