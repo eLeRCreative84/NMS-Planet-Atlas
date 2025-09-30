@@ -516,6 +516,7 @@ function addNewPlanet() {
   updateSelectedPlanetButtons();
   refreshPlanetSidebar();
 	renderPlanetResourcesPanel();
+	updatePlanetMiniPanel()
   
     // Ustaw od razu glob na wybraną teksturę
   globe.globeImageUrl(textureBase64);
@@ -1120,6 +1121,7 @@ window.onload = () => {
   updateNoPlanetsMessage();
   checkNewPlanetInput();
   updateCurrentPlanetHeader();
+  updatePlanetMiniPanel()
 }
   
 </script>
