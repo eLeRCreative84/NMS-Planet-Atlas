@@ -418,8 +418,8 @@ button:disabled {
 /* Minipanel z info o planecie */
 #planetMiniPanel {
   position: fixed;
-  bottom: 50px;
-  left: 50px;
+  left: 0.5rem;
+  bottom: 0.5rem;
   background: rgba(10, 30, 60, 0.9);
   padding: 8px;
   border-radius: 6px;
@@ -486,6 +486,7 @@ button:disabled {
   background: linear-gradient(135deg, #1565c0, #1e88e5);
   transform: scale(1.1);
 }
+
 
 
 
