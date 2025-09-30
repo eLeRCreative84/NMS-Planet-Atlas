@@ -387,3 +387,24 @@ button:disabled {
   border-bottom: 2px solid #102b56;
 
 }
+
+/* Grid na ikony */
+#planetResourcesPanel {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 kolumny */
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Każdy wiersz z ikoną + checkbox + nazwą */
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* odstępy między ikona, checkboxem i nazwą */
+}
+
+/* Ikona pierwiastka */
+.resource-item img {
+  width: 40px;
+  height: 40px;
+}
