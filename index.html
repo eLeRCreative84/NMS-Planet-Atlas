@@ -415,9 +415,8 @@ function updatePlanetMiniPanel() {
   const biomeRow = document.createElement("div");
   biomeRow.style.display = "flex";
   biomeRow.style.alignItems = "center";
-  biomeRow.style.gap = "1px";
-	biomeRow.style.marginBottom = "1px";   // odstęp od kolejnego wiersza
-
+  biomeRow.style.gap = "2px";
+	
   const biomeIcon = icons.find(i => i.type === "UI" && i.name === "Planet");
   if (biomeIcon) {
     const img = document.createElement("img");
@@ -438,9 +437,8 @@ function updatePlanetMiniPanel() {
   const sentinelsRow = document.createElement("div");
   sentinelsRow.style.display = "flex";
   sentinelsRow.style.alignItems = "center";
-  sentinelsRow.style.gap = "1px";
-	 sentinelsRow.style.marginBottom = "1px";
-
+  sentinelsRow.style.gap = "2px";
+	 
   const sentinelIcon = icons.find(i => i.type === "UI" && i.name === "Sentinel");
   if (sentinelIcon) {
     const img = document.createElement("img");
@@ -459,7 +457,6 @@ function updatePlanetMiniPanel() {
 
   // kontener na pierwiastki
   const resourcesContainer = document.createElement("div");
-  resourcesContainer.style.marginTop = "1px";
   resourcesContainer.style.display = "flex";
   resourcesContainer.style.flexDirection = "column";
   resourcesContainer.style.gap = "1px";
@@ -474,7 +471,7 @@ function updatePlanetMiniPanel() {
     const row = document.createElement("div");
     row.style.display = "flex";
     row.style.alignItems = "center";
-    row.style.gap = "4px";
+    row.style.gap = "2px";
 
     const img = document.createElement("img");
     img.src = resObj.icon;
