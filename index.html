@@ -422,8 +422,8 @@ function updatePlanetMiniPanel() {
     const img = document.createElement("img");
     img.src = biomeIcon.icon;
     img.alt = "Biom";
-    img.style.width = "20px";
-    img.style.height = "20px";
+    img.style.width = ICON_SIZE + "px";
+    img.style.height = ICON_SIZE + "px";
     biomeRow.appendChild(img);
   }
 
@@ -444,8 +444,8 @@ function updatePlanetMiniPanel() {
     const img = document.createElement("img");
     img.src = sentinelIcon.icon;
     img.alt = "Sentinel";
-    img.style.width = "20px";
-    img.style.height = "20px";
+    img.style.width = ICON_SIZE + "px";
+    img.style.height = ICON_SIZE + "px";
     sentinelsRow.appendChild(img);
   }
 
@@ -476,8 +476,8 @@ function updatePlanetMiniPanel() {
     const img = document.createElement("img");
     img.src = resObj.icon;
     img.alt = resObj.name;
-    img.style.width = "20px";
-    img.style.height = "20px";
+    img.style.width = ICON_SIZE + "px";
+    img.style.height = ICON_SIZE + "px";
 
     const label = document.createElement("span");
     label.textContent = resObj.name;
