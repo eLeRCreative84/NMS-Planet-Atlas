@@ -425,6 +425,7 @@ function updatePlanetMiniPanel() {
   resourcesContainer.style.gap = "4px";
 
   const resources = details.resources || [];
+  const resourceIcons = icons.filter(i => i.type === "resource");
   resources.forEach(resName => {
     const resObj = icons.find(r => r.name === resName);
     if (!resObj) return;
@@ -942,6 +943,9 @@ function renderPlanetResourcesPanel() {
 
   container.innerHTML = "";
 
+  // tylko pierwiastki
+  const resourceIcons = icons.filter(res => res.type === "resource");
+	
   // Grid 6 kolumn (ikona, checkbox, nazwa ×2)
   const grid = document.createElement("div");
   grid.style.display = "grid";
