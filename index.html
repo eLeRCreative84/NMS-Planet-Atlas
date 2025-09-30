@@ -415,8 +415,8 @@ function updatePlanetMiniPanel() {
   const biomeRow = document.createElement("div");
   biomeRow.style.display = "flex";
   biomeRow.style.alignItems = "center";
-  biomeRow.style.gap = "4px";
-	biomeRow.style.marginBottom = "2px";   // odstęp od kolejnego wiersza
+  biomeRow.style.gap = "1px";
+	biomeRow.style.marginBottom = "1px";   // odstęp od kolejnego wiersza
 
   const biomeIcon = icons.find(i => i.type === "UI" && i.name === "Planet");
   if (biomeIcon) {
@@ -429,7 +429,7 @@ function updatePlanetMiniPanel() {
   }
 
   const biomeText = document.createElement("span");
-  biomeText.textContent = details.biome || "Nieznany";
+  biomeText.textContent = details.biome || "Nieznany biom";
   biomeRow.appendChild(biomeText);
 
   panel.appendChild(biomeRow);
@@ -438,8 +438,8 @@ function updatePlanetMiniPanel() {
   const sentinelsRow = document.createElement("div");
   sentinelsRow.style.display = "flex";
   sentinelsRow.style.alignItems = "center";
-  sentinelsRow.style.gap = "4px";
-	 sentinelsRow.style.marginBottom = "2px";
+  sentinelsRow.style.gap = "1px";
+	 sentinelsRow.style.marginBottom = "1px";
 
   const sentinelIcon = icons.find(i => i.type === "UI" && i.name === "Sentinel");
   if (sentinelIcon) {
@@ -452,17 +452,17 @@ function updatePlanetMiniPanel() {
   }
 
   const sentinelsText = document.createElement("span");
-  sentinelsText.textContent = details.sentinels || "Nieznany";
+  sentinelsText.textContent = details.sentinels || "Nieznani strażnicy";
   sentinelsRow.appendChild(sentinelsText);
 
   panel.appendChild(sentinelsRow);
 
   // kontener na pierwiastki
   const resourcesContainer = document.createElement("div");
-  resourcesContainer.style.marginTop = "2px";
+  resourcesContainer.style.marginTop = "1px";
   resourcesContainer.style.display = "flex";
   resourcesContainer.style.flexDirection = "column";
-  resourcesContainer.style.gap = "4px";
+  resourcesContainer.style.gap = "1px";
 	
 
   const resources = details.resources || [];
