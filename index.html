@@ -412,10 +412,27 @@ function updatePlanetMiniPanel() {
   biomeLine.textContent = `Biom: ${details.biome || "Nieznany"}`;
   panel.appendChild(biomeLine);
 
-  // strażnicy
-  const sentinelsLine = document.createElement("div");
-  sentinelsLine.textContent = `Strażnicy: ${details.sentinels || "Nieznany"}`;
-  panel.appendChild(sentinelsLine);
+  // strażnicy -> ikona + opis
+  const sentinelsRow = document.createElement("div");
+  sentinelsRow.style.display = "flex";
+  sentinelsRow.style.alignItems = "center";
+  sentinelsRow.style.gap = "4px";
+
+  const sentinelIcon = icons.find(i => i.type === "ui" && i.name === "Sentinel");
+  if (sentinelIcon) {
+    const img = document.createElement("img");
+    img.src = sentinelIcon.icon;
+    img.alt = "Sentinel";
+    img.style.width = "20px";
+    img.style.height = "20px";
+    sentinelsRow.appendChild(img);
+  }
+
+  const sentinelsText = document.createElement("span");
+  sentinelsText.textContent = details.sentinels || "Nieznany";
+  sentinelsRow.appendChild(sentinelsText);
+
+  panel.appendChild(sentinelsRow);
 
   // kontener na pierwiastki
   const resourcesContainer = document.createElement("div");
