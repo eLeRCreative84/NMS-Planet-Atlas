@@ -960,10 +960,7 @@ function renderPlanetResourcesPanel() {
   if (!container) return;
 
   container.innerHTML = "";
-
-  // tylko pierwiastki
-  const resourceIcons = icons.filter(res => res.type === "resource");
-	
+ 
   // Grid 6 kolumn (ikona, checkbox, nazwa ×2)
   const grid = document.createElement("div");
   grid.style.display = "grid";
@@ -971,8 +968,10 @@ function renderPlanetResourcesPanel() {
   grid.style.gridGap = "4px";
   grid.style.alignItems = "center";
   container.appendChild(grid);
-
-  icons.forEach(res => {
+  
+	// filtrujemy tylko ikony typu "resource"
+  icons.filter(res => res.type === "resource")
+    .forEach(res => {
     // Ikona pierwiastka
     const img = document.createElement("img");
     img.src = res.icon;
