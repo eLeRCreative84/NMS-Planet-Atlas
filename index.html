@@ -872,33 +872,26 @@ function renderPlanetResourcesPanel() {
   if (!container) return;
 
   container.innerHTML = "";
+  container.id = "planetResourcesPanel"; // nadajemy ID dla CSS grida
 
-  // checkboxy są nieaktywne, gdy nie ma wybranej planety
   const disabledAll = !currentPlanet;
 
   icons.forEach(res => {
     const wrapper = document.createElement("label");
-    wrapper.style.display = "inline-flex";
-    wrapper.style.alignItems = "center";
-    wrapper.style.margin = "5px 10px";
+    wrapper.className = "resource-item"; // zamiast inline-style
 
     const img = document.createElement("img");
     img.src = res.icon;
     img.alt = res.name;
-    img.style.width = "40px";
-    img.style.height = "40px";
-    img.style.marginRight = "6px";
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.disabled = disabledAll;
 
-    // ustawiamy stan checkboxa jeśli planeta istnieje
     if (!disabledAll && planetDetails[currentPlanet]?.resources) {
       checkbox.checked = planetDetails[currentPlanet].resources.includes(res.name);
     }
 
-    // zapisywanie zmian
     checkbox.addEventListener("change", () => {
       if (!currentPlanet) return;
 
@@ -920,7 +913,7 @@ function renderPlanetResourcesPanel() {
 
     wrapper.appendChild(img);
     wrapper.appendChild(checkbox);
-    wrapper.appendChild(document.createTextNode(" " + res.name));
+    wrapper.appendChild(document.createTextNode(res.name));
     container.appendChild(wrapper);
   });
 }
