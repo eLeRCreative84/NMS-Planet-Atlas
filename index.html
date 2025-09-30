@@ -414,29 +414,30 @@ document.getElementById("togglePlanetSidebarBtn").addEventListener("click", togg
   sentinelsDiv.textContent = details.sentinels ? `Strażnicy: ${details.sentinels}` : "Strażnicy: Nieznany";
 
   // Zasoby / pierwiastki (na podstawie checkboxów)
-  const resourcesDiv = document.getElementById("miniPanelResources");
-  resourcesDiv.innerHTML = ""; // czyścimy panel
+  const resources = planetDetails[currentPlanet]?.resources || [];
+  resources.forEach(resName => {
+    const resObj = icons.find(r => r.name === resName);
+    if(!resObj) return;
 
-  if (icons && Array.isArray(icons)) {
-    icons.forEach(res => {
-      if (details.resources && details.resources.includes(res.name)) {
-        const wrapper = document.createElement("div");
-        wrapper.style.display = "flex";
-        wrapper.style.alignItems = "center";
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.alignItems = "center";
+    row.style.gap = "4px"; // odstęp ikona - nazwa
 
-        const img = document.createElement("img");
-        img.src = res.icon;
-        img.alt = res.name;
+    const img = document.createElement("img");
+    img.src = resObj.icon;
+    img.alt = resObj.name;
+    img.style.width = "24px";
+    img.style.height = "24px";
 
-        const span = document.createElement("span");
-        span.textContent = res.name;
+    const label = document.createElement("span");
+    label.textContent = resObj.name;
+    label.style.flexShrink = 0;
 
-        wrapper.appendChild(img);
-        wrapper.appendChild(span);
-        resourcesDiv.appendChild(wrapper);
-      }
-    });
-  }
+    row.appendChild(img);
+    row.appendChild(label);
+    panel.appendChild(row);
+  });
 }
 
 ////////////////////////////////////////////////////////////////////
