@@ -435,7 +435,7 @@ button:disabled {
 #planetMiniPanel div {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: left;
   margin-bottom: 4px;
 }
 
@@ -448,6 +448,7 @@ button:disabled {
 #planetMiniPanel span {
   margin-right: 8px;
 }
+
 
 
 
