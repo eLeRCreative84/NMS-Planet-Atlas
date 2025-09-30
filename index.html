@@ -418,7 +418,7 @@ function updatePlanetMiniPanel() {
   sentinelsRow.style.alignItems = "center";
   sentinelsRow.style.gap = "4px";
 
-  const sentinelIcon = icons.find(i => i.type === "ui" && i.name === "Sentinel");
+  const sentinelIcon = icons.find(i => i.type === "UI" && i.name === "Sentinel");
   if (sentinelIcon) {
     const img = document.createElement("img");
     img.src = sentinelIcon.icon;
@@ -1138,8 +1138,7 @@ window.onload = () => {
   updateNoPlanetsMessage();
   checkNewPlanetInput();
   updateCurrentPlanetHeader();
-  updatePlanetMiniPanel()
-}
+  }
   
 </script>
 </body>
