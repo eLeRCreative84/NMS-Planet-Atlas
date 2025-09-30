@@ -45,6 +45,8 @@ function importAtlas(event){
       updateNoPlanetsMessage();
       refreshPlanetSidebar();
 	    refreshGalaxySidebar();
+		renderPlanetResourcesPanel();
+		updatePlanetMiniPanel();
 
       alert("Import zakończony!");
     } catch(err){ 
