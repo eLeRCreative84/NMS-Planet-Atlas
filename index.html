@@ -866,32 +866,46 @@ document.addEventListener("DOMContentLoaded", () => {
 	renderPlanetResourcesPanel();
 });
 
-// Renderowanie listy checkboxów pierwiastków
+// Renderowanie listy checkboxów pierwiastków dla wybranej planety
 function renderPlanetResourcesPanel() {
   const container = document.getElementById("planet-resources");
   if (!container) return;
 
+  // Czy mamy wybraną planetę? Jeśli nie, checkboxy będą zablokowane
+  const hasPlanet = !!currentPlanet;
+
+  // Czyścimy poprzednią zawartość
   container.innerHTML = "";
-  container.id = "planetResourcesPanel"; // nadajemy ID dla CSS grida
 
-  const disabledAll = !currentPlanet;
+  // Tworzymy siatkę 2 wiersze × 2 kolumny (czyli 6 kolumn: ikona, checkbox, nazwa ×2)
+  const grid = document.createElement("div");
+  grid.style.display = "grid";
+  grid.style.gridTemplateColumns = "40px 20px auto 40px 20px auto"; // szerokość ikon i checkboxów, nazwy automatycznie
+  grid.style.gridGap = "4px"; // margines między elementami
+  grid.style.alignItems = "center"; // wyrównanie checkboxów w pionie
+  container.appendChild(grid);
 
+  // Przechodzimy po wszystkich ikonach pierwiastków
   icons.forEach(res => {
-    // Ikona
+    // Ikona pierwiastka
     const img = document.createElement("img");
     img.src = res.icon;
     img.alt = res.name;
-    img.className = "resource-icon";
+    img.style.width = "40px";
+    img.style.height = "40px";
+    grid.appendChild(img);
 
-    // Checkbox
+    // Checkbox pierwiastka
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.disabled = disabledAll;
+    checkbox.disabled = !hasPlanet; // aktywny tylko jeśli planeta jest wybrana
 
-    if (!disabledAll && planetDetails[currentPlanet]?.resources) {
+    // ustawiamy stan checkboxa jeśli planeta istnieje
+    if (hasPlanet && planetDetails[currentPlanet]?.resources) {
       checkbox.checked = planetDetails[currentPlanet].resources.includes(res.name);
     }
 
+    // zapis zmian do planetDetails
     checkbox.addEventListener("change", () => {
       if (!currentPlanet) return;
 
@@ -911,17 +925,16 @@ function renderPlanetResourcesPanel() {
       }
     });
 
-    // Nazwa pierwiastka
-    const label = document.createElement("span");
-    label.textContent = res.name;
-    label.className = "resource-label";
+    grid.appendChild(checkbox);
 
-    // Dodajemy elementy w kolejności: ikona → checkbox → nazwa
-    container.appendChild(img);
-    container.appendChild(checkbox);
-    container.appendChild(label);
+    // Nazwa pierwiastka, wyrównana do lewej
+    const nameLabel = document.createElement("span");
+    nameLabel.textContent = res.name;
+    nameLabel.style.textAlign = "left";
+    grid.appendChild(nameLabel);
   });
 }
+
   
 ////////////////////////////////////////////////////////////////////
 //---------------------- Inicjalizacja globu ---------------------//
