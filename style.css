@@ -417,13 +417,16 @@ button:disabled {
 
 #planetMiniPanel {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background-color: rgba(0, 0, 0, 0.6);
+  bottom: 50px;
+  left: 50px;
+  background: rgba(10, 30, 60, 0.9);
   padding: 8px;
   border-radius: 6px;
   color: white;
-  font-family: sans-serif;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column; /* treść w pionie */
+  gap: 4px; /* odstęp między wierszami */
   max-width: 220px;
   z-index: 1000;
 }
@@ -445,6 +448,7 @@ button:disabled {
 #planetMiniPanel span {
   margin-right: 8px;
 }
+
 
 
 
