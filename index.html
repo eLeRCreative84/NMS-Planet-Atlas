@@ -416,6 +416,7 @@ function updatePlanetMiniPanel() {
   biomeRow.style.display = "flex";
   biomeRow.style.alignItems = "center";
   biomeRow.style.gap = "4px";
+	biomeRow.style.marginBottom = "2px";   // odstęp od kolejnego wiersza
 
   const biomeIcon = icons.find(i => i.type === "UI" && i.name === "Planet");
   if (biomeIcon) {
@@ -438,6 +439,7 @@ function updatePlanetMiniPanel() {
   sentinelsRow.style.display = "flex";
   sentinelsRow.style.alignItems = "center";
   sentinelsRow.style.gap = "4px";
+	 sentinelsRow.style.marginBottom = "2px";
 
   const sentinelIcon = icons.find(i => i.type === "UI" && i.name === "Sentinel");
   if (sentinelIcon) {
@@ -457,10 +459,11 @@ function updatePlanetMiniPanel() {
 
   // kontener na pierwiastki
   const resourcesContainer = document.createElement("div");
-  resourcesContainer.style.marginTop = "6px";
+  resourcesContainer.style.marginTop = "2px";
   resourcesContainer.style.display = "flex";
   resourcesContainer.style.flexDirection = "column";
   resourcesContainer.style.gap = "4px";
+	
 
   const resources = details.resources || [];
   const resourceIcons = icons.filter(i => i.type === "resource");
