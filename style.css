@@ -415,5 +415,36 @@ button:disabled {
   text-align: left;
 }
 
+#planetMiniPanel {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 8px;
+  border-radius: 6px;
+  color: white;
+  font-family: sans-serif;
+  max-width: 220px;
+  z-index: 1000;
+}
+
+/* Minipanel z info o planecie */
+#planetMiniPanel div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+#planetMiniPanel img {
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
+}
+
+#planetMiniPanel span {
+  margin-right: 8px;
+}
+
 
 
