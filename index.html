@@ -299,6 +299,7 @@
 
 	  <!-- Info o planecie -->
 <div id="planetMiniPanel">
+	<button id="toggleMiniPanelBtn">▼</button>
   <div id="miniPanelBiome"></div>
   <div id="miniPanelResources"></div>
   <div id="miniPanelSentinels"></div>
@@ -402,14 +403,17 @@ function updatePlanetMiniPanel() {
   const panel = document.getElementById("planetMiniPanel");
   if (!panel || !currentPlanet) return;
 
+	// blokada: jeśli panel jest ukryty, to nic nie rób
+  if (panel.classList.contains("hidden")) return;
+	
   // reset zawartości panelu
   panel.innerHTML = "";
 
   const details = planetDetails[currentPlanet] || {};
  
   // USTAWIENIA GLOBALNE dla minipanelu
-  const ICON_SIZE = 60;   // x2 (wcześniej było 20px)
-  const FONT_SIZE = "24px"; // x2 (wcześniej ~9px)
+  const ICON_SIZE = 40;   // x2 (wcześniej było 20px)
+  const FONT_SIZE = "18px"; // x2 (wcześniej ~9px)
  
 	// === BIOM (ikona + tekst) ===
   const biomeRow = document.createElement("div");
@@ -490,6 +494,24 @@ function updatePlanetMiniPanel() {
   panel.appendChild(resourcesContainer);
 }
 
+	// Funkcja do toggle mini panelu
+function toggleMiniPanel() {
+  const miniPanel = document.getElementById("planetMiniPanel");
+  const btn = document.getElementById("toggleMiniPanelBtn");
+
+  miniPanel.classList.toggle("hidden");
+
+  if (miniPanel.classList.contains("hidden")) {
+    btn.textContent = "▲"; // panel ukryty → strzałka w górę
+  } else {
+    btn.textContent = "▼"; // panel widoczny → strzałka w dół
+    updatePlanetMiniPanel();
+  }
+}
+
+// Podłącz przycisk
+document.getElementById("toggleMiniPanelBtn").addEventListener("click", toggleMiniPanel);
+	
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
 //////////////////////////////////////////////////////////////////// 
