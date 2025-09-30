@@ -391,21 +391,29 @@ button:disabled {
 /* Grid na ikony */
 #planetResourcesPanel {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 kolumny */
-  gap: 3px;
+  grid-template-columns: 40px 20px 1fr 40px 20px 1fr; /* 6 kolumn */
+  gap: 4px 8px; /* 4px wiersze, 8px między kolumnami */
+  align-items: center; /* wszystko wyśrodkowane pionowo */
   margin-top: 8px;
 }
 
-/* Każdy wiersz z ikoną + checkbox + nazwą */
-.resource-item {
-  display: flex;
-  align-items: center;
-  gap: 3px; /* odstępy między ikona, checkboxem i nazwą */
+/* Ikony pierwiastków */
+.resource-icon {
+  width: 32px;
+  height: 32px;
+  justify-self: center;
 }
 
-/* Ikona pierwiastka */
-.resource-item img {
-  width: 40px;
-  height: 40px;
+/* Checkboxy */
+#planetResourcesPanel input[type="checkbox"] {
+  margin: 0;
+  justify-self: center;
 }
+
+/* Nazwy pierwiastków */
+.resource-label {
+  text-align: left;
+}
+
+
 
