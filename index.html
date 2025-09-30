@@ -871,21 +871,16 @@ function renderPlanetResourcesPanel() {
   const container = document.getElementById("planet-resources");
   if (!container) return;
 
-  // Czy mamy wybraną planetę? Jeśli nie, checkboxy będą zablokowane
-  const hasPlanet = !!currentPlanet;
-
-  // Czyścimy poprzednią zawartość
   container.innerHTML = "";
 
-  // Tworzymy siatkę 2 wiersze × 2 kolumny (czyli 6 kolumn: ikona, checkbox, nazwa ×2)
+  // Grid 6 kolumn (ikona, checkbox, nazwa ×2)
   const grid = document.createElement("div");
   grid.style.display = "grid";
-  grid.style.gridTemplateColumns = "40px 20px auto 40px 20px auto"; // szerokość ikon i checkboxów, nazwy automatycznie
-  grid.style.gridGap = "4px"; // margines między elementami
-  grid.style.alignItems = "center"; // wyrównanie checkboxów w pionie
+  grid.style.gridTemplateColumns = "40px 20px auto 40px 20px auto";
+  grid.style.gridGap = "4px";
+  grid.style.alignItems = "center";
   container.appendChild(grid);
 
-  // Przechodzimy po wszystkich ikonach pierwiastków
   icons.forEach(res => {
     // Ikona pierwiastka
     const img = document.createElement("img");
@@ -898,24 +893,21 @@ function renderPlanetResourcesPanel() {
     // Checkbox pierwiastka
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.disabled = !hasPlanet; // aktywny tylko jeśli planeta jest wybrana
+    checkbox.disabled = !currentPlanet; // aktywny tylko jeśli planeta jest wybrana
+
+    // przechowujemy w dataset nazwę pierwiastka
+    checkbox.dataset.resource = res.name;
 
     // ustawiamy stan checkboxa jeśli planeta istnieje
-    if (hasPlanet && planetDetails[currentPlanet]?.resources) {
-      checkbox.checked = planetDetails[currentPlanet].resources.includes(res.name);
+    if (currentPlanet && planetDetails[currentPlanet]?.resources?.includes(res.name)) {
+      checkbox.checked = true;
     }
 
-    // zapis zmian do planetDetails
+    // obsługa zmiany stanu
     checkbox.addEventListener("change", () => {
       if (!currentPlanet) return;
 
-      if (!planetDetails[currentPlanet]) {
-        planetDetails[currentPlanet] = { resources: [] };
-      }
-      if (!Array.isArray(planetDetails[currentPlanet].resources)) {
-        planetDetails[currentPlanet].resources = [];
-      }
-
+      if (!planetDetails[currentPlanet]) planetDetails[currentPlanet] = { resources: [] };
       const arr = planetDetails[currentPlanet].resources;
 
       if (checkbox.checked) {
@@ -927,7 +919,7 @@ function renderPlanetResourcesPanel() {
 
     grid.appendChild(checkbox);
 
-    // Nazwa pierwiastka, wyrównana do lewej
+    // Nazwa pierwiastka
     const nameLabel = document.createElement("span");
     nameLabel.textContent = res.name;
     nameLabel.style.textAlign = "left";
