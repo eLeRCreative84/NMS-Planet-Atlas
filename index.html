@@ -296,6 +296,14 @@
 </div>
     <!-- Przycisk do pokazywania/ukrywania panelu -->
    <button id="togglePlanetSidebarBtn">▶</button>
+
+	  <!-- Info o planecie -->
+<div id="planetMiniPanel">
+  <div id="miniPanelBiome"></div>
+  <div id="miniPanelResources"></div>
+  <div id="miniPanelSentinels"></div>
+</div>
+	  
 </div>
    
 <script>
@@ -387,6 +395,49 @@ function togglePlanetSidebar() {
 
 // Podłącz przycisk
 document.getElementById("togglePlanetSidebarBtn").addEventListener("click", togglePlanetSidebar);
+
+	
+// Mini panel z inofo o planecie
+  function updatePlanetMiniPanel() {
+  const panel = document.getElementById("planetMiniPanel");
+  if (!panel || !currentPlanet) return;
+
+  const details = planetDetails[currentPlanet];
+  if (!details) return;
+
+  // Biome
+  const biomeDiv = document.getElementById("miniPanelBiome");
+  biomeDiv.textContent = details.biome ? `Biome: ${details.biome}` : "Biome: Nieznany";
+
+  // Strażnicy
+  const sentinelsDiv = document.getElementById("miniPanelSentinels");
+  sentinelsDiv.textContent = details.sentinels ? `Strażnicy: ${details.sentinels}` : "Strażnicy: Nieznany";
+
+  // Zasoby / pierwiastki (na podstawie checkboxów)
+  const resourcesDiv = document.getElementById("miniPanelResources");
+  resourcesDiv.innerHTML = ""; // czyścimy panel
+
+  if (icons && Array.isArray(icons)) {
+    icons.forEach(res => {
+      if (details.resources && details.resources.includes(res.name)) {
+        const wrapper = document.createElement("div");
+        wrapper.style.display = "flex";
+        wrapper.style.alignItems = "center";
+
+        const img = document.createElement("img");
+        img.src = res.icon;
+        img.alt = res.name;
+
+        const span = document.createElement("span");
+        span.textContent = res.name;
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(span);
+        resourcesDiv.appendChild(wrapper);
+      }
+    });
+  }
+}
 
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
@@ -598,6 +649,7 @@ function refreshPlanetSidebar() {
           refreshPlanetSidebar(); // odświeżamy sidebar, żeby podświetlenie działało
           loadPlanetDetails();
 			renderPlanetResourcesPanel();
+			updatePlanetMiniPanel();
         };
 
         listContainer.appendChild(li);
@@ -687,6 +739,8 @@ function renderPlanetRow(p) {
     selectPlanet(p);
     updateSelectedPlanetButtons();
     refreshPlanetList(); // <-- odśwież listę, żeby przełączyć podświetlenie
+	  renderPlanetResourcesPanel();
+	  updatePlanetMiniPanel();
   };
 
   container.appendChild(btn);
@@ -730,6 +784,7 @@ function selectPlanet(name) {
   globe.globeImageUrl(planet.texture || blackTextureURL);
   updateSelectedPlanetButtons();
 	renderPlanetResourcesPanel();
+	updatePlanetMiniPanel();
 }
 
 // Edycja zaznaczonej planety
@@ -795,6 +850,7 @@ function acceptEditPlanet() {
   setButtonsDisabled(false);
   checkNewPlanetInput();
 	renderPlanetResourcesPanel();
+	updatePlanetMiniPanel();
 }
 
   function cancelEditPlanet() {
@@ -837,6 +893,7 @@ function deleteSelectedPlanet() {
   updateSelectedPlanetButtons();
   refreshPlanetSidebar();
 	renderPlanetResourcesPanel();
+	updatePlanetMiniPanel();
 }
 
 // Wywołanie przy starcie, żeby przyciski były poprawnie wyszarzone jeśli brak planet
