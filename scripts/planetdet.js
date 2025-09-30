@@ -28,6 +28,16 @@ function loadPlanetDetails(){
   document.getElementById("detailUpdated").value = details.updated || "";
   document.getElementById("detailCoords").value = details.coords || "";
   document.getElementById("detailNotes").value = details.notes || "";
+ 
+	// Przywróć checkboxy pierwiastków
+  if (icons && icons.length) {
+    icons.forEach(res => {
+      const checkbox = document.getElementById(`resCheckbox-${res.name}`);
+      if (checkbox) {
+        checkbox.checked = details.resources?.includes(res.name) || false;
+      }
+    });
+  }
 }
 
 
@@ -56,6 +66,9 @@ function savePlanetDetails(){
     return;
   }
 
+  // zachowaj istniejące resources jeśli są
+  const existingResources = planetDetails[currentPlanet]?.resources || [];
+	
   planetDetails[currentPlanet] = {
     galaxy: galaxyVal,
     starSystem: starSystemVal,
@@ -69,7 +82,8 @@ function savePlanetDetails(){
     mode: document.getElementById("detailMode").value,
     updated: document.getElementById("detailUpdated").value,
     coords: document.getElementById("detailCoords").value,
-    notes: document.getElementById("detailNotes").value
+    notes: document.getElementById("detailNotes").value,
+	resources: existingResources
   };
  
  // synchronizuj globalną zmienną (opcjonalne, ale wygodne)
@@ -80,5 +94,6 @@ function savePlanetDetails(){
   updateCurrentPlanetHeader();
   refreshPlanetSidebar();
   refreshGalaxySidebar();
+  updatePlanetMiniPanel();
 }
  
