@@ -417,7 +417,7 @@ button:disabled {
 
 /* Minipanel z info o planecie */
 #planetMiniPanel {
-  position: absolute;
+  position: fixed;
   bottom: 50px;
   left: 50px;
   background: rgba(10, 30, 60, 0.9);
@@ -430,6 +430,8 @@ button:disabled {
   gap: 1px; /* odstęp między wierszami */
   max-width: 220px;
   z-index: 1000;
+	transition: transform 0.4s ease-in-out;
+    transform: translateY(0); /* widoczny */
 }
 
 #planetMiniPanel div {
@@ -447,6 +449,42 @@ button:disabled {
 
 #planetMiniPanel span {
   margin-right: 8px;
+}
+
+/* Ukryty panel – chowamy w dół */
+#planetMiniPanel.hidden {
+  transform: translateY(100%);
+}
+
+/* Przycisk toggle dla mini panelu */
+#toggleMiniPanelBtn {
+  position: absolute;
+  bottom: 100%;       /* nad panelem */
+  left: 0.5rem;
+  margin-bottom: 6px; /* mały odstęp nad panelem */
+  z-index: 1000;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: linear-gradient(135deg, #1976d2, #42a5f5);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: transform 0.4s ease-in-out;
+}
+
+#planetMiniPanel.hidden #toggleMiniPanelBtn {
+  transform: translateY(100%);
+}
+
+#toggleMiniPanelBtn:hover {
+  background: linear-gradient(135deg, #1565c0, #1e88e5);
+  transform: scale(1.1);
 }
 
 
