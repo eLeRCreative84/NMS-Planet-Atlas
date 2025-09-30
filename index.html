@@ -406,8 +406,17 @@ function updatePlanetMiniPanel() {
 	// blokada: jeśli panel jest ukryty, to nic nie rób
   if (panel.classList.contains("hidden")) return;
 	
-  // reset zawartości panelu
-  panel.innerHTML = "";
+ // pobieramy kontenery na treść
+  const biomeContainer = document.getElementById("miniPanelBiome");
+  const resourcesContainer = document.getElementById("miniPanelResources");
+  const sentinelsContainer = document.getElementById("miniPanelSentinels");
+
+  if (!biomeContainer || !resourcesContainer || !sentinelsContainer) return;
+
+  // resetujemy tylko te kontenery
+  biomeContainer.innerHTML = "";
+  resourcesContainer.innerHTML = "";
+  sentinelsContainer.innerHTML = "";
 
   const details = planetDetails[currentPlanet] || {};
  
