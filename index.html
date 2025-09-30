@@ -877,13 +877,13 @@ function renderPlanetResourcesPanel() {
   const disabledAll = !currentPlanet;
 
   icons.forEach(res => {
-    const wrapper = document.createElement("label");
-    wrapper.className = "resource-item"; // zamiast inline-style
-
+    // Ikona
     const img = document.createElement("img");
     img.src = res.icon;
     img.alt = res.name;
+    img.className = "resource-icon";
 
+    // Checkbox
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.disabled = disabledAll;
@@ -911,10 +911,15 @@ function renderPlanetResourcesPanel() {
       }
     });
 
-    wrapper.appendChild(img);
-    wrapper.appendChild(checkbox);
-    wrapper.appendChild(document.createTextNode(res.name));
-    container.appendChild(wrapper);
+    // Nazwa pierwiastka
+    const label = document.createElement("span");
+    label.textContent = res.name;
+    label.className = "resource-label";
+
+    // Dodajemy elementy w kolejności: ikona → checkbox → nazwa
+    container.appendChild(img);
+    container.appendChild(checkbox);
+    container.appendChild(label);
   });
 }
   
