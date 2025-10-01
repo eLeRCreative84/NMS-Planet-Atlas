@@ -1272,14 +1272,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
 globe.showGraticules(true).graticuleLineWidth(0.5);
-
-	//import z pliku
-  document.addEventListener("DOMContentLoaded", () => {
-    const input = document.getElementById("importFile");
-    if (input) {
-      input.addEventListener("change", importAtlas);
-    }
-  });
 	
 // start
 window.onload = () => {
@@ -1290,7 +1282,14 @@ window.onload = () => {
   checkNewPlanetInput();
   updateCurrentPlanetHeader();
   }
-  
+ 	
+	//import z pliku
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("importFile");
+    if (input) {
+      input.addEventListener("change", importAtlas);
+    }
+  }); 
 </script>
 </body>
 </html>
