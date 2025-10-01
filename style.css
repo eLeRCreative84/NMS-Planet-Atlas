@@ -459,8 +459,8 @@ button:disabled {
 /* Przycisk toggle dla mini panelu */
 #toggleMiniPanelBtn {
   position: absolute;
-  botton: 1rem;
-  right: 230px; /* szerokość panelu +10 */
+  top: -45px;  		 /* nad panelem */
+  left: 0;    			 /* wyrównany do lewej krawędzi panelu */
   margin-bottom: 6px; 	/* mały odstęp nad panelem */
   z-index: 1000;
   width: 40px;
@@ -486,6 +486,7 @@ button:disabled {
   background: linear-gradient(135deg, #1565c0, #1e88e5);
   transform: scale(1.1);
 }
+
 
 
 
