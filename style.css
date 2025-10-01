@@ -307,7 +307,6 @@ button:disabled {
 #nextTexturePage:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  pointer-events: none;
 }
 	
 /* Selektor galaktyk */
@@ -487,6 +486,7 @@ button:disabled {
   background: linear-gradient(135deg, #1565c0, #1e88e5);
   transform: scale(1.1);
 }
+
 
 
 
