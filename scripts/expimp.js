@@ -20,27 +20,25 @@ function exportAtlas(){
 function importAtlas(event){
   const file = event.target.files[0];
   if(!file) return;
-
   const reader = new FileReader();
+
   reader.onload = e => {
-    try {
+    try{
       const data = JSON.parse(e.target.result);
 
-      // atlas punktów
+      // 1️⃣ Atlas planet
       if(data.atlas) atlas = data.atlas;
 
-      // planetDetails z normalizacją resources
+      // 2️⃣ Planet details i inicjalizacja resources
       if(data.planetDetails) {
         planetDetails = data.planetDetails;
         Object.keys(planetDetails).forEach(p => {
-          if (!planetDetails[p].resources) planetDetails[p].resources = [];
+          if (!Array.isArray(planetDetails[p].resources)) planetDetails[p].resources = [];
         });
       }
 
-      // dodatkowe dane planet
+      // 3️⃣ Dodatkowe dane
       if(data.planetData) planetData = data.planetData;
-
-      // tekstury galerii
       if(data.textures) {
         textures.length = 0;
         textures.push(...data.textures);
@@ -48,13 +46,13 @@ function importAtlas(event){
         renderTexturePage();
       }
 
-      // wybierz pierwszą planetę, jeśli istnieje
+      // 4️⃣ Ustawienie aktualnej planety
       const planets = Object.keys(atlas);
       currentPlanet = planets[0] || null;
       if (currentPlanet) selectPlanet(currentPlanet);
       else globe.globeImageUrl(blackTextureURL);
 
-      // odśwież wszystko w UI
+      // 5️⃣ Odświeżenie UI
       updateCurrentPlanetHeader();
       refreshPlanetList();
       refreshPointsList();
@@ -62,8 +60,8 @@ function importAtlas(event){
       updateNoPlanetsMessage();
       refreshPlanetSidebar();
       refreshGalaxySidebar();
-      renderPlanetResourcesPanel();
-      updatePlanetMiniPanel();
+      renderPlanetResourcesPanel(); // checkboxy pierwiastków
+      updatePlanetMiniPanel();      // mini-panel aktualny
 
       alert("Import zakończony!");
     } catch(err){ 
@@ -71,5 +69,6 @@ function importAtlas(event){
       alert("Błąd importu JSON"); 
     }
   };
+
   reader.readAsText(file);
 }
