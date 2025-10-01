@@ -1189,22 +1189,23 @@ function importAtlas(event){
       if(data.planetDetails) planetDetails = data.planetDetails;
       if(data.planetData) planetData = data.planetData;
       if(data.textures) {
-        textures.length = 0;
-        textures.push(...data.textures);
-        currentTexturePage = 0;
-        renderTexturePage();
+        textures.length = 0;        // wyczyść obecną listę
+        textures.push(...data.textures); // wczytaj importowane
+        currentTexturePage = 0;     // ustaw początkową stronę
+        renderTexturePage();        // odtwórz galerię
       }
-
       const planets = Object.keys(atlas);
       currentPlanet = planets[0] || null;
+      if (currentPlanet) selectPlanet(currentPlanet);
+      else globe.globeImageUrl(blackTextureURL);
 
-      if (currentPlanet) {
-        
-        selectPlanet(currentPlanet);
-      } else {
-        globe.globeImageUrl(blackTextureURL);
-        updateNoPlanetsMessage();
-      }
+      updateCurrentPlanetHeader();
+      refreshPlanetList();
+      refreshPointsList();
+      refreshGlobePoints();
+      updateNoPlanetsMessage();
+      refreshPlanetSidebar();
+	  refreshGalaxySidebar();
 
       alert("Import zakończony!");
     } catch(err){ 
