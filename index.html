@@ -1137,7 +1137,7 @@ function renderPlanetResourcesPanel() {
       } else {
         planetDetails[currentPlanet].resources = arr.filter(r => r !== res.name);
       }
-		
+		updatePlanetMiniPanel();
     });
 
     grid.appendChild(checkbox);
@@ -1261,11 +1261,7 @@ if(sortSelect) {
 }
 
 
-// inicjalizacja przycisków przewijania minigalerii na starcie
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById('prevTexturePage').disabled = true;
-  document.getElementById('nextTexturePage').disabled = true;
-  });
+
 	
 globe.showGraticules(true).graticuleLineWidth(0.5);
 	
