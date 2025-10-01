@@ -1051,6 +1051,7 @@ function renderPlanetResourcesPanel() {
       } else {
         planetDetails[currentPlanet].resources = arr.filter(r => r !== res.name);
       }
+		updatePlanetMiniPanel();
     });
 
     grid.appendChild(checkbox);
