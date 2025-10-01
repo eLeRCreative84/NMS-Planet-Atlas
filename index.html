@@ -1194,13 +1194,10 @@ function importAtlas(event){
       if (currentPlanet) selectPlanet(currentPlanet);
       else globe.globeImageUrl(blackTextureURL);
 
-      updateCurrentPlanetHeader();
-      refreshPlanetList();
-      refreshPointsList();
-      refreshGlobePoints();
-      updateNoPlanetsMessage();
-      refreshPlanetSidebar();
-	  refreshGalaxySidebar();
+     	refreshPlanetList();
+		refreshGalaxySidebar();
+		renderPlanetResourcesPanel();
+		updatePlanetMiniPanel();
 
       alert("Import zakończony!");
     } catch(err){ 
