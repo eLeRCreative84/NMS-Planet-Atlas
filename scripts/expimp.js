@@ -17,47 +17,35 @@ function exportAtlas(){
   URL.revokeObjectURL(url);
 }
 
-// główny loader, wspólny dla obu metod
-function loadAtlasData(data) {
-  if(data.atlas) atlas = data.atlas;
-  if(data.planetDetails) planetDetails = data.planetDetails;
-  if(data.planetData) planetData = data.planetData;
-  if(data.textures) {
-    textures.length = 0;
-    textures.push(...data.textures);
-    currentTexturePage = 0;
-    renderTexturePage();
-  }
-
-  const planets = Object.keys(atlas);
-  currentPlanet = planets[0] || null;
-  if (currentPlanet) selectPlanet(currentPlanet);
-  else globe.globeImageUrl(blackTextureURL);
-
-  updateCurrentPlanetHeader();
-  refreshPlanetList();
-  refreshPointsList();
-  refreshGlobePoints();
-  updateNoPlanetsMessage();
-  refreshPlanetSidebar();
-  refreshGalaxySidebar();
-  renderPlanetResourcesPanel();
-  updatePlanetMiniPanel();
-}
-
-// import z pliku (input type=file)
 function importAtlas(event){
-  const file = event?.target?.files?.[0];
-  if(!file) {
-    alert("Nie wybrano pliku!");
-    return;
-  }
-
+  const file = event.target.files[0];
+  if(!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    try {
+    try{
       const data = JSON.parse(e.target.result);
-      loadAtlasData(data);
+      if(data.atlas) atlas = data.atlas;
+      if(data.planetDetails) planetDetails = data.planetDetails;
+      if(data.planetData) planetData = data.planetData;
+      if(data.textures) {
+        textures.length = 0;        // wyczyść obecną listę
+        textures.push(...data.textures); // wczytaj importowane
+        currentTexturePage = 0;     // ustaw początkową stronę
+        renderTexturePage();        // odtwórz galerię
+      }
+      const planets = Object.keys(atlas);
+      currentPlanet = planets[0] || null;
+      if (currentPlanet) selectPlanet(currentPlanet);
+      else globe.globeImageUrl(blackTextureURL);
+
+      updateCurrentPlanetHeader();
+      refreshPlanetList();
+      refreshPointsList();
+      refreshGlobePoints();
+      updateNoPlanetsMessage();
+      refreshPlanetSidebar();
+	  refreshGalaxySidebar();
+
       alert("Import zakończony!");
     } catch(err){ 
       console.error(err);
@@ -65,17 +53,4 @@ function importAtlas(event){
     }
   };
   reader.readAsText(file);
-}
-
-// import z atlas.json na serwerze (np. GitHub Pages)
-async function importAtlasFromServer(url = "atlas.json") {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Błąd HTTP: " + response.status);
-    const data = await response.json();
-    loadAtlasData(data);
-    console.log("Atlas załadowany z serwera:", url);
-  } catch (err) {
-    console.error("Błąd ładowania atlas.json:", err);
-  }
 }
