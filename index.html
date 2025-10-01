@@ -1172,9 +1172,17 @@ if(sortSelect) {
         refreshPointsList();
     });
 }
-  
-globe.showGraticules(true).graticuleLineWidth(0.5);
 
+
+// inicjalizacja przycisków przewijania minigalerii na starcie
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById('prevTexturePage').disabled = true;
+  document.getElementById('nextTexturePage').disabled = true;
+  renderTexturePage(); // żeby od razu ustawić poprawny stan
+});
+	
+globe.showGraticules(true).graticuleLineWidth(0.5);
+	
 // start
 window.onload = () => {
   openTab("start"); // aktywuj pierwszą zakładkę
