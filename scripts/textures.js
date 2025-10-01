@@ -127,9 +127,14 @@ function renderTexturePage() {
     gallery.appendChild(img);
   });
 
-  // włącz/wyłącz przyciski
-  document.getElementById('prevTexturePage').disabled = currentTexturePage === 0;
-  document.getElementById('nextTexturePage').disabled = end >= textures.length;
+   // aktywne tylko, jeśli w galerii jest więcej niż 12 tekstur
+  if (textures.length > TEXTURES_PER_PAGE) {
+    prevBtn.disabled = currentTexturePage === 0;
+    nextBtn.disabled = end >= textures.length;
+  } else {
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+  }
 }
 
 // zmiana strony galerii
