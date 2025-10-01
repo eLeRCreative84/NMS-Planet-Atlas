@@ -2,31 +2,6 @@
 //--------------- Punkty, lista, tworzenie, edycja ---------------//
 //////////////////////////////////////////////////////////////////// 
 
-// Ograniczenie zakresów imputów X I Y
-const latInput = document.getElementById("lat");
-const lngInput = document.getElementById("lng");
-
-function clampLatLng() {
-  let lat = parseFloat(latInput.value);
-  let lng = parseFloat(lngInput.value);
-
-  if (!isNaN(lat)) {
-    if (lat < -90) lat = -90;
-    if (lat > 90) lat = 90;
-    latInput.value = lat;
-  }
-
-  if (!isNaN(lng)) {
-    if (lng < -180) lng = -180;
-    if (lng > 180) lng = 180;
-    lngInput.value = lng;
-  }
-}
-
-// Nasłuchiwanie zmiany wartości
-latInput.addEventListener("input", clampLatLng);
-lngInput.addEventListener("input", clampLatLng);
-  
 // Lista punktow
 function refreshPointsList() {
     const list = document.getElementById("pointsList");
@@ -305,66 +280,6 @@ function addPoles(planet){
   }
 }
 
-// Funkcja tworząca teksturę z gwiazdką
-function createStarTexture() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = '48px serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'yellow'; // kolor gwiazdki
-    ctx.fillText('⭐', canvas.width/2, canvas.height/2);
-    const texture = new THREE.CanvasTexture(canvas);
-    return texture;
-}
-
- function updateMyLocation() {
-  const lat = parseFloat(document.getElementById("myLat").value);
-  const lng = parseFloat(document.getElementById("myLng").value);
-
-  if (isNaN(lat) || isNaN(lng)) {
-    myLocationPoint = null;
-  } else {
-    myLocationPoint = { 
-      lat, 
-      lng, 
-      altitude: 0.02, 
-      type: "Moja", 
-     };
-  }
-
-  refreshGlobePoints(); // rysujemy razem z resztą
-}
-
-document.getElementById("myLat").addEventListener("input", updateMyLocation);
-document.getElementById("myLng").addEventListener("input", updateMyLocation);
-
-// Ograniczenie zakresu dla mojej lokalizacji
-const myLatInput = document.getElementById("myLat");
-const myLngInput = document.getElementById("myLng");
-
-function clampMyLatLng() {
-  let lat = parseFloat(myLatInput.value);
-  let lng = parseFloat(myLngInput.value);
-
-  if (!isNaN(lat)) {
-    if (lat < -90) lat = -90;
-    if (lat > 90) lat = 90;
-    myLatInput.value = lat;
-  }
-
-  if (!isNaN(lng)) {
-    if (lng < -180) lng = -180;
-    if (lng > 180) lng = 180;
-    myLngInput.value = lng;
-  }
-}
-
-myLatInput.addEventListener("input", clampMyLatLng);
-myLngInput.addEventListener("input", clampMyLatLng);
  
 // odświeżamy glob z uwzględnieniem mnożnika wysokości
  function refreshGlobePoints() {
