@@ -1088,7 +1088,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Renderowanie listy checkboxów pierwiastków dla wybranej planety
 function renderPlanetResourcesPanel() {
-  const container = document.getElementById("planet-resources");
+  if (!currentPlanet || !planetDetails[currentPlanet]) return;
+	const container = document.getElementById("planet-resources");
   if (!container) return;
 
   container.innerHTML = "";
@@ -1265,8 +1266,7 @@ if(sortSelect) {
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('prevTexturePage').disabled = true;
   document.getElementById('nextTexturePage').disabled = true;
-  renderTexturePage(); // żeby od razu ustawić poprawny stan
-});
+  });
 	
 globe.showGraticules(true).graticuleLineWidth(0.5);
 	
