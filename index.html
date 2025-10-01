@@ -680,7 +680,9 @@ function addNewPlanet() {
   alert(`Dodano nową planetę: ${name}`);
   updateNoPlanetsMessage()
 }
-  
+
+
+	
 // Lista planet
 // Zwraca dane do renderowania – tylko sortowanie i grupowanie
 function getGroupedPlanets() {
@@ -943,18 +945,6 @@ function updateSelectedPlanetButtons() {
   delBtn.disabled = !enabled;
 }
 
-// Wywołujemy po każdej zmianie zaznaczenia planety
-function selectPlanet(name) {
-  const planet = planetData.find(p => p.name === name);
-  if (!planet) return;
-  currentPlanet = planet.name;
-  updateCurrentPlanetHeader();
-  globe.globeImageUrl(planet.texture || blackTextureURL);
-  updateSelectedPlanetButtons();
-	renderPlanetResourcesPanel();
-	updatePlanetMiniPanel();
-}
-
 // Edycja zaznaczonej planety
 function editSelectedPlanet() {
   if (!currentPlanet) {
@@ -978,7 +968,22 @@ const box = document.getElementById("editPlanetBox");
   // wyłącz inne przyciski
   setButtonsDisabled(true);
   }
-  
+
+// Wywołujemy po każdej zmianie zaznaczenia planety
+function selectPlanet(name) {
+  const planet = planetData.find(p => p.name === name);
+  if (!planet) return;
+  currentPlanet = planet.name;
+  updateCurrentPlanetHeader();
+  globe.globeImageUrl(planet.texture || blackTextureURL);
+  updateSelectedPlanetButtons();
+	renderPlanetResourcesPanel();
+	updatePlanetMiniPanel();
+	refreshPlanetSidebar();
+	refreshPointsList();
+	refreshGlobePoints();
+}
+	
 // Zatwierdzenie edycji
 function acceptEditPlanet() {
   const newName = document.getElementById("editPlanetName").value.trim();
@@ -1184,20 +1189,22 @@ function importAtlas(event){
       if(data.planetDetails) planetDetails = data.planetDetails;
       if(data.planetData) planetData = data.planetData;
       if(data.textures) {
-        textures.length = 0;        // wyczyść obecną listę
-        textures.push(...data.textures); // wczytaj importowane
-        currentTexturePage = 0;     // ustaw początkową stronę
-        renderTexturePage();        // odtwórz galerię
+        textures.length = 0;
+        textures.push(...data.textures);
+        currentTexturePage = 0;
+        renderTexturePage();
       }
+
       const planets = Object.keys(atlas);
       currentPlanet = planets[0] || null;
-      if (currentPlanet) selectPlanet(currentPlanet);
-      else globe.globeImageUrl(blackTextureURL);
 
-     	refreshPlanetList();
-		refreshGalaxySidebar();
-		renderPlanetResourcesPanel();
-		updatePlanetMiniPanel();
+      if (currentPlanet) {
+        
+        selectPlanet(currentPlanet);
+      } else {
+        globe.globeImageUrl(blackTextureURL);
+        updateNoPlanetsMessage();
+      }
 
       alert("Import zakończony!");
     } catch(err){ 
