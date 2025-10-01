@@ -299,12 +299,13 @@
 
 	  <!-- Info o planecie -->
 <div id="planetMiniPanel">
-	<button id="toggleMiniPanelBtn">▼</button>
+	
   <div id="miniPanelBiome"></div>
   <div id="miniPanelResources"></div>
   <div id="miniPanelSentinels"></div>
 </div>
-	  
+	  <!-- Przycisk do pokazywania/ukrywania minipanelu -->
+	  <button id="toggleMiniPanelBtn">▼</button>
 </div>
    
 <script>
@@ -577,6 +578,7 @@ function addNewPlanet() {
   refreshPlanetSidebar();
 	renderPlanetResourcesPanel();
 	updatePlanetMiniPanel()
+	
   
     // Ustaw od razu glob na wybraną teksturę
   globe.globeImageUrl(textureBase64);
