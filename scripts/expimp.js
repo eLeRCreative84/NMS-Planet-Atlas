@@ -21,47 +21,32 @@ function importAtlas(event){
   const file = event.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-
   reader.onload = e => {
     try{
       const data = JSON.parse(e.target.result);
-
-      // 1️⃣ Atlas planet
       if(data.atlas) atlas = data.atlas;
-
-      // 2️⃣ Planet details i inicjalizacja resources
-      if(data.planetDetails) {
-        planetDetails = data.planetDetails;
-        Object.keys(planetDetails).forEach(p => {
-          if (!Array.isArray(planetDetails[p].resources)) planetDetails[p].resources = [];
-        });
-      }
-
-      // 3️⃣ Dodatkowe dane
+      if(data.planetDetails) planetDetails = data.planetDetails;
       if(data.planetData) planetData = data.planetData;
       if(data.textures) {
-        textures.length = 0;
-        textures.push(...data.textures);
-        currentTexturePage = 0;
-        renderTexturePage();
+        textures.length = 0;        // wyczyść obecną listę
+        textures.push(...data.textures); // wczytaj importowane
+        currentTexturePage = 0;     // ustaw początkową stronę
+        renderTexturePage();        // odtwórz galerię
       }
-
-      // 4️⃣ Ustawienie aktualnej planety
       const planets = Object.keys(atlas);
       currentPlanet = planets[0] || null;
       if (currentPlanet) selectPlanet(currentPlanet);
       else globe.globeImageUrl(blackTextureURL);
 
-      // 5️⃣ Odświeżenie UI
       updateCurrentPlanetHeader();
       refreshPlanetList();
       refreshPointsList();
       refreshGlobePoints();
       updateNoPlanetsMessage();
       refreshPlanetSidebar();
-      refreshGalaxySidebar();
-      renderPlanetResourcesPanel(); // checkboxy pierwiastków
-      updatePlanetMiniPanel();      // mini-panel aktualny
+	    refreshGalaxySidebar();
+		renderPlanetResourcesPanel();
+		updatePlanetMiniPanel();
 
       alert("Import zakończony!");
     } catch(err){ 
@@ -69,6 +54,5 @@ function importAtlas(event){
       alert("Błąd importu JSON"); 
     }
   };
-
   reader.readAsText(file);
 }
