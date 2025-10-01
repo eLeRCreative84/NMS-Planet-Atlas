@@ -408,7 +408,8 @@ function updatePlanetMiniPanel() {
   if (panel.classList.contains("hidden")) return;
 	
  // reset zawartości panelu
-  panel.innerHTML = "";
+const contentEls = panel.querySelectorAll("div:not(:first-child)");
+  contentEls.forEach(el => el.remove());
 
   const details = planetDetails[currentPlanet] || {};
  
