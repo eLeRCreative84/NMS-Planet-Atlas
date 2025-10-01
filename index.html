@@ -1088,8 +1088,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Renderowanie listy checkboxów pierwiastków dla wybranej planety
 function renderPlanetResourcesPanel() {
-  if (!currentPlanet || !planetDetails[currentPlanet]) return;
-	const container = document.getElementById("planet-resources");
+  const container = document.getElementById("planet-resources");
   if (!container) return;
 
   container.innerHTML = "";
@@ -1138,7 +1137,7 @@ function renderPlanetResourcesPanel() {
       } else {
         planetDetails[currentPlanet].resources = arr.filter(r => r !== res.name);
       }
-		updatePlanetMiniPanel();
+		
     });
 
     grid.appendChild(checkbox);
