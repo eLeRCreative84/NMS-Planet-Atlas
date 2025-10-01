@@ -127,7 +127,7 @@ function renderTexturePage() {
     gallery.appendChild(img);
   });
 
-   // aktywne tylko, jeśli w galerii jest więcej niż 12 tekstur
+   // aktywne przyciski przewijania tylko, jeśli w galerii jest więcej niż 12 tekstur
   if (textures.length > TEXTURES_PER_PAGE) {
     prevBtn.disabled = currentTexturePage === 0;
     nextBtn.disabled = end >= textures.length;
