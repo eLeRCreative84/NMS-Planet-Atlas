@@ -969,19 +969,19 @@ const box = document.getElementById("editPlanetBox");
   setButtonsDisabled(true);
   }
 
-// Wywołujemy po każdej zmianie zaznaczenia planety
-function selectPlanet(name) {
-  const planet = planetData.find(p => p.name === name);
-  if (!planet) return;
-  currentPlanet = planet.name;
-  updateCurrentPlanetHeader();
-  globe.globeImageUrl(planet.texture || blackTextureURL);
-  updateSelectedPlanetButtons();
-	renderPlanetResourcesPanel();
-	updatePlanetMiniPanel();
-	refreshPlanetSidebar();
-	refreshPointsList();
-	refreshGlobePoints();
+  // Przełącznik aktywnej planety
+  function selectPlanet(name) {
+  // Szuka w tablicy planet obiektu, który ma taki sam 'name'
+    const planet = planetData.find(p => p.name === name);
+  // Jeśli nic nie znalazła → kończy działanie
+    if (!planet) return; 
+
+  // Ustawia globalną zmienną currentPlanet na tę planetę
+    currentPlanet = planet.name;
+       
+  // Używamy tekstury planety jeśli istnieje, w przeciwnym razie czarna
+  const textureToUse = planet.texture ? planet.texture : blackTextureURL;
+globe.globeImageUrl(textureToUse);
 }
 	
 // Zatwierdzenie edycji
