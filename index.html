@@ -5,13 +5,13 @@
 <title>Atlas Planetarny</title>
 <script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
-<script src="scripts/icons.js" defer></script>
-<script src="scripts/textures.js" defer></script>
-<script src="scripts/points.js" defer></script>
-<script src="scripts/galaxies.js" defer></script>
-<script src="scripts/planetdet.js" defer></script>
-<script src="scripts/scaling.js" defer></script>
-<script src="scripts/expimp.js" defer></script>
+<script src="scripts/icons.js"></script>
+<script src="scripts/textures.js"></script>
+<script src="scripts/points.js"></script>
+<script src="scripts/galaxies.js"></script>
+<script src="scripts/planetdet.js"></script>
+<script src="scripts/scaling.js"></script>
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -1154,7 +1154,62 @@ function renderPlanetResourcesPanel() {
     grid.appendChild(nameLabel);
   });
 }
+////////////////////////////////////////////////////////////////////
+//---------------- Eksport / Import Atlasu ---------------//
+////////////////////////////////////////////////////////////////////  
 
+function exportAtlas(){
+  const blob = new Blob([JSON.stringify({
+    atlas,
+    planetDetails,
+    planetData,
+    textures // dodajemy listę galerii do JSON
+  }, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "atlas.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importAtlas(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const data = JSON.parse(e.target.result);
+      if(data.atlas) atlas = data.atlas;
+      if(data.planetDetails) planetDetails = data.planetDetails;
+      if(data.planetData) planetData = data.planetData;
+      if(data.textures) {
+        textures.length = 0;        // wyczyść obecną listę
+        textures.push(...data.textures); // wczytaj importowane
+        currentTexturePage = 0;     // ustaw początkową stronę
+        renderTexturePage();        // odtwórz galerię
+      }
+      const planets = Object.keys(atlas);
+      currentPlanet = planets[0] || null;
+      if (currentPlanet) selectPlanet(currentPlanet);
+      else globe.globeImageUrl(blackTextureURL);
+
+      updateCurrentPlanetHeader();
+      refreshPlanetList();
+      refreshPointsList();
+      refreshGlobePoints();
+      updateNoPlanetsMessage();
+      refreshPlanetSidebar();
+	  refreshGalaxySidebar();
+
+      alert("Import zakończony!");
+    } catch(err){ 
+      console.error(err);
+      alert("Błąd importu JSON"); 
+    }
+  };
+  reader.readAsText(file);
+}
   
 ////////////////////////////////////////////////////////////////////
 //---------------------- Inicjalizacja globu ---------------------//
