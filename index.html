@@ -98,16 +98,15 @@
     <input class="lock-while-edit" type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
 
 <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
-
-
 <label data-i18n="start_languageSelector">Wybierz język</label>
-<select id="languageSelector" onchange="setLanguage(this.value)">
+<select id="languageSelector">
   <option value="pl">Polski</option>
   <option value="en">English</option>
   
 </select>
  
  </div>
+
 
 	
     <!-- Zakładka PLANETY -->
@@ -278,243 +277,11 @@
   <label data-i18n="detail_planet_system_label">Układ planetarny</label>
   <input type="text" id="detailPlanetSystem" />
 
-  <label for="detailBiome">Biom:</label>
-	<select id="detailBiome" onchange="showAliasForBiome(this.value)">
-	  <option value="">-- Wybierz biom --</option>
-	  <option value="Lush" data-i18n="Lush">Bujny</option>
-	  <option value="Barren" data-i18n="Barren">Jałowy</option>
-	  <option value="Dead" data-i18n="Dead">Martwy</option>
-	  <option value="Exotic" data-i18n="Exotic">Egzotyczny</option>
-	  <option value="Mega_exotic" data-i18n="Mega_exotic">Mega Egzotyczny</option>
-	  <option value="Scorched" data-i18n="Scorched">Spalony</option>
-	  <option value="Frozen" data-i18n="Frozen">Zamrożony</option>
-	  <option value="Toxic" data-i18n="Toxic">Toksyczny</option>
-	  <option value="Irradiated" data-i18n="Irradiated">Napromieniowany</option>
-	  <option value="Marsh" data-i18n="Marsh">Moczary</option>
-	  <option value="Volcanic" data-i18n="Volcanic">Wulkaniczny</option>
-	  <option value="Gas_giant" data-i18n="Gas_giant">Gazowy Gigant</option>
-	</select>
-
-
-  <!-- Lush -->
-<select id="lush_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Rainy">Deszczowy</option>
-<option data-i18n="Lush">Bujny</option>
-<option data-i18n="Tropical">Tropikalny</option>
-<option data-i18n="Viridescent">Zielonkawy</option>
-<option data-i18n="Paradise">Rajski</option>
-<option data-i18n="Temperate">Umiarkowana</option>
-<option data-i18n="Humid">Wilgotny</option>
-<option data-i18n="Overgrown">Porośnięty</option>
-<option data-i18n="Flourishing">Kwitnący</option>
-<option data-i18n="Grassy">Trawiasty</option>
-<option data-i18n="Bountiful">Obfity</option>
-</select>
-
-<!-- Barren -->
-<select id="barren_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Barren">Jałowy</option>
-<option data-i18n="Desert">Pustynny</option>
-<option data-i18n="Rocky">Skalisty</option>
-<option data-i18n="Bleak">Ponury</option>
-<option data-i18n="Parched">Wyschnięty</option>
-<option data-i18n="Abandoned">Opustoszały</option>
-<option data-i18n="Dusty">Pylisty</option>
-<option data-i18n="Desolate_barren">Bezkresny</option>
-<option data-i18n="Wind_swept">Smagany wiatrem</option>
-</select>
-
-<!-- Dead -->
-<select id="dead_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Terraforming_Catastrophe">Katastrofa Terraformacji</option>
-<option data-i18n="Dead">Martwy</option>
-<option data-i18n="Empty">Pusty</option>
-<option data-i18n="Desolate_dead">Pustkowie</option>
-<option data-i18n="Lifeless">Bez życia</option>
-<option data-i18n="Forsaken">Porzucony</option>
-<option data-i18n="Life_Incompatible">Niezdatny do życia</option>
-<option data-i18n="Low_Atmosphere">Niska atmosfera</option>
-<option data-i18n="Airless">Bezatmosferyczny</option>
-<option data-i18n="Abandoned">Opuszczony</option>
-</select>
-
-<!-- Exotic -->
-<select id="exotic_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Fissured">Szczelinowy</option>
-<option data-i18n="of_Light">Świetlny</option>
-<option data-i18n="Breached">Przerwany</option>
-<option data-i18n="Rattling">Trzaskający</option>
-<option data-i18n="Spined">Kolczasty</option>
-<option data-i18n="Skeletal">Szkieletowy</option>
-<option data-i18n="Bubbling">Bulgoczący</option>
-<option data-i18n="Frothing">Pieniący się</option>
-<option data-i18n="Foaming">Pienisty</option>
-<option data-i18n="Contoured">Profilowany</option>
-<option data-i18n="Cabled">Okablowany</option>
-<option data-i18n="Webbed">Sieciowy</option>
-<option data-i18n="Mechanical">Mechaniczny</option>
-<option data-i18n="Metallic">Metaliczny</option>
-<option data-i18n="Metallurgic">Metalurgiczny</option>
-<option data-i18n="Hexagonal">Sześciokątny</option>
-<option data-i18n="Plated">Płytowy</option>
-<option data-i18n="Scaly">Łuskowy</option>
-<option data-i18n="Fungal">Grzybowy</option>
-<option data-i18n="Sporal">Zarodnikowy</option>
-<option data-i18n="Capped">Płetwowy</option>
-<option data-i18n="Finned">Ostrzowy</option>
-<option data-i18n="Bladed">Pokryty skorupami</option>
-<option data-i18n="Shell_Strewn">Zasklepiony</option>
-<option data-i18n="Ossified">Kostniejący</option>
-<option data-i18n="Petrified">Skamieniały</option>
-<option data-i18n="Calcified">Zwapniały</option>
-<option data-i18n="Columned">Kolumnowy</option>
-<option data-i18n="Pillared">Słupowy</option>
-<option data-i18n="Sharded">Rozszczepiony</option>
-<option data-i18n="Shattered">Zmiażdżony</option>
-<option data-i18n="Fractured">Pęknięty</option>
-<option data-i18n="Fragmented">Fragmentaryczny</option>
-<option data-i18n="Crimson">Karmazynowy</option>
-<option data-i18n="Planetary_Anomaly">Anomalia Planetarna</option>
-<option data-i18n="Malfunctioning">Niesprawny</option>
-<option data-i18n="Breached">Przerwany</option>
-<option data-i18n="Infected">Zainfekowany</option>
-<option data-i18n="[REDACTED]">[ZASTRZEŻONE]</option>
-<option data-i18n="Glassy">Szklany</option>
-<option data-i18n="Thirsty">Spragniony</option>
-<option data-i18n="Doomed">Skazany</option>
-<option data-i18n="Erased">Wymazany</option>
-<option data-i18n="Temporary">Tymczasowy</option>
-<option data-i18n="Corrupted">Uszkodzony</option>
-</select>
-
-<!-- Mega Exotic -->
-<select id="mega_exotic_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Crimson_Red_biome">Karmazynowy - Czerwony biom</option>
-<option data-i18n="Planetary_Anomaly_Red_biome">Anomalia Planetarna - Czerwony biom</option>
-<option data-i18n="Planetary_Anomaly_Green_biome">Anomalia Planetarna - Zielony biom</option>
-<option data-i18n="Planetary_Anomaly_Blue_biome">Anomalia Planetarna - Niebieski biom</option>
-<option data-i18n="Lost_Red">Zaginiona Czerwień</option>
-<option data-i18n="Lost_Green">Zaginiona Zieleń</option>
-<option data-i18n="Lost_Blue">Zaginiony Błękit</option>
-<option data-i18n="[REDACTED]_Red_biome">[ZASTRZEŻONE] - Czerwony biom</option>
-<option data-i18n="[REDACTED]_Green_biome">[ZASTRZEŻONE] - Zielony biom</option>
-<option data-i18n="[REDACTED]_Blue_biome">[ZASTRZEŻONE] - Niebieski biom</option>
-<option data-i18n="Stellar_Corruption_Detected_Red_biome">Wykryto Korupcję Gwiezdną - Czerwony biom</option>
-<option data-i18n="Stellar_Corruption_Detected_Green_biome">Wykryto Korupcję Gwiezdną - Zielony biom</option>
-<option data-i18n="Stellar_Corruption_Detected_Blue_biome">Wykryto Korupcję Gwiezdną - Niebieski biom</option>
-<option data-i18n="Chromatic_Fog_Red_biome">Chromatyczna Mgła - Czerwony biom</option>
-<option data-i18n="Chromatic_Fog_Green_biome">Chromatyczna Mgła - Zielony biom</option>
-<option data-i18n="Chromatic_Fog_Blue_biome">Chromatyczna Mgła - Niebieski biom</option>
-<option data-i18n="Vermillion_Globe">Czerwonawy Glob</option>
-<option data-i18n="Scarlet">Szkarłatny</option>
-<option data-i18n="Blood">Krew</option>
-<option data-i18n="Wine_Dark">Ciemnoczerwone Wino</option>
-<option data-i18n="Vile_Anomaly">Złośliwa Anomalia</option>
-<option data-i18n="Toxic_Anomaly">Toksyczna Anomalia</option>
-<option data-i18n="Doomed_Jade">Skazany Szmaragd</option>
-<option data-i18n="Haunted_Emeril">Nawiedzony Emeril</option>
-<option data-i18n="Deathly_Green_Anomaly">Śmiertelna Zielona Anomalia</option>
-<option data-i18n="Azure">Azur</option>
-<option data-i18n="Cerulean">Lazurowy</option>
-<option data-i18n="Ultramarine">Ultramaryna</option>
-</select>
-
-<!-- Scorched -->
-<select id="scorched_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Charred">Zwęglony</option>
-<option data-i18n="Arid">Suchy</option>
-<option data-i18n="Scorched">Spalony</option>
-<option data-i18n="Hot">Gorący</option>
-<option data-i18n="Fiery">Ognisty</option>
-<option data-i18n="Boiling">Wrzący</option>
-<option data-i18n="High_Temperature">Wysoka Temperatura</option>
-<option data-i18n="Torrid">Parujący</option>
-<option data-i18n="Incandescent">Rozżarzony</option>
-<option data-i18n="Scalding">Poparzeniowy</option>
-</select>
-
-<!-- Frozen -->
-<select id="frozen_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Frozen">Zamarznięty</option>
-<option data-i18n="Icebound">Pokryty Lodem</option>
-<option data-i18n="Arctic">Arktyczny</option>
-<option data-i18n="Glacial">Lodowcowy</option>
-<option data-i18n="Sub_zero">Poniżej Zera</option>
-<option data-i18n="Icy">Lodowy</option>
-<option data-i18n="Frostbound">Mroźny</option>
-<option data-i18n="Freezing">Lodowaty</option>
-<option data-i18n="Hiemal">Zimowy</option>
-<option data-i18n="Hyperborean">Hiperborejski</option>
-</select>
-
-<!-- Toxic -->
-<select id="toxic_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Toxic">Toksyczny</option>
-<option data-i18n="Poisonous">Trujący</option>
-<option data-i18n="Noxious">Szkodliwy</option>
-<option data-i18n="Corrosive">Korozyjny</option>
-<option data-i18n="Acidic">Kwasowy</option>
-<option data-i18n="Caustic">Żrący</option>
-<option data-i18n="Acrid">Ostry</option>
-<option data-i18n="Blighted">Zniszczony</option>
-<option data-i18n="Miasmatic">Miasmatyczny</option>
-<option data-i18n="Rotting">Rozkładający się</option>
-</select>
-
-<!-- Irradiated -->
-<select id="irradiated_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Irradiated">Napromieniowany</option>
-<option data-i18n="Radioactive">Radioaktywny</option>
-<option data-i18n="Contaminated">Skażony</option>
-<option data-i18n="Nuclear">Nuklearny</option>
-<option data-i18n="Isotopic">Izotopowy</option>
-<option data-i18n="Decaying_Nuclear">Rozkładający się Nuklearnie</option>
-<option data-i18n="Gamma_Intensive">Wysokogamowy</option>
-<option data-i18n="High_Radio_Source">Źródło Wysokiego Promieniowania</option>
-<option data-i18n="Supercritical">Nadkrytyczny</option>
-<option data-i18n="High_Energy">Wysokoenergetyczny</option>
-</select>
-
-<!-- Marsh -->
-<select id="marsh_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Marshy">Bagienny</option>
-<option data-i18n="Swamp">Moczarowy</option>
-<option data-i18n="Tropical_Marsh">Podzwrotnikowy</option>
-<option data-i18n="Foggy">Mglisty</option>
-<option data-i18n="Misty">Zamglony</option>
-<option data-i18n="Boggy">Błotnisty</option>
-<option data-i18n="Endless_Morass">Nieskończone Bagno</option>
-<option data-i18n="Quagmire">Grzęzawisko</option>
-<option data-i18n="Hazy">Lekko Zamglony</option>
-<option data-i18n="Cloudy">Pochmurny</option>
-<option data-i18n="Vapour">Parowy</option>
-<option data-i18n="Reeking">Odorem</option>
-<option data-i18n="Murky">Mętny</option>
-<option data-i18n="Damp">Przemoczony</option>
-</select>
-
-<!-- Volcanic -->
-<select id="volcanic_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Lava">Lawa</option>
-<option data-i18n="Magma">Magma</option>
-<option data-i18n="Erupting">Wybuchowy</option>
-<option data-i18n="Volcanic">Wulkaniczny</option>
-<option data-i18n="Ash_Shrouded">Pokryty Popiołem</option>
-<option data-i18n="Ashen">Popielaty</option>
-<option data-i18n="Tectonic">Tektoniczny</option>
-<option data-i18n="Unstable">Niestabilny</option>
-<option data-i18n="Violent">Burzliwy</option>
-<option data-i18n="Molten">Roztopiony</option>
-<option data-i18n="Flame_Ruptured">Rozżarzony</option>
-<option data-i18n="Imminent_Core_Detonation">Nadchodząca Detonacja Jądra</option>
-<option data-i18n="Obsidian_Bead">Obsydianowy</option>
-<option data-i18n="Basalt">Bazaltowy</option>
-</select>
-
-<!-- Gas Giant -->
-<select id="gasgiant_alias" class="biome-alias" style="display:none;">
-<option data-i18n="Gas_Giant">Gazowy Gigant</option>
-</select>
+ <div class="biome-selector" style="position: relative;">
+  <label for="biomeAliasInput">Biom / Alias biomu:</label>
+  <input type="text" id="biomeAliasInput" placeholder="Wpisz nazwę biomu lub alias...">
+  <div id="biomeAliasDropdown" class="dropdown"></div>
+</div>
 
   <label data-i18n="detail_weather_label">Pogoda</label>
   <select id="detailWeather">
@@ -712,7 +479,7 @@ function setLanguage(lang) {
           refreshPointsList();
           refreshPlanetSidebar();
           refreshGalaxySidebar();
-		  updatePlanetMiniPanel();
+	  updatePlanetMiniPanel();
 }
 
 // Zakładki
@@ -876,13 +643,8 @@ function savePlanetDetails(){
     //Jeśli nie istnieje (np. nowo utworzony obiekt jeszcze nie ma zapisanych detali) — tworzy pusty obiekt {} jako „bezpieczny fallback”.
        const existing = planetDetails[currentPlanet] || {};
 	
-	// pobierz wybrany biom
-const biome = document.getElementById("detailBiome").value;
-	
-	// Wybierz widoczny select z aliasami
-const visibleAliasSelect = document.querySelector('.biome-alias:not([style*="display: none"])');
-const biomeAlias = visibleAliasSelect ? visibleAliasSelect.value : '';
-
+	const biome = document.getElementById("detailBiome").value;
+	const biomeAlias = document.getElementById("detailBiomeAlias").value;
 	// zachowaj istniejące resources jeśli są
       const existingResources = planetDetails[currentPlanet]?.resources || [];
 
@@ -1143,17 +905,297 @@ function generatePlanetName() {
   checkNewPlanetInput();
 }
 
-function showAliasForBiome(biomeKey) {
-  // Ukryj wszystkie selecty z aliasami
-  document.querySelectorAll('.biome-alias').forEach(sel => sel.style.display = 'none');
+// 🌿 Dane biomów i aliasów
 
-  // Pokaż tylko alias wybranego biomu
-  if (biomeKey) {
-    const sel = document.getElementById(`${biomeKey.toLowerCase()}_alias`);
-    if (sel) sel.style.display = 'block';
-  }
-}
+const biomeAliases = [
 
+//Lush
+
+{ biome: "Lush", alias: "Deszczowy" },
+{ biome: "Lush", alias: "Bujny" },
+{ biome: "Lush", alias: "Tropikalny" },
+{ biome: "Lush", alias: "Zielonkawy" },
+{ biome: "Lush", alias: "Rajski" },
+{ biome: "Lush", alias: "Umiarkowana" },
+{ biome: "Lush", alias: "Wilgotny" },
+{ biome: "Lush", alias: "Porośnięty" },
+{ biome: "Lush", alias: "Kwitnący" },
+{ biome: "Lush", alias: "Trawiasty" },
+{ biome: "Lush", alias: "Obfity" },
+
+//Barren
+
+{ biome: "Barren", alias: "Jałowy" },
+{ biome: "Barren", alias: "Pustynny" },
+{ biome: "Barren", alias: "Skalisty" },
+{ biome: "Barren", alias: "Ponury" },
+{ biome: "Barren", alias: "Wyschnięty" },
+{ biome: "Barren", alias: "Opustoszały" },
+{ biome: "Barren", alias: "Pylisty" },
+{ biome: "Barren", alias: "Bezkresny" },
+{ biome: "Barren", alias: "Smagany wiatrem" },
+
+//Dead
+
+{ biome: "Dead", alias: "Katastrofa Terraformacji" },
+{ biome: "Dead", alias: "Martwy" },
+{ biome: "Dead", alias: "Pusty" },
+{ biome: "Dead", alias: "Pustkowie" },
+{ biome: "Dead", alias: "Bez życia" },
+{ biome: "Dead", alias: "Porzucony" },
+{ biome: "Dead", alias: "Niezdatny do życia" },
+{ biome: "Dead", alias: "Niska atmosfera" },
+{ biome: "Dead", alias: "Bezatmosferyczny" },
+{ biome: "Dead", alias: "Opuszczony" },
+
+//Exotic
+
+{ biome: "Exotic", alias: "Szczelinowy" },
+{ biome: "Exotic", alias: "Świetlny" },
+{ biome: "Exotic", alias: "Przerwany" },
+{ biome: "Exotic", alias: "Trzaskający" },
+{ biome: "Exotic", alias: "Kolczasty" },
+{ biome: "Exotic", alias: "Szkieletowy" },
+{ biome: "Exotic", alias: "Bulgoczący" },
+{ biome: "Exotic", alias: "Pieniący się" },
+{ biome: "Exotic", alias: "Pienisty" },
+{ biome: "Exotic", alias: "Profilowany" },
+{ biome: "Exotic", alias: "Okablowany" },
+{ biome: "Exotic", alias: "Sieciowy" },
+{ biome: "Exotic", alias: "Mechaniczny" },
+{ biome: "Exotic", alias: "Metaliczny" },
+{ biome: "Exotic", alias: "Metalurgiczny" },
+{ biome: "Exotic", alias: "Sześciokątny" },
+{ biome: "Exotic", alias: "Płytowy" },
+{ biome: "Exotic", alias: "Łuskowy" },
+{ biome: "Exotic", alias: "Grzybowy" },
+{ biome: "Exotic", alias: "Zarodnikowy" },
+{ biome: "Exotic", alias: "Płetwowy" },
+{ biome: "Exotic", alias: "Ostrzowy" },
+{ biome: "Exotic", alias: "Pokryty skorupami" },
+{ biome: "Exotic", alias: "Zasklepiony" },
+{ biome: "Exotic", alias: "Kostniejący" },
+{ biome: "Exotic", alias: "Skamieniały" },
+{ biome: "Exotic", alias: "Zwapniały" },
+{ biome: "Exotic", alias: "Kolumnowy" },
+{ biome: "Exotic", alias: "Słupowy" },
+{ biome: "Exotic", alias: "Rozszczepiony" },
+{ biome: "Exotic", alias: "Zmiażdżony" },
+{ biome: "Exotic", alias: "Pęknięty" },
+{ biome: "Exotic", alias: "Fragmentaryczny" },
+{ biome: "Exotic", alias: "Karmazynowy" },
+{ biome: "Exotic", alias: "Anomalia Planetarna" },
+{ biome: "Exotic", alias: "Niesprawny" },
+{ biome: "Exotic", alias: "Przerwany" },
+{ biome: "Exotic", alias: "Zainfekowany" },
+{ biome: "Exotic", alias: "[ZASTRZEŻONE]" },
+{ biome: "Exotic", alias: "Szklany" },
+{ biome: "Exotic", alias: "Spragniony" },
+{ biome: "Exotic", alias: "Skazany" },
+{ biome: "Exotic", alias: "Wymazany" },
+{ biome: "Exotic", alias: "Tymczasowy" },
+{ biome: "Exotic", alias: "Uszkodzony" },
+
+//Mega Exotic
+
+{ biome: "Mega_Exotic", alias: "Karmazynowy - Czerwony biom" },
+{ biome: "Mega_Exotic", alias: "Anomalia Planetarna - Czerwony biom" },
+{ biome: "Mega_Exotic", alias: "Anomalia Planetarna - Zielony biom" },
+{ biome: "Mega_Exotic", alias: "Anomalia Planetarna - Niebieski biom" },
+{ biome: "Mega_Exotic", alias: "Zaginiona Czerwień" },
+{ biome: "Mega_Exotic", alias: "Zaginiona Zieleń" },
+{ biome: "Mega_Exotic", alias: "Zaginiony Błękit" },
+{ biome: "Mega_Exotic", alias: "[ZASTRZEŻONE] - Czerwony biom" },
+{ biome: "Mega_Exotic", alias: "[ZASTRZEŻONE] - Zielony biom" },
+{ biome: "Mega_Exotic", alias: "[ZASTRZEŻONE] - Niebieski biom" },
+{ biome: "Mega_Exotic", alias: "Wykryto Korupcję Gwiezdną - Czerwony biom" },
+{ biome: "Mega_Exotic", alias: "Wykryto Korupcję Gwiezdną - Zielony biom" },
+{ biome: "Mega_Exotic", alias: "Wykryto Korupcję Gwiezdną - Niebieski biom" },
+{ biome: "Mega_Exotic", alias: "Chromatyczna Mgła - Czerwony biom" },
+{ biome: "Mega_Exotic", alias: "Chromatyczna Mgła - Zielony biom" },
+{ biome: "Mega_Exotic", alias: "Chromatyczna Mgła - Niebieski biom" },
+{ biome: "Mega_Exotic", alias: "Czerwonawy Glob" },
+{ biome: "Mega_Exotic", alias: "Szkarłatny" },
+{ biome: "Mega_Exotic", alias: "Krew" },
+{ biome: "Mega_Exotic", alias: "Ciemnoczerwone Wino" },
+{ biome: "Mega_Exotic", alias: "Złośliwa Anomalia" },
+{ biome: "Mega_Exotic", alias: "Toksyczna Anomalia" },
+{ biome: "Mega_Exotic", alias: "Skazany Szmaragd" },
+{ biome: "Mega_Exotic", alias: "Nawiedzony Emeril" },
+{ biome: "Mega_Exotic", alias: "Śmiertelna Zielona Anomalia" },
+{ biome: "Mega_Exotic", alias: "Azur" },
+{ biome: "Mega_Exotic", alias: "Lazurowy" },
+{ biome: "Mega_Exotic", alias: "Ultramaryna" },
+
+//Scorched
+
+{ biome: "Scorched", alias: "Zwęglony" },
+{ biome: "Scorched", alias: "Suchy" },
+{ biome: "Scorched", alias: "Spalony" },
+{ biome: "Scorched", alias: "Gorący" },
+{ biome: "Scorched", alias: "Ognisty" },
+{ biome: "Scorched", alias: "Wrzący" },
+{ biome: "Scorched", alias: "Wysoka Temperatura" },
+{ biome: "Scorched", alias: "Parujący" },
+{ biome: "Scorched", alias: "Rozżarzony" },
+{ biome: "Scorched", alias: "Poparzeniowy" },
+
+//Frozen
+
+{ biome: "Frozen", alias: "Zamarznięty" },
+{ biome: "Frozen", alias: "Pokryty Lodem" },
+{ biome: "Frozen", alias: "Arktyczny" },
+{ biome: "Frozen", alias: "Lodowcowy" },
+{ biome: "Frozen", alias: "Poniżej Zera" },
+{ biome: "Frozen", alias: "Lodowy" },
+{ biome: "Frozen", alias: "Mroźny" },
+{ biome: "Frozen", alias: "Lodowaty" },
+{ biome: "Frozen", alias: "Zimowy" },
+{ biome: "Frozen", alias: "Hiperborejski" },
+
+//Toxic
+
+{ biome: "Toxic", alias: "Toksyczny" },
+{ biome: "Toxic", alias: "Trujący" },
+{ biome: "Toxic", alias: "Szkodliwy" },
+{ biome: "Toxic", alias: "Korozyjny" },
+{ biome: "Toxic", alias: "Kwasowy" },
+{ biome: "Toxic", alias: "Żrący" },
+{ biome: "Toxic", alias: "Ostry" },
+{ biome: "Toxic", alias: "Zniszczony" },
+{ biome: "Toxic", alias: "Miasmatyczny" },
+{ biome: "Toxic", alias: "Rozkładający się" },
+
+//Irradiated
+
+{ biome: "Irradiated", alias: "Napromieniowany" },
+{ biome: "Irradiated", alias: "Radioaktywny" },
+{ biome: "Irradiated", alias: "Skażony" },
+{ biome: "Irradiated", alias: "Nuklearny" },
+{ biome: "Irradiated", alias: "Izotopowy" },
+{ biome: "Irradiated", alias: "Rozkładający się Nuklearnie" },
+{ biome: "Irradiated", alias: "Wysokogamowy" },
+{ biome: "Irradiated", alias: "Źródło Wysokiego Promieniowania" },
+{ biome: "Irradiated", alias: "Nadkrytyczny" },
+{ biome: "Irradiated", alias: "Wysokoenergetyczny" },
+
+//Marsh
+
+{ biome: "Marsh", alias: "Bagienny" },
+{ biome: "Marsh", alias: "Moczarowy" },
+{ biome: "Marsh", alias: "Podzwrotnikowy" },
+{ biome: "Marsh", alias: "Mglisty" },
+{ biome: "Marsh", alias: "Zamglony" },
+{ biome: "Marsh", alias: "Błotnisty" },
+{ biome: "Marsh", alias: "Nieskończone Bagno" },
+{ biome: "Marsh", alias: "Grzęzawisko" },
+{ biome: "Marsh", alias: "Lekko Zamglony" },
+{ biome: "Marsh", alias: "Pochmurny" },
+{ biome: "Marsh", alias: "Parowy" },
+{ biome: "Marsh", alias: "Wydzielający odór" },
+{ biome: "Marsh", alias: "Mętny" },
+{ biome: "Marsh", alias: "Przemoczony" },
+
+//Volcanic
+
+{ biome: "Volcanic", alias: "Lawa" },
+{ biome: "Volcanic", alias: "Magma" },
+{ biome: "Volcanic", alias: "Wybuchowy" },
+{ biome: "Volcanic", alias: "Wulkaniczny" },
+{ biome: "Volcanic", alias: "Pokryty Popiołem" },
+{ biome: "Volcanic", alias: "Popielaty" },
+{ biome: "Volcanic", alias: "Tektoniczny" },
+{ biome: "Volcanic", alias: "Niestabilny" },
+{ biome: "Volcanic", alias: "Burzliwy" },
+{ biome: "Volcanic", alias: "Roztopiony" },
+{ biome: "Volcanic", alias: "Rozżarzony" },
+{ biome: "Volcanic", alias: "Nadchodząca Detonacja Jądra" },
+{ biome: "Volcanic", alias: "Obsydianowy" },
+{ biome: "Volcanic", alias: "Bazaltowy" },
+
+//Gas Giant
+
+{ biome: "Gas_Giant", alias: "Gazowy Gigant" },
+];
+
+// 🔎 Słowa-klucze biomów (również PL) – by system rozpoznał wpisany typ biomu
+
+const biomeKeywords = {
+  lush: ["lush", "bujny", "bujna"], 
+  barren: ["barren", "jałowy", "jałowa"], 
+  dead: ["dead", "martwy", "pusty"], 
+  exotic: ["exotic", "egzotyczny", "egzotyczna", "dziwny", "dziwna"], 
+  mega_exotic: ["mega egzotyczny", "mega egzotyczna", "mega dziwny", "mega dziwna"], 
+  scorched: ["scorched", "spalony", "spalona"],
+  frozen: ["frozen", "zamrożony", "zamrożona"],
+  toxic: ["toxic", "toksyczny", "toksyczna"], 
+  irradiated: ["irradiated", "napromieniowany", "napromieniowana"], 
+  marsh: ["marsh", "bagienny", "bagienna", "moczary"], 
+  volcanic: ["volcanic", "wulkaniczny", "wulkaniczna"], 
+  gas_giant: ["gas_giant", "gazowy gigant", "gigant", "gazowy", "gazowa"]
+};
+
+
+let selectedBiome = "";
+let selectedAlias = "";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("biomeAliasInput");
+  const dropdown = document.getElementById("biomeAliasDropdown");
+
+  input.addEventListener("input", () => {
+    const val = input.value.toLowerCase().trim();
+    dropdown.innerHTML = "";
+
+    if (!val) {
+      dropdown.style.display = "none";
+      return;
+    }
+
+    // 1️⃣ Spróbuj rozpoznać, czy wpisany tekst to biom
+    let matchedBiome = null;
+    for (const [biome, keywords] of Object.entries(biomeKeywords)) {
+      if (keywords.some(k => val.includes(k))) {
+        matchedBiome = biome.charAt(0).toUpperCase() + biome.slice(1);
+        break;
+      }
+    }
+
+    // 2️⃣ Filtruj aliasy – jeśli rozpoznano biom, pokazuj tylko jego aliasy
+    let filtered = biomeAliases.filter(a => 
+  (matchedBiome ? a.biome === matchedBiome : true) &&
+  a.alias.toLowerCase().includes(val)
+);
+
+filtered.forEach(a => {
+  const option = document.createElement("div");
+  option.innerHTML = `<strong>${a.alias}</strong> <span style="opacity:0.7;">(${a.biome})</span>`;
+  option.addEventListener("click", () => {
+    input.value = a.alias;
+    selectedBiome = a.biome;
+    selectedAlias = a.alias;
+    dropdown.style.display = "none";
+  });
+  dropdown.appendChild(option);
+});
+
+
+    dropdown.style.display = "block";
+  });
+
+  // 3️⃣ Zamknięcie dropdownu po kliknięciu poza
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".biome-selector")) {
+      dropdown.style.display = "none";
+    }
+  });
+
+  // 4️⃣ Eksport dla saveDetails()
+  window.getSelectedBiomeData = () => ({
+    biome: selectedBiome,
+    biomeAlias: selectedAlias,
+  });
+});
 
 
 ////////////////////////////////////////////////////////////////////
@@ -1505,52 +1547,52 @@ function clearFilters() {
   refreshPlanetList();
 }
 
-//function initPlanetFilters() {
-//  const biomeSelect = document.getElementById("biomeFilter");
-//  const aliasSelect = document.getElementById("biomeAliasFilter");
-//  const resourceSelect = document.getElementById("resourceFilter");
-//  const nameInput = document.getElementById("planetSearchInput"); // poprawione ID
-//
-//  if (!biomeSelect || !aliasSelect || !resourceSelect) return;
+function initPlanetFilters() {
+  const biomeSelect = document.getElementById("biomeFilter");
+  const aliasSelect = document.getElementById("biomeAliasFilter");
+  const resourceSelect = document.getElementById("resourceFilter");
+  const nameInput = document.getElementById("planetSearchInput"); // poprawione ID
+
+  if (!biomeSelect || !aliasSelect || !resourceSelect) return;
 
   // Biomy + aliasy z obiektu biomeAliases
-//  biomeSelect.innerHTML = `<option value="">Wszystkie biomy</option>`;
- // aliasSelect.innerHTML = `<option value="">Wszystkie aliasy biomów</option>`;
+  biomeSelect.innerHTML = `<option value="">Wszystkie biomy</option>`;
+  aliasSelect.innerHTML = `<option value="">Wszystkie aliasy biomów</option>`;
 
-//  Object.entries(biomeAliases).forEach(([biome, aliasesStr]) => {
-//    const biomeOpt = document.createElement("option");
-//    biomeOpt.value = biome;
-//    biomeOpt.textContent = biome;
-//    biomeSelect.appendChild(biomeOpt);
+  Object.entries(biomeAliases).forEach(([biome, aliasesStr]) => {
+    const biomeOpt = document.createElement("option");
+    biomeOpt.value = biome;
+    biomeOpt.textContent = biome;
+    biomeSelect.appendChild(biomeOpt);
 
- //   aliasesStr.split(",").map(a => a.trim()).forEach(alias => {
- //     const aliasOpt = document.createElement("option");
-//      aliasOpt.value = alias;
- //     aliasOpt.textContent = `${alias} (${biome})`;
-//      aliasSelect.appendChild(aliasOpt);
-//    });
-//  });
+    aliasesStr.split(",").map(a => a.trim()).forEach(alias => {
+      const aliasOpt = document.createElement("option");
+      aliasOpt.value = alias;
+      aliasOpt.textContent = `${alias} (${biome})`;
+      aliasSelect.appendChild(aliasOpt);
+    });
+  });
 
   // Pierwiastki z globalnej listy icons
-//  resourceSelect.innerHTML = `<option value="">️Wszystkie pierwiastki</option>`;
-//  if (icons && icons.length) {
-//    icons.forEach(icon => {
-//      const opt = document.createElement("option");
- //     opt.value = icon.name;
- //     opt.textContent = icon.name;
-//      resourceSelect.appendChild(opt);
-//    });
-//  }
+  resourceSelect.innerHTML = `<option value="">️Wszystkie pierwiastki</option>`;
+  if (icons && icons.length) {
+    icons.forEach(icon => {
+      const opt = document.createElement("option");
+      opt.value = icon.name;
+      opt.textContent = icon.name;
+      resourceSelect.appendChild(opt);
+    });
+  }
 
   // Reakcja na zmianę filtrów
-//  [biomeSelect, aliasSelect, resourceSelect, nameInput].forEach(el => {
-//    if (el) el.addEventListener("input", refreshPlanetList);
-//  });
-//}
+  [biomeSelect, aliasSelect, resourceSelect, nameInput].forEach(el => {
+    if (el) el.addEventListener("input", refreshPlanetList);
+  });
+}
 
 // Uruchamiamy po załadowaniu DOM
 document.addEventListener("DOMContentLoaded", () => {
- // initPlanetFilters();
+  initPlanetFilters();
   refreshPlanetList(); // od razu wyświetlamy listę planet
 
   // Obsługa zmiany języka
@@ -1899,25 +1941,19 @@ const contentEls = panel.querySelectorAll("div:not(:first-child)");
     biomeRow.appendChild(img);
   }
 
-// Utwórz element tekstowy biomu
-const biomeText = document.createElement("span");
-const biomeKey = details.biome || "";
-const biomeTextValue = translations[currentLang]?.[biomeKey] || biomeKey;
-biomeText.textContent = biomeTextValue || "Nieznany biom";
-biomeRow.appendChild(biomeText);
+  const biomeText = document.createElement("span");
+  biomeText.textContent = details.biome || "Nieznany biom";
+  biomeRow.appendChild(biomeText);
 
-// Alias
-if (details.biomeAlias) {
-  const aliasText = document.createElement("span");
-  const aliasKey = details.biomeAlias;
-  const aliasTextValue = translations[currentLang]?.[aliasKey] || aliasKey;
-  aliasText.textContent = `(${aliasTextValue})`;
-  aliasText.style.fontStyle = "italic";
-  aliasText.style.color = "#555";
-  biomeRow.appendChild(aliasText);
-}
+  if (details.biomeAlias) {
+    const aliasText = document.createElement("span");
+    aliasText.textContent = `(${details.biomeAlias})`;
+    aliasText.style.fontStyle = "italic";
+    aliasText.style.color = "#555";
+    biomeRow.appendChild(aliasText);
+  }
 
-panel.appendChild(biomeRow);
+  panel.appendChild(biomeRow);
 
   // strażnicy -> ikona + opis
   const sentinelsRow = document.createElement("div");
@@ -2805,7 +2841,7 @@ window.onload = () => {
   updateNoPlanetsMessage();
   checkNewPlanetInput();
   updateCurrentPlanetHeader();
- // initPlanetFilters();
+  initPlanetFilters();
   
 }
   
