@@ -410,7 +410,7 @@ button:disabled {
   display: flex;
   flex-direction: column; /* treść w pionie */
   gap: 1px; /* odstęp między wierszami */
-  max-width: 220px;
+  max-width: 520px;
   z-index: 1000;
 	transition: transform 0.4s ease-in-out;
     transform: translateY(0); /* widoczny */
