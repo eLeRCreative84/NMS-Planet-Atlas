@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <title>Atlas Planetarny</title>
-<script src="https://unpkg.com/three"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="style.css">
@@ -278,7 +277,7 @@
   <input type="text" id="detailPlanetSystem" />
 
  <div class="biome-selector" style="position: relative;">
-  <label for="biomeAliasInput">Biom / Alias biomu:</label>
+  <label for="biomeAliasInput">Biom / Alias biomu</label>
   <input type="text" id="biomeAliasInput" placeholder="Wpisz nazwę biomu lub alias...">
   <div id="biomeAliasDropdown" class="dropdown"></div>
 </div>
@@ -654,7 +653,14 @@ function savePlanetDetails(){
        const existing = planetDetails[currentPlanet] || {};
 	
 	const biomeInput = document.getElementById("biomeAliasInput");
-	const biomeAliasVal = biomeInput ? biomeInput.value : "";
+        const biomeAliasVal = biomeInput ? biomeInput.value : "";
+
+       // jeśli użytkownik wybrał coś z dropdowna – pobierz prawdziwy biom
+       const { biome: biomeVal, biomeAlias: aliasVal } = window.getSelectedBiomeData();
+
+
+
+
 	// zachowaj istniejące resources jeśli są
       const existingResources = planetDetails[currentPlanet]?.resources || [];
 
@@ -672,8 +678,8 @@ function savePlanetDetails(){
     galaxy: galaxyVal,
     starSystem: starSystemVal,
     planetSystem: planetSystemVal || "Nieznany", // jeśli brak – ląduje w „Nieznany”
-    biome: biomeAliasVal,           // <- tu używamy inputu
-    biomeAlias: biomeAliasVal,      // <- jeśli alias i biome mają być takie same
+    biome: biomeVal,
+    biomeAlias: aliasVal,
     weather: document.getElementById("detailWeather").value,
     sentinels: document.getElementById("detailSentinels").value,
     flora: document.getElementById("detailFlora").value,
@@ -1921,16 +1927,17 @@ const contentEls = panel.querySelectorAll("div:not(:first-child)");
   }
 
   const biomeText = document.createElement("span");
-  biomeText.textContent = details.biome || "Nieznany biom";
+  biomeText.textContent = details.biomeAlias || "Nieznany biom";
   biomeRow.appendChild(biomeText);
 
-  if (details.biomeAlias) {
-    const aliasText = document.createElement("span");
-    aliasText.textContent = `(${details.biomeAlias})`;
-    aliasText.style.fontStyle = "italic";
-    aliasText.style.color = "#555";
-    biomeRow.appendChild(aliasText);
-  }
+if (details.biome) {
+  const aliasText = document.createElement("span");
+  const translatedBiome = biomeNames[details.biome][currentLang];
+  aliasText.textContent = `(${translatedBiome})`;
+  aliasText.style.fontStyle = "italic";
+  aliasText.style.color = "#555";
+  biomeRow.appendChild(aliasText);
+}
 
   panel.appendChild(biomeRow);
 
