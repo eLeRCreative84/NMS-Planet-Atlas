@@ -103,6 +103,10 @@
   <option value="en">English</option>
   
 </select>
+ <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+    <button id="toggleMusicBtn" class="music-btn">🎵 Muzyka: OFF</button>
+<audio id="bgMusic" src="audio/background.mp3" loop></audio>
+   <input type="range" id="musicVolume" min="0" max="100" value="40" />
  
  </div>
 
@@ -414,6 +418,7 @@
    <!-- Panel z notatkami punktu -->
 <div id="pointNotesPanel"></div>
    
+      
 </div>
    
 <script>
@@ -444,10 +449,8 @@ function setLanguage(lang) {
   }
   currentLang = lang;
 
-const input = document.getElementById("biomeAliasInput");
-
-  // jeśli coś wpisane, odśwież dropdown natychmiast
-  if (input.value.trim()) {
+  const input = document.getElementById("biomeAliasInput");
+  if (input && input.value.trim()) {
     const event = new Event("input");
     input.dispatchEvent(event);
   }
@@ -480,7 +483,9 @@ document.querySelectorAll("[data-i18n], [data-i18n-placeholder]").forEach(el => 
       el.textContent = translations[lang][key];
     }
   });
-
+		// odśwież filtry i interfejsy
+		document.dispatchEvent(new Event("languageChanged"));
+		
           updateCurrentPlanetHeader();
           refreshGlobePoints();
           refreshPointsList();
@@ -1181,6 +1186,41 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// 🎵 MUZYKA W TLE
+document.addEventListener("DOMContentLoaded", () => {
+  const bgMusic = document.getElementById("bgMusic");
+  const musicBtn = document.getElementById("toggleMusicBtn");
+  const volumeSlider = document.getElementById("musicVolume");
+
+  if (!bgMusic || !musicBtn || !volumeSlider) return;
+
+  // ustawienia początkowe (z lokalStorage jeśli istnieją)
+  const savedVol = localStorage.getItem("musicVolume");
+  bgMusic.volume = savedVol !== null ? parseFloat(savedVol) : 0.4;
+  volumeSlider.value = bgMusic.volume * 100;
+
+  // ▶️ Obsługa przycisku ON/OFF
+  musicBtn.addEventListener("click", () => {
+    if (bgMusic.paused) {
+      bgMusic.play()
+        .then(() => {
+          musicBtn.textContent = "🎵 Muzyka: ON";
+        })
+        .catch(err => console.warn("Autoodtwarzanie zablokowane:", err));
+    } else {
+      bgMusic.pause();
+      musicBtn.textContent = "🎵 Muzyka: OFF";
+    }
+  });
+
+  // 🔊 Suwak głośności (płynna regulacja)
+  volumeSlider.addEventListener("input", e => {
+    const vol = e.target.value / 100;
+    bgMusic.volume = vol;
+    localStorage.setItem("musicVolume", vol); // zapamiętaj głośność
+  });
+});
+
 
 ////////////////////////////////////////////////////////////////////
 //------------------- Sidebar galaktyk ----------------------------//
@@ -1523,60 +1563,74 @@ function refreshPlanetList() {
   });
 }
 
-// function clearFilters() {
-//  document.getElementById("planetSearchInput").value = "";
-//  document.getElementById("biomeFilter").value = "";
-//  document.getElementById("biomeAliasFilter").value = "";
-//  document.getElementById("resourceFilter").value = "";
-//  refreshPlanetList();
-// }
+function clearFilters() {
+  document.getElementById("planetSearchInput").value = "";
+  document.getElementById("biomeFilter").value = "";
+  document.getElementById("biomeAliasFilter").value = "";
+  document.getElementById("resourceFilter").value = "";
+  refreshPlanetList();
+}
 
-// function initPlanetFilters() {
-//  const biomeSelect = document.getElementById("biomeFilter");
-//  const aliasSelect = document.getElementById("biomeAliasFilter");
-//  const resourceSelect = document.getElementById("resourceFilter");
-//  const nameInput = document.getElementById("planetSearchInput"); // poprawione ID
+function initPlanetFilters() {
+  const biomeSelect = document.getElementById("biomeFilter");
+  const aliasSelect = document.getElementById("biomeAliasFilter");
+  const nameInput = document.getElementById("planetSearchInput");
+  const resourceSelect = document.getElementById("resourceFilter");
 
-//  if (!biomeSelect || !aliasSelect || !resourceSelect) return;
+  if (!biomeSelect || !aliasSelect) return;
 
-  // Biomy + aliasy z obiektu biomeAliases
-//  biomeSelect.innerHTML = `<option value="">Wszystkie biomy</option>`;
-//  aliasSelect.innerHTML = `<option value="">Wszystkie aliasy biomów</option>`;
 
-//  Object.entries(biomeAliases).forEach(([biome, aliasesStr]) => {
-//    const biomeOpt = document.createElement("option");
-//    biomeOpt.value = biome;
- //   biomeOpt.textContent = biome;
- //   biomeSelect.appendChild(biomeOpt);
-//
- //   aliasesStr.split(",").map(a => a.trim()).forEach(alias => {
-//      const aliasOpt = document.createElement("option");
- //     aliasOpt.value = alias;
- //     aliasOpt.textContent = `${alias} (${biome})`;
- //     aliasSelect.appendChild(aliasOpt);
- //   });
-//  });
+  //Biomy – pobierane z biomeNames z tłumaczeniami
 
-  // Pierwiastki z globalnej listy icons
-//  resourceSelect.innerHTML = `<option value="">️Wszystkie pierwiastki</option>`;
-//  if (icons && icons.length) {
-//    icons.forEach(icon => {
-//      const opt = document.createElement("option");
-//      opt.value = icon.name;
-//      opt.textContent = icon.name;
-//      resourceSelect.appendChild(opt);
-//    });
-//  }
+  biomeSelect.innerHTML = `<option value="">${translations[currentLang]?.filters_all_biomes || "Wszystkie biomy"}</option>`;
 
-  // Reakcja na zmianę filtrów
-//  [biomeSelect, aliasSelect, resourceSelect, nameInput].forEach(el => {
-//    if (el) el.addEventListener("input", refreshPlanetList);
-//  });
-// }
+  Object.keys(biomeNames).forEach(biomeKey => {
+    const opt = document.createElement("option");
+    opt.value = biomeKey;
+    opt.textContent = biomeNames[biomeKey][currentLang] || biomeKey;
+    biomeSelect.appendChild(opt);
+  });
+
+
+  //Alias biomów – nowy format z tablicy biomeAliases
+
+  aliasSelect.innerHTML = `<option value="">${translations[currentLang]?.filters_all_aliases || "Wszystkie aliasy biomów"}</option>`;
+
+  biomeAliases.forEach(obj => {
+    const opt = document.createElement("option");
+    opt.value = obj.alias[currentLang].toLowerCase();
+    opt.textContent = `${obj.alias[currentLang]} (${biomeNames[obj.biome][currentLang] || obj.biome})`;
+    aliasSelect.appendChild(opt);
+  });
+
+  //Surowce – z globalnej listy icons (tylko type === "resource")
+
+  resourceSelect.innerHTML = `<option value="">${translations[currentLang]?.filters_all_resources || "Wszystkie pierwiastki"}</option>`;
+  icons
+    .filter(icon => icon.type === "resource")
+    .forEach(icon => {
+      const opt = document.createElement("option");
+      opt.value = icon.name.toLowerCase();
+      opt.textContent = icon.name;
+      resourceSelect.appendChild(opt);
+    });
+
+  //Reakcja na zmianę filtrów / wyszukiwarki
+
+  [biomeSelect, aliasSelect, nameInput].forEach(el => {
+    if (el) el.addEventListener("input", refreshPlanetList);
+  });
+}
+
+//Dynamiczne odświeżanie po zmianie języka
+
+document.addEventListener("languageChanged", () => {
+  initPlanetFilters();
+});
 
 // Uruchamiamy po załadowaniu DOM
 document.addEventListener("DOMContentLoaded", () => {
-//  initPlanetFilters();
+  initPlanetFilters();
   refreshPlanetList(); // od razu wyświetlamy listę planet
 
   // Obsługa zmiany języka
@@ -2842,7 +2896,7 @@ window.onload = () => {
   updateNoPlanetsMessage();
   checkNewPlanetInput();
   updateCurrentPlanetHeader();
-//  initPlanetFilters();
+  initPlanetFilters();
   
 }
   
