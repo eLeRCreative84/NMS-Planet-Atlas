@@ -183,6 +183,10 @@ const translations = {
   "detail_portal_btn": "Przejdź do NMS Portals",
   "detail_notes_label": "Notatki",
   "detail_save_btn": "Zapisz detale",
+  "header_planet_list": "Lista planet", 
+  "header_galaxy_list": "Galaktyki",
+  "header_My_loc": "Moja lokalizacja",
+  "biome_search_name": "Wpisz nazwę biomu lub alias...",
 
     planet_noSelected: "Brak wybranej planety",
     alert_enterPlanetSystem: "Wprowadź nazwę układu planetarnego aby poprawnie wyświetlić planetę na liście!",
@@ -376,6 +380,10 @@ const translations = {
   "detail_portal_btn": "Go to NMS Portals",
   "detail_notes_label": "Notes",
   "detail_save_btn": "Save details",
+  "header_planet_list": "List of planets", 
+  "header_galaxy_list": "Galaxies",
+  "header_My_loc": "My location",
+  "biome_search_name": "Enter the name of the biome or alias...",
 
     planet_noSelected: "No planet selected",
     alert_enterPlanetSystem: "Enter the planet system name to display the planet correctly in the list!",
