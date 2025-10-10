@@ -187,13 +187,34 @@ const translations = {
   "header_galaxy_list": "Galaktyki",
   "header_My_loc": "Moja lokalizacja",
   "biome_search_name": "Wpisz nazwę biomu lub alias...",
+  
+  
+  unknown_biome: "Nieznany biom",
+  unknown_sentinels: "Nieznani strażnicy",
 
     planet_noSelected: "Brak wybranej planety",
     alert_enterPlanetSystem: "Wprowadź nazwę układu planetarnego aby poprawnie wyświetlić planetę na liście!",
     alert_savedPlanetDetails: "Opis zapisany!",
     unknown_starSystem: "Nieznany układ gwiezdny",
     unknown_planetSystem: "Nieznany układ planetarny",
-
+	
+	alert_planet_exists: "Planeta / Księżyc o tej nazwie już istnieje!",
+	alert_select_planet_for_moon: "Wybierz planetę, do której chcesz przypisać nowy księżyc!",
+	alert_added_object: "Dodano nowy obiekt: {objectType} - {name}",
+	alert_no_planet_selected: "Najpierw zaznacz planetę.",
+	alert_enter_new_name: "Podaj nową nazwę planety.",
+	alert_name_exists: "Planeta o tej nazwie już istnieje!",
+	alert_select_planet_first_points: "Najpierw wybierz planetę w zakładce 'Planety'!",
+	alert_point_exists: "Punkt typu \"{type}\" o współrzędnych X:{lat}, Y:{lng} z taką samą notatką już istnieje!",
+	alert_invalid_coords: "Podaj współrzędne X i Y!",
+	alert_add_point: "Dodano nowy punkt: {name}",
+	alert_texture_url_required: "Podaj URL tekstury!",
+	alert_texture_invalid: "Nieprawidłowy URL lub lokalna ścieżka!",
+	alert_select_planet_first: "Najpierw wybierz planetę!",
+	alert_texture_added: "Dodano teksturę do planety {planet}",
+	alert_texture_load_error: "Nie udało się załadować obrazu. Sprawdź URL lub lokalną ścieżkę.",
+	alert_import_done: "Import zakończony!",
+	alert_import_error: "Błąd importu JSON",
     
   },
   "en": {
@@ -384,12 +405,27 @@ const translations = {
   "header_galaxy_list": "Galaxies",
   "header_My_loc": "My location",
   "biome_search_name": "Enter the name of the biome or alias...",
+ 
+    unknown_biome: "Unknown biome",
+    unknown_sentinels: "Unknown sentinels",
 
-    planet_noSelected: "No planet selected",
-    alert_enterPlanetSystem: "Enter the planet system name to display the planet correctly in the list!",
-    alert_savedPlanetDetails: "Description saved!",
-    unknown_starSystem: "Unknown star system",
-    unknown_planetSystem: "Unknown planetary system",
+  alert_planet_exists: "A planet or moon with this name already exists!",
+  alert_select_planet_for_moon: "Select a planet to assign the new moon to!",
+  alert_added_object: "Added new object: {objectType} - {name}",
+  alert_no_planet_selected: "Select a planet first.",
+  alert_enter_new_name: "Enter a new planet name.",
+  alert_name_exists: "A planet with this name already exists!",
+  alert_select_planet_first_points: "First, choose a planet in the 'Planets' tab!",
+  alert_point_exists: "A point of type \"{type}\" at X:{lat}, Y:{lng} with the same note already exists!",
+  alert_invalid_coords: "Enter X and Y coordinates!",
+  alert_add_point: "Added new point: {name}",
+  alert_texture_url_required: "Enter a texture URL!",
+  alert_texture_invalid: "Invalid URL or local path!",
+  alert_select_planet_first: "Select a planet first!",
+  alert_texture_added: "Added texture to planet {planet}",
+  alert_texture_load_error: "Failed to load image. Check the URL or local path.",
+  alert_import_done: "Import completed!",
+  alert_import_error: "JSON import error"
    
   }
 };
