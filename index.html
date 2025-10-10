@@ -491,7 +491,9 @@ document.querySelectorAll("[data-i18n], [data-i18n-placeholder]").forEach(el => 
           refreshPointsList();
           refreshPlanetSidebar();
           refreshGalaxySidebar();
-	  updatePlanetMiniPanel();
+	      updatePlanetMiniPanel();
+		  renderPlanetResourcesPanel();
+		  initPlanetFilters();
 }
 
 // Zakładki
@@ -1186,6 +1188,46 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// tłumaczenie pierwiastków
+
+const resourceNames = {
+  "Kobalt": { pl: "Kobalt", en: "Cobalt" },
+  "Sód": { pl: "Sód", en: "Sodium" },
+  "Miedź": { pl: "Miedź", en: "Copper" },
+  "Sól": { pl: "Sól", en: "Salt" },
+  "Cytofosforan": { pl: "Cytofosforan", en: "Cyto-Phosphate" },
+  "Metal chromatyczny": { pl: "Metal chromatyczny", en: "Chromatic Metal" },
+  "Piryt": { pl: "Piryt", en: "Pyrite" },
+  "Amoniak": { pl: "Amoniak", en: "Ammonia" },
+  "Uran": { pl: "Uran", en: "Uranium" },
+  "Dioksyt": { pl: "Dioksyt", en: "Dioxite" },
+  "Fosfor": { pl: "Fosfor", en: "Phosphorus" },
+  "Grzybowa pleśń": { pl: "Grzybowa pleśń", en: "Fungal Mould" },
+  "Kryształ Mrozu": { pl: "Kryształ Mrozu", en: "Frost Crystal" },
+  "Korzeń gamma": { pl: "Korzeń gamma", en: "Gamma Root" },
+  "Miąższ kaktusa": { pl: "Miąższ kaktusa", en: "Cactus Flesh" },
+  "Solanium": { pl: "Solanium", en: "Solanium" },
+  "Gwiezdny pąk": { pl: "Gwiezdny pąk", en: "Star Bulb" },
+  "Bulwa rdzeniowa": { pl: "Bulwa rdzeniowa", en: "Marrow Bulb" },
+  "Pęcherz wodorostu": { pl: "Pęcherz wodorostu", en: "Kelp Sac" },
+  "Namagnesowany ferryt": { pl: "Namagnesowany ferryt", en: "Magnetised Ferrite" },
+  "Kadm": { pl: "Kadm", en: "Cadmium" },
+  "Emeril": { pl: "Emeril", en: "Emeril" },
+  "Ind": { pl: "Ind", en: "Indium" },
+  "Kwarcyt": { pl: "Kwarcyt", en: "Quartzite" },
+  "Parafin": { pl: "Parafin", en: "Paraffinium" },
+  "Bazalt": { pl: "Bazalt", en: "Basalt" },
+  "Skrystalizowany hel": { pl: "Skrystalizowany hel", en: "Crystallised Helium" },
+  "Lit": { pl: "Lit", en: "Lithium" },
+  "Srebro": { pl: "Srebro", en: "Silver" },
+  "Złoto": { pl: "Złoto", en: "Gold" },
+  "Zardzewiały metal": { pl: "Zardzewiały metal", en: "Rusted Metal" },
+  "Siarka": { pl: "Siarka", en: "Sulphurine" },
+  "Radon": { pl: "Radon", en: "Radon" },
+  "Azot": { pl: "Azot", en: "Nitrogen" },
+  "Metan": { pl: "Metan", en: "Methane" }
+};
+
 // 🎵 MUZYKA W TLE
 document.addEventListener("DOMContentLoaded", () => {
   const bgMusic = document.getElementById("bgMusic");
@@ -1607,13 +1649,16 @@ function initPlanetFilters() {
 
   resourceSelect.innerHTML = `<option value="">${translations[currentLang]?.filters_all_resources || "Wszystkie pierwiastki"}</option>`;
   icons
-    .filter(icon => icon.type === "resource")
-    .forEach(icon => {
-      const opt = document.createElement("option");
-      opt.value = icon.name.toLowerCase();
-      opt.textContent = icon.name;
-      resourceSelect.appendChild(opt);
-    });
+    icons
+  .filter(icon => icon.type === "resource")
+  .forEach(icon => {
+    const opt = document.createElement("option");
+    opt.value = icon.name.toLowerCase();
+    const translatedName = resourceNames[icon.name]?.[currentLang] || icon.name;
+    opt.textContent = translatedName;
+    resourceSelect.appendChild(opt);
+  });
+
 
   //Reakcja na zmianę filtrów / wyszukiwarki
 
@@ -1921,7 +1966,9 @@ function renderPlanetResourcesPanel() {
 
     // Nazwa pierwiastka
     const nameLabel = document.createElement("span");
-    nameLabel.textContent = res.name;
+    const translatedName = resourceNames[res.name]?.[currentLang] || res.name;
+    nameLabel.textContent = translatedName;
+
     nameLabel.style.textAlign = "left";
     grid.appendChild(nameLabel);
   });
@@ -2055,7 +2102,9 @@ if (details.biome) {
     img.style.height = ICON_SIZE + "px";
 
     const label = document.createElement("span");
-    label.textContent = resObj.name;
+    const translatedName = resourceNames[resObj.name]?.[currentLang] || resObj.name;
+    label.textContent = translatedName;
+
 
     row.appendChild(img);
     row.appendChild(label);
