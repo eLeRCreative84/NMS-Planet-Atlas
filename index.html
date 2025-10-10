@@ -1406,9 +1406,9 @@ function addNewPlanet() {
   const isMoon = isMoonCheckbox.checked;
 
  if (atlas[name]) {
-    alert("Planeta / Księżyc o tej nazwie już istnieje!");
-    return;
-  }
+  alert(translations[currentLang].alert_planet_exists);
+  return;
+}
 
   let parentPlanet = null;
 
@@ -1421,13 +1421,13 @@ function addNewPlanet() {
     else if (currentPlanet && planetDetails[currentPlanet]?.parentPlanetId) {
       parentPlanet = planetDetails[currentPlanet].parentPlanetId;
       alert(
-        `Wybrany obiekt to księżyc — nowy księżyc zostanie przypisany do planety "${parentPlanet}".`
-      );
+      translations[currentLang].alert_moon_assigned.replace("{planet}", parentPlanet)
+    );
     }
     // przypadek 3: nie wybrano nic
     else {
-      alert("Wybierz planetę, do której chcesz przypisać nowy księżyc!");
-      return;
+      alert(translations[currentLang].alert_select_planet_for_moon);
+    return;
     }
   }
 
@@ -1483,7 +1483,14 @@ function addNewPlanet() {
 
   input.value = "";
   checkNewPlanetInput();
-  alert(`Dodano nowy obiekt: ${isMoon ? "Księżyc" : "Planetę"} - ${name}`);
+  alert(
+  translations[currentLang].alert_added_object.replace(
+    "{objectType}",
+    isMoon
+      ? (currentLang === "pl" ? "Księżyc" : "Moon")
+      : (currentLang === "pl" ? "Planetę" : "Planet")
+  ).replace("{name}", name)
+);
   updateNoPlanetsMessage();
 }
   
@@ -1773,7 +1780,7 @@ function selectPlanet(name) {
 // Edycja zaznaczonej planety
 function editSelectedPlanet() {
   if (!currentPlanet) {
-    alert("Najpierw zaznacz planetę.");
+    alert(translations[currentLang].alert_select_planet_first);
     return;
   }
   isEditing = true;
@@ -1798,14 +1805,14 @@ const box = document.getElementById("editPlanetBox");
 function acceptEditPlanet() {
   const newName = document.getElementById("editPlanetName").value.trim();
 
-  if (!newName) {
-    alert("Podaj nową nazwę planety.");
+ if (!newName) {
+    alert(translations[currentLang].alert_enter_new_name);
     return;
   }
 
   // Jeśli nazwa się zmieniła i już istnieje, blokujemy
   if (newName !== currentPlanet && atlas[newName]) {
-    alert("Planeta o tej nazwie już istnieje!");
+    alert(translations[currentLang].alert_planet_exists);
     return;
   }
 
@@ -2027,7 +2034,7 @@ const contentEls = panel.querySelectorAll("div:not(:first-child)");
   }
 
   const biomeText = document.createElement("span");
-  let aliasDisplay = "Nieznany biom";
+  let aliasDisplay = translations[currentLang]?.unknown_biome || "Nieznany biom";
 
 if (details.biome && details.biomeAlias) {
   // znajdź w biomeAliases obiekt odpowiadający wybranemu aliasowi
@@ -2072,7 +2079,8 @@ if (details.biome) {
   }
 
   const sentinelsText = document.createElement("span");
-  sentinelsText.textContent = details.sentinels || "Nieznani strażnicy";
+  sentinelsText.textContent = details.sentinels || translations[currentLang]?.unknown_sentinels || "Nieznani strażnicy";
+
   sentinelsRow.appendChild(sentinelsText);
 
   panel.appendChild(sentinelsRow);
@@ -2315,7 +2323,7 @@ function getFilteredPoints(points) {
   
 function addPoint(){
   if (!currentPlanet) {
-    alert("Najpierw wybierz planetę w zakładce 'Planety'!");
+    alert(translations[currentLang].alert_select_planet_first_points);
     return;
   }
 
@@ -2334,12 +2342,17 @@ function addPoint(){
     p.notes === notes
   );
   if (exists) {
-    alert(`Punkt typu "${type}" o współrzędnych X:${lat}, Y:${lng} z taką samą notatką już istnieje!`);
+    alert(
+      translations[currentLang].alert_point_exists
+        .replace("{type}", type)
+        .replace("{lat}", lat)
+        .replace("{lng}", lng)
+    );
     return;
   }
   
   if (isNaN(lat) || isNaN(lng)) {
-    alert("Podaj współrzędne X i Y!");
+    alert(translations[currentLang].alert_invalid_coords);
     return;
   }
 
@@ -2355,7 +2368,9 @@ function addPoint(){
 } else {
   atlas[currentPlanet].push(point);
 }
-  alert(`Dodano nowy punkt: ${name}`);
+   alert(
+  translations[currentLang].alert_add_point.replace("{name}", name)
+);
   refreshPlanetList();
   refreshGlobePoints();
   refreshPointsList();
@@ -2539,13 +2554,13 @@ function getActivePointTypes() {
 function addTextureUrl() {
   const texture = document.getElementById('planetTextureUrl').value.trim();
   if (!texture) {
-    alert("Podaj URL tekstury!");
+    alert(translations[currentLang].alert_texture_url_required);
     return;
   }
 
   // sprawdzenie podstawowe, URL musi zaczynać się od http(s):// lub textures/
   if (!/^https?:\/\/|^textures\//.test(texture)) {
-    alert("Nieprawidłowy URL lub lokalna ścieżka!");
+    alert(translations[currentLang].alert_texture_invalid);
     return;
   }
 
@@ -2556,7 +2571,7 @@ function addTextureUrl() {
     // obraz istnieje → zapisujemy w planetData
     const planet = planetData.find(p => p.name === currentPlanet);
     if (!planet) {
-      alert("Najpierw wybierz planetę!");
+      alert(translations[currentLang].alert_select_planet_first);
       return;
     }
 
@@ -2574,10 +2589,12 @@ function addTextureUrl() {
       renderTexturePage();
     }
 
-    alert(`Dodano teksturę do planety ${currentPlanet}`);
+    alert(
+      translations[currentLang].alert_texture_added.replace("{planet}", currentPlanet)
+    );
   };
   img.onerror = () => {
-    alert("Nie udało się załadować obrazu. Sprawdź URL lub lokalną ścieżkę.");
+    alert(translations[currentLang].alert_texture_load_error);
   };
 }
 
@@ -2599,7 +2616,7 @@ globe.globeImageUrl(textureToUse);
   // Funkcja do zmiany koloru planety
 function changePlanetColor() {
   if (!currentPlanet) {
-    alert("Najpierw wybierz planetę!");
+    alert(translations[currentLang].alert_select_planet_first);
     return;
   }
 
@@ -2707,10 +2724,10 @@ function importAtlas(event){
       refreshPlanetSidebar();
 	  refreshGalaxySidebar();
 
-      alert("Import zakończony!");
+      alert(translations[currentLang].alert_import_done);
     } catch(err){ 
       console.error(err);
-      alert("Błąd importu JSON"); 
+      alert(translations[currentLang].alert_import_error); 
     }
   };
   reader.readAsText(file);
