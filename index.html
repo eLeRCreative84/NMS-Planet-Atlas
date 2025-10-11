@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>Atlas Planetarny</title>
+<script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
 <script src="https://unpkg.com/globe.gl"></script>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="style.css">
@@ -34,7 +35,7 @@
         <input type="number" id="lng" step="1" min="-180" max="180" />
       </div>
     </div>
-
+     
     <label data-i18n="start_label_pointName">Nazwa punktu</label>
     <input type="text" id="name" onkeydown="if(event.key === 'Enter') addPoint()" />
 
@@ -51,7 +52,7 @@
     <textarea id="notes"></textarea>
 
     <button onclick="addPoint()" data-i18n="start_btn_addPoint">Dodaj punkt</button>
-
+    <button id="pickOnGlobeBtn">Zaznacz na globie</button>
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
 
     <h2 data-i18n="start_scaling">Skalowanie globu i punktów</h2>
@@ -91,7 +92,72 @@
     </table>
 
     <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
+  
+<div id="gridControls" style="text-align:center; margin-top:10px;">
 
+<!-- Sekcja siatki -->
+<div style="margin-bottom:10px;">
+  <strong>Siatka:</strong>
+  <table style="width: 100%; margin-top: 0.5rem; border-collapse: collapse;">
+    <tr>
+      <td style="width: 70%; text-align: left;">Co 30°</td>
+      <td style="width: 30%; text-align: left;">
+        <input type="checkbox" id="grid30">
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 70%; text-align: left;">Co 10°</td>
+      <td style="width: 30%; text-align: left;">
+        <input type="checkbox" id="grid10">
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- Sekcja etykiet -->
+<div style="margin-bottom:10px;">
+  <strong>Etykiety:</strong>
+  <table style="width: 100%; margin-top: 0.5rem; border-collapse: collapse;">
+    <tr>
+      <td style="width: 70%; text-align: left;">Co 30°</td>
+      <td style="width: 30%; text-align: left;">
+        <input type="checkbox" id="labels30">
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 70%; text-align: left;">Co 10°</td>
+      <td style="width: 30%; text-align: left;">
+        <input type="checkbox" id="labels10">
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 70%; text-align: left;">Dodatkowe ±90°</td>
+      <td style="width: 30%; text-align: left;">
+        <input type="checkbox" id="labelsSides">
+      </td>
+    </tr>
+  </table>
+</div>
+
+  <!-- Kolor siatki -->
+  <div style="margin-bottom:10px; text-align:center;">
+    <label for="gridColor">Kolor siatki:</label><br>
+    <input type="color" id="gridColor" value="#888888"
+           style="width:100%; height:35px; border:none; border-radius:6px; margin-top:5px;">
+  </div>
+
+  <!-- Przezroczystość -->
+  <div style="margin-bottom:5px;">
+    <label for="gridOpacity">Przezroczystość:</label><br>
+    <input type="range" id="gridOpacity" min="0" max="1" step="0.05" value="0.3" 
+           style="width:100%;">
+  </div>
+</div>
+
+
+
+
+  <div style="height:5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
     <h2 data-i18n="start_importExport">Import/Eksport</h2>
     <button class="lock-while-edit" onclick="exportAtlas()" data-i18n="start_btn_export">Eksport JSON</button>
     <input class="lock-while-edit" type="file" id="importFile" accept="application/json" onchange="importAtlas(event)" />
@@ -2546,7 +2612,7 @@ function getActivePointTypes() {
   return Array.from(document.querySelectorAll(".pointFilter:checked"))
               .map(cb => cb.value);
 }
-  
+ 
 ////////////////////////////////////////////////////////////////////
 //------------------- Tekstury i kolory planet -------------------//
 ////////////////////////////////////////////////////////////////////  
@@ -2860,9 +2926,212 @@ const globe = Globe()(document.getElementById("globeViz"))
     }
   });
 
-globe.showGraticules(true);   	 // włącz siatkę geograficzną
-globe.graticuleLineWidth = 0.5; // ustaw grubość linii
+// Zaznaczenie punktów na globie 
+let pickMode = false;
 
+// znajdź przycisk
+const pickBtn = document.getElementById('pickOnGlobeBtn');
+
+// po kliknięciu włącz tryb wyboru
+pickBtn.addEventListener('click', (e) => {
+  e.stopPropagation(); // Zatrzymuje propagację, żeby event "poza globem" się nie odpalił
+  pickMode = !pickMode;
+  pickBtn.textContent = pickMode ? 'Kliknij na globie...' : 'Zaznacz na globie';
+  pickBtn.style.background = pickMode ? '#4CAF50' : '';
+});
+
+// nasłuchiwanie kliknięcia na globie
+globe.onGlobeClick((coords, event) => {
+  event.stopPropagation(); // ważne — kliknięcie w glob nie wyłączy trybu
+  if (!pickMode) return;
+
+  const { lat, lng } = coords;
+  document.getElementById('lat').value = lat.toFixed(3);
+  document.getElementById('lng').value = lng.toFixed(3);
+
+  pickBtn.textContent = 'Zaznacz na globie';
+  pickBtn.style.background = '';
+  pickMode = false;
+
+  alert(`Wybrano punkt: ${lat.toFixed(3)}, ${lng.toFixed(3)}`);
+});
+
+// Kliknięcie poza globem anuluje tryb wybierania
+document.addEventListener("click", (e) => {
+  if (!pickMode) return;
+
+  const globeEl = document.getElementById("globeWrapper");
+  if (!globeEl.contains(e.target) && e.target !== pickBtn) {
+    pickMode = false;
+    pickBtn.textContent = "Zaznacz na globie";
+    pickBtn.style.background = "";
+  }
+});
+
+
+let geoGridGroup = null;
+let geoLabelContainer = null;
+let labelDivs = [];
+
+// === FUNKCJA TWORZENIA SIATKI ===
+function addGeoGrid(scene, step = 10, color = '#888888', opacity = 0.3) {
+  if (geoGridGroup) scene.remove(geoGridGroup);
+
+  const radius = globe.getGlobeRadius();
+  const material = new THREE.LineBasicMaterial({ color: new THREE.Color(color), opacity, transparent: true });
+
+  geoGridGroup = new THREE.Group();
+
+  // równoleżniki
+  for (let lat = -90; lat <= 90; lat += step) {
+    const curve = new THREE.EllipseCurve(0, 0, radius * Math.cos(THREE.MathUtils.degToRad(lat)), radius * Math.cos(THREE.MathUtils.degToRad(lat)));
+    const points = curve.getPoints(100).map(p => new THREE.Vector3(p.x, radius * Math.sin(THREE.MathUtils.degToRad(lat)), p.y));
+    geoGridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), material));
+  }
+
+  // południki
+  for (let lng = -180; lng < 180; lng += step) {
+    const points = [];
+    for (let lat = -90; lat <= 90; lat += 2) {
+      const phi = (90 - lat) * Math.PI / 180;
+      const theta = (lng + 180) * Math.PI / 180;
+      const x = -radius * Math.sin(phi) * Math.cos(theta);
+      const z = radius * Math.sin(phi) * Math.sin(theta);
+      const y = radius * Math.cos(phi);
+      points.push(new THREE.Vector3(x, y, z));
+    }
+    geoGridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), material));
+  }
+
+  scene.add(geoGridGroup);
+}
+
+// === FUNKCJA TWORZENIA ETYKIET ===
+function addGeoLabels(step = 30, showSides = false, color = '#888888') {
+  if (geoLabelContainer) geoLabelContainer.remove();
+  labelDivs = [];
+
+  geoLabelContainer = document.createElement('div');
+  geoLabelContainer.style.position = 'absolute';
+  geoLabelContainer.style.pointerEvents = 'none';
+  geoLabelContainer.style.top = '0';
+  geoLabelContainer.style.left = '0';
+  document.body.appendChild(geoLabelContainer);
+
+  const camera = globe.camera();
+  const renderer = globe.renderer();
+  const radius = globe.getGlobeRadius();
+
+  function addLabel(lat, lng, text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    div.style.position = 'absolute';
+    div.style.fontSize = '10px';
+    div.style.color = color;
+    div.style.textShadow = '0 0 2px #000';
+    geoLabelContainer.appendChild(div);
+    labelDivs.push({ div, lat, lng });
+  }
+
+  // równoleżniki po 2 stronach globu
+  for (let lat = -90; lat <= 90; lat += step) {
+    addLabel(lat, 0, `${lat}°`);
+    addLabel(lat, 180, `${lat}°`);
+  }
+
+  // południki co step
+  for (let lng = -180; lng < 180; lng += step) {
+    addLabel(0, lng, `${lng}°`);
+  }
+
+	// dodatkowe etykiety ±90° na południkach ±90°
+	if (showSides) {
+	  for (let lat = -90; lat <= 90; lat += step) {
+		if (lat === -90 || lat === 90) continue; // pomiń bieguny
+		addLabel(lat, 90, `${lat}°`);
+		addLabel(lat, -90, `${lat}°`);
+	  }
+	}
+
+
+  function updateLabels() {
+    const rect = renderer.domElement.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const cameraPosition = camera.position.clone();
+
+    labelDivs.forEach(({ div, lat, lng }) => {
+      const phi = (90 - lat) * Math.PI / 180;
+      const theta = (lng + 180) * Math.PI / 180;
+      const x = -radius * Math.sin(phi) * Math.cos(theta);
+      const z = radius * Math.sin(phi) * Math.sin(theta);
+      const y = radius * Math.cos(phi);
+
+      const worldVec = new THREE.Vector3(x, y, z);
+      const toCamera = cameraPosition.clone().sub(worldVec).normalize();
+      const normal = worldVec.clone().normalize();
+      const visible = normal.dot(toCamera) > 0;
+
+      if (visible) {
+        const vector = worldVec.clone().project(camera);
+        const x2d = rect.left + (vector.x * 0.5 + 0.5) * width;
+        const y2d = rect.top + (-vector.y * 0.5 + 0.5) * height;
+        div.style.transform = `translate(-50%, -50%) translate(${x2d}px, ${y2d}px)`;
+        div.style.display = 'block';
+      } else {
+        div.style.display = 'none';
+      }
+    });
+  }
+
+  globe.controls().addEventListener('change', updateLabels);
+  updateLabels();
+}
+
+// === OBSŁUGA UI ===
+const grid30Cb = document.getElementById('grid30');
+const grid10Cb = document.getElementById('grid10');
+const labels30Cb = document.getElementById('labels30');
+const labels10Cb = document.getElementById('labels10');
+const labelsSidesCb = document.getElementById('labelsSides');
+const colorInput = document.getElementById('gridColor');
+const opacityInput = document.getElementById('gridOpacity');
+
+function refreshGridAndLabels() {
+  // siatka
+  if (grid10Cb.checked) {
+    addGeoGrid(globe.scene(), 10, colorInput.value, parseFloat(opacityInput.value));
+  } else if (grid30Cb.checked) {
+    addGeoGrid(globe.scene(), 30, colorInput.value, parseFloat(opacityInput.value));
+  } else if (geoGridGroup) {
+    globe.scene().remove(geoGridGroup);
+    geoGridGroup = null;
+  }
+
+  // etykiety
+  let labelStep = 0;
+  if (labels10Cb.checked) labelStep = 10;
+  else if (labels30Cb.checked) labelStep = 30;
+
+  if (labelStep > 0) {
+    addGeoLabels(labelStep, labelsSidesCb.checked, colorInput.value);
+  } else if (geoLabelContainer) {
+    geoLabelContainer.remove();
+    geoLabelContainer = null;
+  }
+}
+
+[grid30Cb, grid10Cb, labels30Cb, labels10Cb, labelsSidesCb, colorInput, opacityInput].forEach(el =>
+  el.addEventListener('input', refreshGridAndLabels)
+);
+
+// domyślnie siatka co 10 i etykiety co 30
+grid10Cb.checked = true;
+labels30Cb.checked = true;
+refreshGridAndLabels();
+
+
+ 
 //Panel z ntotakami punktu	
 const pointNotesPanel = document.getElementById("pointNotesPanel");
 let autoScrollInterval = null;
@@ -2952,7 +3221,6 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   setLanguage(currentLang); // ustaw domyślny język
 });
-
 
 // start
 window.onload = () => {
