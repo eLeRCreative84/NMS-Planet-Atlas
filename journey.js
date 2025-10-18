@@ -6,15 +6,16 @@ export function initJourney(container) {
     }
 
     // ======= CANVAS =======
-    const canvas = document.createElement("canvas");
+     const canvas = document.createElement("canvas");
     canvas.id = "renderCanvas";
-    canvas.style.width = "100vw";
-    canvas.style.height = "100vh";
-    canvas.style.display = "block";
-    canvas.style.touchAction = "none";
-
-    // zamiast document.body, wstaw do container
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
     container.appendChild(canvas);
+
+    // Twój HUD też w containerze
+    const hud = document.createElement("div");
+    hud.id = "hud";
+    container.appendChild(hud);
 
 // ======= HUD =======
 const hud = document.createElement("div");
@@ -791,5 +792,6 @@ window.addEventListener("resize",()=>engine.resize());
 
 
 window.initJourney = initJourney;
+
 
 
