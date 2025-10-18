@@ -6,7 +6,14 @@
 <script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
 <script src="https://unpkg.com/globe.gl"></script>
  <script src="https://cdn.babylonjs.com/babylon.js"></script>
- <script type="module" src="journey.js"></script>
+ <script type="module">
+  import { initJourney } from './journey.js';
+
+  document.addEventListener("DOMContentLoaded", () => {
+      const podrozEl = document.getElementById("podroz");
+      initJourney(podrozEl);
+  });
+</script>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="style.css">
 <script src="translate.js"></script>
@@ -492,7 +499,10 @@
 </div>
 
  <!-- Zakładka PODRÓŻ -->
-<div id="podroz" class="tab-content"></div>	
+
+<div id="podroz" class="tab-content">
+    <div id="journeyContainer"></div>
+</div>
    
 <script>
 let atlas = {};
@@ -513,11 +523,6 @@ let headerLock = true; // blokada na starcie celem zablokowania możliwości nad
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
 //////////////////////////////////////////////////////////////////// 
-
-document.addEventListener("DOMContentLoaded", () => {
-      initJourney(); // wywołanie funkcji z journey.js
-    });
-
 
 let currentLang = "pl"; // domyślny język
 
