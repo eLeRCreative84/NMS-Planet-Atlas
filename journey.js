@@ -1,17 +1,20 @@
 function initJourney(container) {
-  
-  if (document.getElementById("renderCanvas")) {
-    console.warn("Journey is already initialized.");
-    return;
-  }
-// ======= CANVAS =======
-const canvas = document.createElement("canvas");
-canvas.id = "renderCanvas";
-canvas.style.width = "100vw";
-canvas.style.height = "100vh";
-canvas.style.display = "block";
-canvas.style.touchAction = "none";
-document.body.appendChild(canvas);
+    // jeśli canvas już istnieje, nie twórz nowego
+    if (document.getElementById("renderCanvas")) {
+        console.warn("Journey is already initialized.");
+        return;
+    }
+
+    // ======= CANVAS =======
+    const canvas = document.createElement("canvas");
+    canvas.id = "renderCanvas";
+    canvas.style.width = "100vw";
+    canvas.style.height = "100vh";
+    canvas.style.display = "block";
+    canvas.style.touchAction = "none";
+
+    // zamiast document.body, wstaw do container
+    container.appendChild(canvas);
 
 // ======= HUD =======
 const hud = document.createElement("div");
@@ -786,5 +789,6 @@ window.addEventListener("resize",()=>engine.resize());
 
 
 }
+
 
 window.initJourney = initJourney;
