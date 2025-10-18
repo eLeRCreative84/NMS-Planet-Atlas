@@ -1,4 +1,4 @@
-function initJourney(container) {
+export function initJourney(container) {
     // jeśli canvas już istnieje, nie twórz nowego
     if (document.getElementById("renderCanvas")) {
         console.warn("Journey is already initialized.");
@@ -791,4 +791,5 @@ window.addEventListener("resize",()=>engine.resize());
 
 
 window.initJourney = initJourney;
+
 
