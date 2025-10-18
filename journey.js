@@ -92,7 +92,6 @@ document.head.appendChild(style);
    tylko dopisałem obsługę siatki regionów (2 poziomy).
    =============================== */
 
-const canvas = document.getElementById("renderCanvas");
 const engine = new BABYLON.Engine(canvas,true);
 const scene = new BABYLON.Scene(engine);
 
@@ -792,3 +791,4 @@ window.addEventListener("resize",()=>engine.resize());
 
 
 window.initJourney = initJourney;
+
