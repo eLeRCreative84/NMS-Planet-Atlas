@@ -5,9 +5,14 @@
 <title>Atlas Planetarny</title>
 <script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
 <script src="https://unpkg.com/globe.gl"></script>
+ <script src="https://cdn.babylonjs.com/babylon.js"></script>
+ <script type="module" src="js/journey.js"></script>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="style.css">
 <script src="translate.js"></script>
+
+
+
 </head>
 <body>
   <div id="form">
@@ -16,6 +21,8 @@
     <button class="lock-while-edit" onclick="openTab('planety')" data-i18n="tab_planety">Planety</button>
     <button class="lock-while-edit" onclick="openTab('punkty')" data-i18n="tab_punkty">Punkty</button>
     <button class="lock-while-edit" onclick="openTab('detale')" data-i18n="tab_detale">Detale</button>
+	  <button class="lock-while-edit" onclick="openTab('podroz')" data-i18n="tab_podroz">Podróż</button>
+
   </div>
 
   <!-- Zakładka START -->
@@ -446,6 +453,7 @@
 </div>
 </div>
 
+
   <!-- Obszar wizualizacji globu -->
   <div id="globeWrapper" style="position: relative;">
     <!-- nagłówek overlay -->
@@ -483,9 +491,17 @@
    
    <!-- Panel z notatkami punktu -->
 <div id="pointNotesPanel"></div>
-   
-      
+     
+	  
 </div>
+
+ <!-- Zakładka PODRÓŻ -->
+<div id="podroz" class="tab-content">
+
+<canvas id="renderCanvas" style="width:100vw; height:100vh;"></canvas>
+
+ 
+</div>	
    
 <script>
 let atlas = {};
@@ -506,6 +522,11 @@ let headerLock = true; // blokada na starcie celem zablokowania możliwości nad
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
 //////////////////////////////////////////////////////////////////// 
+
+document.addEventListener("DOMContentLoaded", () => {
+      initJourney(); // wywołanie funkcji z journey.js
+    });
+
 
 let currentLang = "pl"; // domyślny język
 
@@ -586,8 +607,61 @@ function openTab(tabId) {
     }
   });
 
-  // odśwież nagłówek planety 
-  updateCurrentPlanetHeader();
+// sterowanie widocznością globu
+  const globeWrapper = document.getElementById("globeWrapper");
+ if (tabId === "podroz") {
+    // Ukryj glob
+    if (globeWrapper) globeWrapper.style.display = "none";
+
+    // Ukryj etykiety (jeśli istnieją)
+    if (window.geoLabelContainer) geoLabelContainer.style.display = "none";
+
+    // Usuń siatkę (jeśli istnieje)
+    if (window.geoGridGroup && globe && globe.scene) {
+      globe.scene().remove(geoGridGroup);
+      geoGridGroup = null;
+    }
+
+    // Zatrzymaj auto-obrót
+    if (typeof autoRotate !== "undefined") {
+      autoRotate = false;
+      if (globe && globe.controls) globe.controls.autoRotate = false;
+    }
+
+    // Pokaż kontener Journey
+    const journeyEl = document.getElementById("journeyContainer");
+    journeyEl.style.display = "block";
+
+    // Sprawdź, czy już załadowano Journey.js
+    if (!window.journeyInitialized) {
+        window.journeyInitialized = true;
+        // Tutaj wstrzykuj swój kod Journey.js
+        initJourney(journeyEl); // <-- funkcja initJourney z Journey.js
+    }
+
+  // --- Zachowanie przy powrocie do innych zakładek ---
+  } else {
+    // Pokaż glob
+    if (globeWrapper) globeWrapper.style.display = "block";
+
+    // Przywróć etykiety (jeśli checkboxy aktywne)
+    if (window.geoLabelContainer) {
+      geoLabelContainer.style.display = "block";
+    } else {
+      refreshGridAndLabels();
+    }
+
+    // Przywróć siatkę i etykiety wg checkboxów
+    refreshGridAndLabels();
+
+    // Wznów auto-obrót (jeśli był aktywny wcześniej)
+    if (typeof autoRotate !== "undefined" && autoRotate === true) {
+      if (globe && globe.controls) globe.controls.autoRotate = true;
+    }
+
+    // Odśwież nagłówek planety
+    updateCurrentPlanetHeader();
+  }
 }
 
 function showPlanetSearchTab() {
@@ -3221,6 +3295,8 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   setLanguage(currentLang); // ustaw domyślny język
 });
+
+
 
 // start
 window.onload = () => {
