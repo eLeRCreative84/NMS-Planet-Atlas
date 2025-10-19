@@ -1,23 +1,14 @@
-<!DOCTYPE html>  
+<!DOCTYPE html> 
 <html lang="pl">
 <head>
 <meta charset="UTF-8" />
 <title>Atlas Planetarny</title>
 <script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
 <script src="https://unpkg.com/globe.gl"></script>
- <script src="https://cdn.babylonjs.com/babylon.js"></script>
- <script type="module">
-  import { initJourney } from './journey.js';
-
-  document.addEventListener("DOMContentLoaded", () => {
-      const podrozEl = document.getElementById("podroz");
-      initJourney(podrozEl);
-  });
-</script>
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="style.css">
 <script src="translate.js"></script>
-
 </head>
 <body>
   <div id="form">
@@ -26,8 +17,7 @@
     <button class="lock-while-edit" onclick="openTab('planety')" data-i18n="tab_planety">Planety</button>
     <button class="lock-while-edit" onclick="openTab('punkty')" data-i18n="tab_punkty">Punkty</button>
     <button class="lock-while-edit" onclick="openTab('detale')" data-i18n="tab_detale">Detale</button>
-	  <button class="lock-while-edit" onclick="openTab('podroz')" data-i18n="tab_podroz">Podróż</button>
-
+	<button class="lock-while-edit" onclick="openTab('journey')" data-i18n="tab_journey">Podróż</button>
   </div>
 
   <!-- Zakładka START -->
@@ -458,7 +448,6 @@
 </div>
 </div>
 
-
   <!-- Obszar wizualizacji globu -->
   <div id="globeWrapper" style="position: relative;">
     <!-- nagłówek overlay -->
@@ -496,12 +485,9 @@
    
    <!-- Panel z notatkami punktu -->
 <div id="pointNotesPanel"></div>
-</div>
-
- <!-- Zakładka PODRÓŻ -->
-
-<div id="podroz" class="tab-content">
-    <div id="journeyContainer"></div>
+   
+      <!-- Babylon.js (ukryty na start) -->
+<canvas id="babylonCanvas" style="width:100%; height:100%; display:none;"></canvas>   
 </div>
    
 <script>
@@ -523,6 +509,100 @@ let headerLock = true; // blokada na starcie celem zablokowania możliwości nad
 ////////////////////////////////////////////////////////////////////
 //----------------- Zakładki i inne elementy UI -----------------//
 //////////////////////////////////////////////////////////////////// 
+
+// === GLOBALNE ZMIENNE ===
+let babylonEngine = null;
+let babylonScene = null;
+let babylonCamera = null;
+let babylonRenderLoopActive = false;
+
+// === INICJALIZACJA SCENY BABYLON ===
+function initBabylon() {
+    const canvas = document.getElementById("babylonCanvas");
+    babylonEngine = new BABYLON.Engine(canvas, true);
+    babylonScene = new BABYLON.Scene(babylonEngine);
+
+    // Kamera i światło
+    babylonCamera = new BABYLON.ArcRotateCamera("camera", Math.PI / 2, Math.PI / 3, 10, BABYLON.Vector3.Zero(), babylonScene);
+    babylonCamera.attachControl(canvas, true);
+    new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), babylonScene);
+
+    // Przykładowy obiekt
+    BABYLON.MeshBuilder.CreateSphere("planet", {diameter: 2}, babylonScene);
+
+    console.log("Babylon.js scena gotowa");
+}
+
+// === WŁĄCZ / WYŁĄCZ BABYLON ===
+function showBabylonScene() {
+    document.getElementById("globeViz").style.display = "none";
+    document.getElementById("babylonCanvas").style.display = "block";
+
+    // Zatrzymanie renderowania Globe.gl (jeśli używasz np. requestAnimationFrame)
+    if (window.globeRenderLoopId) cancelAnimationFrame(window.globeRenderLoopId);
+
+    // Ukryj siatkę / etykiety (jeśli są oddzielnymi warstwami)
+    document.querySelectorAll(".globe-label, .globe-grid").forEach(el => el.style.display = "none");
+
+    // Start Babylon
+    if (!babylonEngine) initBabylon();
+
+    babylonRenderLoopActive = true;
+    babylonEngine.runRenderLoop(() => {
+        if (babylonRenderLoopActive && babylonScene) babylonScene.render();
+    });
+
+    console.log("Babylon scene started");
+}
+
+function hideBabylonScene() {
+  const globeViz = document.getElementById("globeViz");
+  const globeWrapper = document.getElementById("globeWrapper");
+  const babylonCanvas = document.getElementById("babylonCanvas");
+
+  // schowaj babylon
+  babylonCanvas.style.display = "none";
+  babylonRenderLoopActive = false;
+
+  // pokaż glob
+  globeViz.style.display = "block";
+
+  // 🔧 przywrócenie oryginalnych stylów CSS
+  Object.assign(globeWrapper.style, {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden"
+  });
+
+  Object.assign(globeViz.style, {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+  });
+
+  const canvas = globeViz.querySelector("canvas");
+  if (canvas) {
+    Object.assign(canvas.style, {
+      display: "block",
+      margin: "0 auto"
+    });
+  }
+
+  // przywróć siatkę / etykiety
+  document.querySelectorAll(".globe-label, .globe-grid").forEach(el => {
+    el.style.display = "";
+  });
+
+  console.log("Babylon scene stopped, Globe.gl restored with CSS reset");
+}
+
 
 let currentLang = "pl"; // domyślny język
 
@@ -602,62 +682,16 @@ function openTab(tabId) {
       btn.classList.add("active");
     }
   });
-
-// sterowanie widocznością globu
-  const globeWrapper = document.getElementById("globeWrapper");
- if (tabId === "podroz") {
-    // Ukryj glob
-    if (globeWrapper) globeWrapper.style.display = "none";
-
-    // Ukryj etykiety (jeśli istnieją)
-    if (window.geoLabelContainer) geoLabelContainer.style.display = "none";
-
-    // Usuń siatkę (jeśli istnieje)
-    if (window.geoGridGroup && globe && globe.scene) {
-      globe.scene().remove(geoGridGroup);
-      geoGridGroup = null;
-    }
-
-    // Zatrzymaj auto-obrót
-    if (typeof autoRotate !== "undefined") {
-      autoRotate = false;
-      if (globe && globe.controls) globe.controls.autoRotate = false;
-    }
-
-    // Pokaż kontener Journey
-    const journeyEl = document.getElementById("journeyContainer");
-    journeyEl.style.display = "block";
-
-    // Sprawdź, czy już załadowano Journey.js
-    if (!window.journeyInitialized) {
-        window.journeyInitialized = true;
-        // Tutaj wstrzykuj swój kod Journey.js
-        initJourney(journeyEl); // <-- funkcja initJourney z Journey.js
-    }
-
-  // --- Zachowanie przy powrocie do innych zakładek ---
+  
+    // fragment odpowiedzialny za Babylon.js
+  if (tabId === "journey") {
+    showBabylonScene();
   } else {
-    // Pokaż glob
-    if (globeWrapper) globeWrapper.style.display = "block";
-
-    // Przywróć etykiety (jeśli checkboxy aktywne)
-    if (window.geoLabelContainer) {
-      geoLabelContainer.style.display = "block";
-    } else {
-      refreshGridAndLabels();
-    }
-
-    // Przywróć siatkę i etykiety wg checkboxów
-    refreshGridAndLabels();
-
-    // Wznów auto-obrót (jeśli był aktywny wcześniej)
-    if (typeof autoRotate !== "undefined" && autoRotate === true) {
-      if (globe && globe.controls) globe.controls.autoRotate = true;
-    }
-
-    // Odśwież nagłówek planety
-    updateCurrentPlanetHeader();
+    hideBabylonScene();
   }
+
+  // odśwież nagłówek planety 
+  updateCurrentPlanetHeader();
 }
 
 function showPlanetSearchTab() {
@@ -3291,8 +3325,6 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   setLanguage(currentLang); // ustaw domyślny język
 });
-
-
 
 // start
 window.onload = () => {
