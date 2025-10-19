@@ -1,5 +1,5 @@
 body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; font-size: 14px; }
-  #form { flex: 0 0 25%; min-width: 280px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
+  #form { flex: 0 0 25%; min-width: 340px; max-width: 450px; padding: 1rem; background: #0a1e3a; color: white; overflow-y: auto; box-sizing: border-box; }
   #globeViz { flex: 1; background: black; position: relative; }
   /* upewniamy się że canvas zajmuje cały obszar kontenera */
   #globeViz canvas { width: 100% !important; height: 100% !important; display: block; background: transparent; }
@@ -80,6 +80,17 @@ body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; 
 #globeViz canvas {
   display: block;   /* zmienia canvas z inline na block – dzięki temu zachowuje się jak div i nie ma "spacji" obok */
   margin: 0 auto;   /* ustawia automatyczne marginesy poziome → efekt: wycentrowanie canvasa w kontenerze */
+}
+
+#babylonCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none; /* ukryty na start */
+  z-index: 20; /* nad globem i overlayami, ale pod UI jeśli trzeba */
+  pointer-events: none; /* żeby Babylon nie blokował kliknięć w UI, dopóki nieaktywna zakładka */
 }
 
 /* Nagłówek nad wizualizacją planety */
@@ -496,3 +507,4 @@ button:disabled {
 
 
 
+[
