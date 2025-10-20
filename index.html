@@ -176,11 +176,8 @@
     <button id="toggleMusicBtn" class="music-btn">🎵 Muzyka: OFF</button>
 <audio id="bgMusic" src="audio/background.mp3" loop></audio>
    <input type="range" id="musicVolume" min="0" max="100" value="40" />
- 
- </div>
+  </div>
 
-
-	
     <!-- Zakładka PLANETY -->
 <div id="planety" class="tab-content">
 
@@ -593,7 +590,7 @@ function initBabylon() {
 
   // === Kamera i światło ===
   babylonCamera = new BABYLON.ArcRotateCamera(
-    "camera",
+    " babylonCamera",
     Math.PI / 4,
     Math.PI / 4,
     600,
@@ -659,26 +656,18 @@ function showBabylonScene() {
   document.getElementById("globeWrapper").style.display = "none";
   document.getElementById("babylonWrapper").style.display = "block";
 
-  if (!babylonEngine) {
-	  initBabylon(); 
-     } else {
-      setTimeout(() => {
-      babylonCamera.attachControl(document.getElementById("babylonCanvas"), true);
-    }, 200);
-  }
-	
+  if (!babylonEngine) initBabylon();
   babylonRenderLoopActive = true;
   setTimeout(() => babylonEngine.resize(), 100);
 }
 
 function hideBabylonScene() {
-  babylonCamera.detachControl();
   document.getElementById("babylonWrapper").style.display = "none";
   document.getElementById("globeWrapper").style.display = "block";
   babylonRenderLoopActive = false;
 }
 
-
+//////////////////// Tłumaczenie ///////////////////////
 let currentLang = "pl"; // domyślny język
 
 function setLanguage(lang) {
@@ -909,9 +898,6 @@ function savePlanetDetails(){
        // jeśli użytkownik wybrał coś z dropdowna – pobierz prawdziwy biom
        const { biome: biomeVal, biomeAlias: aliasVal } = window.getSelectedBiomeData();
 
-
-
-
 	// zachowaj istniejące resources jeśli są
       const existingResources = planetDetails[currentPlanet]?.resources || [];
 
@@ -920,10 +906,6 @@ function savePlanetDetails(){
 	  const parentPlanet = existing.parentPlanet || null;
 	  const system = existing.system || null;
 	  const starSystem = existing.starSystem || null;
-
-
-
-
 
   planetDetails[currentPlanet] = {
     galaxy: galaxyVal,
@@ -960,7 +942,6 @@ function savePlanetDetails(){
 		}
 	  });
 
-
   alert(translations[currentLang].alert_savedPlanetDetails);
   refreshPlanetList();
   updateCurrentPlanetHeader();
@@ -968,7 +949,6 @@ function savePlanetDetails(){
   refreshGalaxySidebar();
 	updatePlanetMiniPanel();
 }
-
 
 // Renderowanie list planet na wizualizacji globu
 function refreshPlanetSidebar() {
@@ -1094,8 +1074,6 @@ listContainer.appendChild(starHeader);
 
 			  listContainer.appendChild(moonLi);
 			});
-
-		
       });
     });
   });
@@ -1508,7 +1486,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
 ////////////////////////////////////////////////////////////////////
 //------------------- Sidebar galaktyk ----------------------------//
 ////////////////////////////////////////////////////////////////////
@@ -1722,7 +1699,6 @@ function createEdgeBetweenPoints(pd1, pd2) {
   return line;              // zwróć dla logiki w addSolarSystemPoint
 }
 
-
 /* === addSolarSystemPoint: teraz dodaje dane do logicznego regionu (regions[key].pointsData)
    i ewentualnie przeładowuje scenę jeśli to ten region jest aktualnie załadowany.
 */
@@ -1798,7 +1774,6 @@ function updateControlsState() {
   }
 }
  
-
 let level = 0; 
 let selectedTile = null;
 let currentGroupX = 0;
@@ -1951,7 +1926,6 @@ function updateGalaxyTilesHasPoints() {
   });
 }
 
-
 /* ===============================
    SIDEBAR – lista układów
    =============================== */
@@ -2024,7 +1998,6 @@ coordInput.addEventListener("input", () => {
     coordInput.style.borderColor = "#f00"; // czerwony – niepoprawny
   }
 });
-
 
 // === Pomocnicze funkcje do renderowania/zarządzania mesh'ami w scenie ===
 function clearRenderedPoints(){
@@ -2133,7 +2106,6 @@ function loadRegionByKey(regionKey, options = {}) {
 	}
 }
 
-
 // === Obsługa przycisku Dodaj punkt ===
 document.getElementById("addPointSolarSystem").addEventListener("click", () => {
   const gal = coordInput.value.trim();
@@ -2196,7 +2168,6 @@ document.getElementById("addPointSolarSystem").addEventListener("click", () => {
 }
 
 });
-
 
 document.getElementById("zoomToPointSolarSystem").addEventListener("click",()=>{ if(selectedPoint) focusCameraOn(selectedPoint); });
 
@@ -2418,8 +2389,7 @@ function getGroupedPlanets() {
 }
 
 // Renderuje nagłówki i planety.
-  
-function refreshPlanetList() {
+  function refreshPlanetList() {
   const list = document.getElementById("planetList");
   if (!list) return;
 
