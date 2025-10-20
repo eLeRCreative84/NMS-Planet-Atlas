@@ -515,8 +515,12 @@
    
    <!-- Panel z notatkami punktu -->
 <div id="pointNotesPanel"></div>
-   
-      <!-- Babylon.js (ukryty na start) -->
+</div>
+
+	<!--  Wrapper Babylon -->	
+ <div id="babylonWrapper" style="position: relative; width:100%; height:100%; display:none;">
+
+	 <!-- Babylon.js (ukryty na start) -->
 <canvas id="babylonCanvas" style="width:100%; height:100%; display:none;"></canvas>  
 	    <div id="regionMap"></div>
 <div id="regionControls">
@@ -528,7 +532,7 @@
   <!-- Sidebar lista układów -->
 <div id="solarList"></div>
 </div>
- 	
+	
 <script>
 let atlas = {};
 let planetDetails = {}; // szczegóły każdej planety
@@ -640,118 +644,20 @@ function initBabylon() {
 
 // === WŁĄCZ / WYŁĄCZ BABYLON ===
 function showBabylonScene() {
-  document.getElementById("globeViz").style.display = "none";
-  document.getElementById("babylonCanvas").style.display = "block";
+  document.getElementById("globeWrapper").style.display = "none";
+  document.getElementById("babylonWrapper").style.display = "block";
 
-  if (window.globeRenderLoopId) cancelAnimationFrame(window.globeRenderLoopId);
-  document.querySelectorAll(".globe-label, .globe-grid").forEach(el => el.style.display = "none");
-
-  // Ukryj panele globu
-  ["planetSidebar", "galaxySidebar", "togglePlanetSidebarBtn",
-   "planetMiniPanel", "toggleMiniPanelBtn", "pointNotesPanel", "myLocationBox"]
-    .forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = "none";
-    });
-
-  // === Pokaż HUD Babylon
-  ["regionMap", "regionControls", "groupNameLabel", "solarList"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "block";
-  });
-
-  // === Uruchom silnik Babylon 
-  if (!babylonEngine) {
-  requestAnimationFrame(() => {
-    initBabylon();
-    babylonRenderLoopActive = true;
-  });
-} else {
+  if (!babylonEngine) initBabylon();
   babylonRenderLoopActive = true;
-}
-
-  // Po pokazaniu canvasa – wymuś resize
-  setTimeout(() => {
-    if (babylonEngine) babylonEngine.resize();
-  }, 100);
-
-  console.log("Babylon scene started");
+  setTimeout(() => babylonEngine.resize(), 100);
 }
 
 function hideBabylonScene() {
-  const globeViz = document.getElementById("globeViz");
-  const globeWrapper = document.getElementById("globeWrapper");
-  const babylonCanvas = document.getElementById("babylonCanvas");
-
-  // Schowaj Babylon
-  babylonCanvas.style.display = "none";
+  document.getElementById("babylonWrapper").style.display = "none";
+  document.getElementById("globeWrapper").style.display = "block";
   babylonRenderLoopActive = false;
-
-//SCHOWAJ HUD BABYLON
-  const hudElements = [
-    "regionMap",
-    "regionControls",
-    "groupNameLabel",
-    "solarList"
-  ];
-  hudElements.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
-	
-  // Pokaż glob
-  globeViz.style.display = "block";
-
-  // Przywróć widoczność paneli i przycisków
-  const uiToShow = [
-    "planetSidebar",
-    "galaxySidebar",
-    "togglePlanetSidebarBtn",
-    "planetMiniPanel",
-    "toggleMiniPanelBtn",
-    "pointNotesPanel",
-    "myLocationBox",
-  ];
-  uiToShow.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "";
-  });
-
-  // Przywrócenie oryginalnych stylów CSS
-  Object.assign(globeWrapper.style, {
-    position: "relative",
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
-  });
-
-  Object.assign(globeViz.style, {
-    position: "relative",
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  });
-
-  const canvas = globeViz.querySelector("canvas");
-  if (canvas) {
-    Object.assign(canvas.style, {
-      display: "block",
-      margin: "0 auto",
-    });
-  }
-
-  // Przywróć siatkę / etykiety
-  document.querySelectorAll(".globe-label, .globe-grid").forEach(el => {
-    el.style.display = "";
-  });
-
-  console.log("Babylon scene stopped, Globe.gl restored with CSS reset");
 }
+
 
 let currentLang = "pl"; // domyślny język
 
