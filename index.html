@@ -672,6 +672,7 @@ function showBabylonScene() {
 }
 
 function hideBabylonScene() {
+  babylonCamera.detachControl();
   document.getElementById("babylonWrapper").style.display = "none";
   document.getElementById("globeWrapper").style.display = "block";
   babylonRenderLoopActive = false;
