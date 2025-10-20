@@ -659,7 +659,14 @@ function showBabylonScene() {
   document.getElementById("globeWrapper").style.display = "none";
   document.getElementById("babylonWrapper").style.display = "block";
 
-  if (!babylonEngine) initBabylon();
+  if (!babylonEngine) {
+	  initBabylon(); 
+     } else {
+      setTimeout(() => {
+      babylonCamera.attachControl(document.getElementById("babylonCanvas"), true);
+    }, 200);
+  }
+	
   babylonRenderLoopActive = true;
   setTimeout(() => babylonEngine.resize(), 100);
 }
