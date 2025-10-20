@@ -82,17 +82,6 @@ body { margin: 0; display: flex; height: 100vh; font-family: Arial, sans-serif; 
   margin: 0 auto;   /* ustawia automatyczne marginesy poziome → efekt: wycentrowanie canvasa w kontenerze */
 }
 
-#babylonCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none; /* ukryty na start */
-  z-index: 20; /* nad globem i overlayami, ale pod UI jeśli trzeba */
-  pointer-events: none; /* żeby Babylon nie blokował kliknięć w UI, dopóki nieaktywna zakładka */
-}
-
 /* Nagłówek nad wizualizacją planety */
 #planetOverlayHeader {
   position: absolute;
@@ -576,11 +565,32 @@ button:disabled {
   background: rgba(0,100,0,0.4);
 }
 
+#babylonWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background: black;
+}
+
+#babylonCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none; /* ukryty na start */
+  z-index: 2; /* nad globem i overlayami, ale pod UI jeśli trzeba */
+  pointer-events: none; /* żeby Babylon nie blokował kliknięć w UI, dopóki nieaktywna zakładka */
+}
+
 /* HUD Babylon (na wierzchu) */
 #regionMap,
 #regionControls,
 #groupNameLabel,
 #solarList {
   z-index: 5; /* wyraźnie powyżej canvasa */
-
-
+  position: absolute;
+}
