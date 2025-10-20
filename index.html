@@ -534,6 +534,8 @@ function initBabylon() {
 }
 
 // === WŁĄCZ / WYŁĄCZ BABYLON ===
+
+	// Ukryj glob
 function showBabylonScene() {
     document.getElementById("globeViz").style.display = "none";
     document.getElementById("babylonCanvas").style.display = "block";
@@ -544,6 +546,21 @@ function showBabylonScene() {
     // Ukryj siatkę / etykiety (jeśli są oddzielnymi warstwami)
     document.querySelectorAll(".globe-label, .globe-grid").forEach(el => el.style.display = "none");
 
+  //Ukryj panele i przyciski z globu
+  const uiToHide = [
+    "planetSidebar",
+    "galaxySidebar",
+    "togglePlanetSidebarBtn",
+    "planetMiniPanel",
+    "toggleMiniPanelBtn",
+    "pointNotesPanel",
+    "myLocationBox",
+  ];
+  uiToHide.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+	
     // Start Babylon
     if (!babylonEngine) initBabylon();
 
@@ -567,7 +584,22 @@ function hideBabylonScene() {
   // pokaż glob
   globeViz.style.display = "block";
 
-  // 🔧 przywrócenie oryginalnych stylów CSS
+	// Przywróć widoczność paneli i przycisków
+  const uiToShow = [
+    "planetSidebar",
+    "galaxySidebar",
+    "togglePlanetSidebarBtn",
+    "planetMiniPanel",
+    "toggleMiniPanelBtn",
+    "pointNotesPanel",
+    "myLocationBox",
+  ];
+  uiToShow.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "";
+  });
+
+  // przywrócenie oryginalnych stylów CSS
   Object.assign(globeWrapper.style, {
     position: "relative",
     width: "100%",
