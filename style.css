@@ -583,7 +583,6 @@ button:disabled {
   height: 100%;
   display: none; /* ukryty na start */
   z-index: 3; /* nad globem i overlayami, ale pod UI jeśli trzeba */
-  pointer-events: none; /* żeby Babylon nie blokował kliknięć w UI, dopóki nieaktywna zakładka */
 }
 
 /* HUD Babylon (na wierzchu) */
@@ -594,3 +593,4 @@ button:disabled {
   z-index: 5; /* wyraźnie powyżej canvasa */
   position: absolute;
 }
+
