@@ -563,67 +563,12 @@ function initBabylon() {
     babylonEngine = new BABYLON.Engine(canvas, true);
     babylonScene = new BABYLON.Scene(babylonEngine);
 
-    // === Regiony (logiczne, nie fizyczne) ===
-const REGION_WIDTH = 4096;
-const REGION_DEPTH = 4096;
-const REGION_HEIGHT = 256;
-  
-// === Kamera i światło ===
-/* Uwaga: scena 3D zawsze obejmuje tylko jeden obszar — pojedynczy region
-   (rozmiar określony niżej). Kamera i skybox nie będą przesuwane. */
-const camera = new BABYLON.ArcRotateCamera("camera", Math.PI/4, Math.PI/4, 600, new BABYLON.Vector3(REGION_WIDTH/2, 128, REGION_DEPTH/2), scene);
-camera.attachControl(canvas,true);
-camera.minZ = 0.1; 
-camera.maxZ = 20000;
-camera.lowerRadiusLimit = 50;
-camera.upperRadiusLimit = 8000;
+     babylonCamera = new BABYLON.ArcRotateCamera("camera", Math.PI / 2, Math.PI / 3, 10, BABYLON.Vector3.Zero(), babylonScene);
+    babylonCamera.attachControl(canvas, true);
+    new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), babylonScene);
 
-const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0,1,0), scene);
-
-// === Skybox ===
-const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {size:10000}, scene);
-const skyboxMaterial = new BABYLON.StandardMaterial("skyBoxMat", scene);
-skyboxMaterial.backFaceCulling=false;
-skyboxMaterial.disableLighting=true;
-skyboxMaterial.diffuseColor=new BABYLON.Color3(0,0,0);
-skyboxMaterial.specularColor=new BABYLON.Color3(0,0,0);
-skyboxMaterial.reflectionTexture=new BABYLON.CubeTexture("https://raw.githubusercontent.com/eLeRCreative84/NMS-Planet-Atlasv2/main/textures/skybox/sky1", scene);
-skyboxMaterial.reflectionTexture.coordinatesMode=BABYLON.Texture.SKYBOX_MODE;
-skybox.material = skyboxMaterial;
-
-// upewnij się, że skybox wygląda jak tło niezależne od położenia kamery
-skybox.infiniteDistance = true;
-scene.clearColor = new BABYLON.Color4(0,0,0,1);
-
-/* Uwaga: tu traktujemy model uproszczony:
-   - globalnie mamy 16 x 16 regionów ułożonych w siatkę (index 0..15 po X i Z)
-   - te 16x16 regionów są pogrupowane w 16 grup 4x4 (czyli GROUPS_PER_AXIS = 4)
-   - ALE scena 3D obejmuje tylko **jeden** region w danym momencie (0..4096)
-*/
-const GROUPS_PER_AXIS = 4;        // 4x4 grup = 16 grup (poziom GALAKTYKA)
-const REGIONS_PER_GROUP = 4;      // 4x4 regionów w grupie = 16 regionów (poziom GRUPA)
-const REGIONS_AXIS = GROUPS_PER_AXIS * REGIONS_PER_GROUP; // 16 regions per axis
-
-let renderedPoints = []; // aktualnie wyrenderowane mesh'e w scenie (dla załadowanego regionu)
-let renderedEdges = [];
-let selectedPoint = null; // odnosi się do mesh'a w scenie (jeśli zaznaczony)
-let regions = {}; // { "ix_iz": { pointsData: [ {id,x,y,z,galactic} ] } }
-let uniqueIdCounter = 0;
-let loadedRegionKey = null; // który region jest załadowany do sceny (np. "3_5")
-
-// ===== inicjalizacja struktur danych regionów (puste) =====
-for (let iz = 0; iz < REGIONS_AXIS; iz++) {
-  for (let ix = 0; ix < REGIONS_AXIS; ix++) {
-    const key = regionIndexKey(ix, iz);
-    regions[key] = { pointsData: [], edges: [] }; 
-  }
-}
-
-// Materiały punktów
-const pointMat = new BABYLON.StandardMaterial("pointMat", scene);
-pointMat.emissiveColor = new BABYLON.Color3(0,1,0);
-const selectedMat = new BABYLON.StandardMaterial("selectedMat", scene);
-selectedMat.emissiveColor = new BABYLON.Color3(1,0,0);
+    // Przykładowy obiekt
+    BABYLON.MeshBuilder.CreateSphere("planet", {diameter: 2}, babylonScene);
 }
 
 // === WŁĄCZ / WYŁĄCZ BABYLON ===
