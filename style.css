@@ -504,7 +504,7 @@ button:disabled {
 /* Journey */
 
 #hud {
-  position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6);
+  position:absolute; top:100px; left:10px; background:rgba(0,0,0,0.6);
   color:white; padding:10px; border-radius:5px; font-size:14px;
 }
 #hud input { width:100px; margin:2px; }
@@ -606,3 +606,4 @@ button:disabled {
   border-color: rgba(0,200,0,0.9);
   background: rgba(0,100,0,0.4);
 }
+
