@@ -556,34 +556,93 @@ let babylonScene = null;
 let babylonCamera = null;
 let babylonRenderLoopActive = false;
 
+// === PARAMETRY SCENY BABYLON ===
+const REGION_WIDTH = 4096;
+const REGION_DEPTH = 4096;
+const REGION_HEIGHT = 256;
+const GROUPS_PER_AXIS = 4;
+const REGIONS_PER_GROUP = 4;
+const REGIONS_AXIS = GROUPS_PER_AXIS * REGIONS_PER_GROUP; // 16 regionów w osi
+
+let renderedPoints = [];
+let renderedEdges = [];
+let selectedPoint = null;
+let regions = {};
+let uniqueIdCounter = 0;
+let loadedRegionKey = null;
+
+// ======= FUNKCJA TWORZĄCA KLUCZ REGIONU =======
+function regionIndexKey(ix, iz) {
+  return `${ix}_${iz}`;
+}
+
 // === INICJALIZACJA SCENY BABYLON ===
 function initBabylon() {
-    const canvas = document.getElementById("babylonCanvas");
-    babylonEngine = new BABYLON.Engine(canvas, true);
-    babylonScene = new BABYLON.Scene(babylonEngine);
+  const canvas = document.getElementById("babylonCanvas");
+  babylonEngine = new BABYLON.Engine(canvas, true);
+  babylonScene = new BABYLON.Scene(babylonEngine);
 
-     babylonCamera = new BABYLON.ArcRotateCamera("camera", Math.PI / 2, Math.PI / 3, 10, BABYLON.Vector3.Zero(), babylonScene);
-    babylonCamera.attachControl(canvas, true);
-    new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), babylonScene);
+  // === Kamera i światło ===
+  babylonCamera = new BABYLON.ArcRotateCamera(
+    "camera",
+    Math.PI / 4,
+    Math.PI / 4,
+    600,
+    new BABYLON.Vector3(REGION_WIDTH / 2, 128, REGION_DEPTH / 2),
+    babylonScene
+  );
+  babylonCamera.attachControl(canvas, true);
+  babylonCamera.minZ = 0.1;
+  babylonCamera.maxZ = 20000;
+  babylonCamera.lowerRadiusLimit = 50;
+  babylonCamera.upperRadiusLimit = 8000;
 
-    // Przykładowy obiekt
-    BABYLON.MeshBuilder.CreateSphere("planet", {diameter: 2}, babylonScene);
+  new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), babylonScene);
+
+  // === Skybox ===
+  const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 10000 }, babylonScene);
+  const skyboxMaterial = new BABYLON.StandardMaterial("skyBoxMat", babylonScene);
+  skyboxMaterial.backFaceCulling = false;
+  skyboxMaterial.disableLighting = true;
+  skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+  skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+  skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+    "https://raw.githubusercontent.com/eLeRCreative84/NMS-Planet-Atlasv2/main/textures/skybox/sky1",
+    babylonScene
+  );
+  skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+  skybox.material = skyboxMaterial;
+  skybox.infiniteDistance = true;
+
+  babylonScene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+
+  // === Inicjalizacja struktur regionów ===
+  for (let iz = 0; iz < REGIONS_AXIS; iz++) {
+    for (let ix = 0; ix < REGIONS_AXIS; ix++) {
+      const key = regionIndexKey(ix, iz);
+      regions[key] = { pointsData: [], edges: [] };
+    }
+  }
+
+  // === Przykładowa planeta (na środku regionu) ===
+  BABYLON.MeshBuilder.CreateSphere("planet", { diameter: 100 }, babylonScene);
+
+  console.log("Babylon.js scene initialized");
 }
 
 // === WŁĄCZ / WYŁĄCZ BABYLON ===
-
-	// Ukryj glob
 function showBabylonScene() {
-    document.getElementById("globeViz").style.display = "none";
-    document.getElementById("babylonCanvas").style.display = "block";
+  // Ukryj glob
+  document.getElementById("globeViz").style.display = "none";
+  document.getElementById("babylonCanvas").style.display = "block";
 
-    // Zatrzymanie renderowania Globe.gl (jeśli używasz np. requestAnimationFrame)
-    if (window.globeRenderLoopId) cancelAnimationFrame(window.globeRenderLoopId);
+  // Zatrzymaj render globu
+  if (window.globeRenderLoopId) cancelAnimationFrame(window.globeRenderLoopId);
 
-    // Ukryj siatkę / etykiety (jeśli są oddzielnymi warstwami)
-    document.querySelectorAll(".globe-label, .globe-grid").forEach(el => el.style.display = "none");
+  // Ukryj siatkę / etykiety
+  document.querySelectorAll(".globe-label, .globe-grid").forEach(el => (el.style.display = "none"));
 
-  //Ukryj panele i przyciski z globu
+  // Ukryj panele i przyciski z globu
   const uiToHide = [
     "planetSidebar",
     "galaxySidebar",
@@ -597,16 +656,16 @@ function showBabylonScene() {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
   });
-	
-    // Start Babylon
-    if (!babylonEngine) initBabylon();
 
-    babylonRenderLoopActive = true;
-    babylonEngine.runRenderLoop(() => {
-        if (babylonRenderLoopActive && babylonScene) babylonScene.render();
-    });
+  // Uruchom Babylon
+  if (!babylonEngine) initBabylon();
 
-    console.log("Babylon scene started");
+  babylonRenderLoopActive = true;
+  babylonEngine.runRenderLoop(() => {
+    if (babylonRenderLoopActive && babylonScene) babylonScene.render();
+  });
+
+  console.log("Babylon scene started");
 }
 
 function hideBabylonScene() {
@@ -614,14 +673,14 @@ function hideBabylonScene() {
   const globeWrapper = document.getElementById("globeWrapper");
   const babylonCanvas = document.getElementById("babylonCanvas");
 
-  // schowaj babylon
+  // Schowaj Babylon
   babylonCanvas.style.display = "none";
   babylonRenderLoopActive = false;
 
-  // pokaż glob
+  // Pokaż glob
   globeViz.style.display = "block";
 
-	// Przywróć widoczność paneli i przycisków
+  // Przywróć widoczność paneli i przycisków
   const uiToShow = [
     "planetSidebar",
     "galaxySidebar",
@@ -636,7 +695,7 @@ function hideBabylonScene() {
     if (el) el.style.display = "";
   });
 
-  // przywrócenie oryginalnych stylów CSS
+  // Przywrócenie oryginalnych stylów CSS
   Object.assign(globeWrapper.style, {
     position: "relative",
     width: "100%",
@@ -644,7 +703,7 @@ function hideBabylonScene() {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    overflow: "hidden"
+    overflow: "hidden",
   });
 
   Object.assign(globeViz.style, {
@@ -653,25 +712,24 @@ function hideBabylonScene() {
     height: "100%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   });
 
   const canvas = globeViz.querySelector("canvas");
   if (canvas) {
     Object.assign(canvas.style, {
       display: "block",
-      margin: "0 auto"
+      margin: "0 auto",
     });
   }
 
-  // przywróć siatkę / etykiety
+  // Przywróć siatkę / etykiety
   document.querySelectorAll(".globe-label, .globe-grid").forEach(el => {
     el.style.display = "";
   });
 
   console.log("Babylon scene stopped, Globe.gl restored with CSS reset");
 }
-
 
 let currentLang = "pl"; // domyślny język
 
