@@ -606,7 +606,7 @@ function initBabylon() {
   skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
   skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
   skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
-    "https://raw.githubusercontent.com/eLeRCreative84/NMS-Planet-Atlasv2/main/textures/skybox/sky1",
+    "https://raw.githubusercontent.com/eLeRCreative84/NMS-Planet-Atlas/main/textures/skybox/sky1",
     babylonScene
   );
   skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
@@ -660,12 +660,15 @@ function showBabylonScene() {
     if (el) el.style.display = "block";
   });
 
-  // === Uruchom silnik Babylon tylko raz
+  // === Uruchom silnik Babylon 
   if (!babylonEngine) {
+  requestAnimationFrame(() => {
     initBabylon();
-  }
-
+    babylonRenderLoopActive = true;
+  });
+} else {
   babylonRenderLoopActive = true;
+}
 
   // Po pokazaniu canvasa – wymuś resize
   setTimeout(() => {
