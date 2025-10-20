@@ -576,4 +576,11 @@ button:disabled {
   background: rgba(0,100,0,0.4);
 }
 
+/* HUD Babylon (na wierzchu) */
+#regionMap,
+#regionControls,
+#groupNameLabel,
+#solarList {
+  z-index: 5; /* wyraźnie powyżej canvasa */
+
 
