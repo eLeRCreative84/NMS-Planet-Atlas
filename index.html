@@ -1651,20 +1651,20 @@ function focusCameraOn(pointMesh, distance = 200) {
   if (!pointMesh) return;
 
   const target = pointMesh.position.clone();
-  const dir = camera.position.subtract(camera.target || new BABYLON.Vector3(REGION_WIDTH/2, REGION_HEIGHT/2, REGION_DEPTH/2))
+  const dir = babylonCamera.position.subtract(babylonCamera.target || new BABYLON.Vector3(REGION_WIDTH/2, REGION_HEIGHT/2, REGION_DEPTH/2))
                .normalize()
                .scale(distance);
   const newPos = target.add(dir);
 
   // policz dystans i dopasuj długość animacji
-  const dist = BABYLON.Vector3.Distance(camera.position, newPos);
+  const dist = BABYLON.Vector3.Distance(babylonCamera.position, newPos);
   const frameCount = Math.min(120, Math.max(30, dist / 20)); // im dalej, tym dłuższy lot
 
   // animacja pozycji kamery z easingiem
   const posAnim = new BABYLON.Animation("camMoveSmooth", "position", 60,
     BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
   posAnim.setKeys([
-    { frame: 0, value: camera.position.clone() },
+    { frame: 0, value: babylonCamera.position.clone() },
     { frame: frameCount, value: newPos }
   ]);
 
@@ -1677,14 +1677,14 @@ function focusCameraOn(pointMesh, distance = 200) {
   const targetAnim = new BABYLON.Animation("camTargetSmooth", "target", 60,
     BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
   targetAnim.setKeys([
-    { frame: 0, value: camera.target.clone() },
+    { frame: 0, value: babylonCamera.target.clone() },
     { frame: frameCount, value: target }
   ]);
   targetAnim.setEasingFunction(easing);
 
   // przypisz i uruchom
-  camera.animations = [posAnim, targetAnim];
-  scene.beginAnimation(camera, 0, frameCount, false);
+  babylonCamera.animations = [posAnim, targetAnim];
+  babylonScene.beginAnimation(babylonCamera, 0, frameCount, false);
 }
 
 
@@ -1694,7 +1694,7 @@ function createEdgeBetweenPoints(pd1, pd2) {
     new BABYLON.Vector3(pd1.x, pd1.y, pd1.z),
     new BABYLON.Vector3(pd2.x, pd2.y, pd2.z)
   ];
-  const line = BABYLON.MeshBuilder.CreateLines(`edge_${pd1.id}_${pd2.id}`, { points, updatable: true }, scene);
+  const line = BABYLON.MeshBuilder.CreateLines(`edge_${pd1.id}_${pd2.id}`, { points, updatable: true }, babylonScene);
   line.color = new BABYLON.Color3(1, 1, 0); // żółty
   line.isPickable = false; // żeby nie przeszkadzało przy kliku
 
@@ -1856,10 +1856,10 @@ function drawGroupGrid(groupX, groupZ){
         const key = regionIndexKey(regionX, regionZ);
         loadRegionByKey(key);
         // ustaw kamere nad środkiem obszaru (nie przestawiamy sceny)
-        camera.setTarget(new BABYLON.Vector3(REGION_WIDTH/2, REGION_HEIGHT/2, REGION_DEPTH/2));
-        camera.alpha = Math.PI / 4;
-        camera.beta = Math.PI / 4;
-        camera.radius = 600;
+        babylonCamera.setTarget(new BABYLON.Vector3(REGION_WIDTH/2, REGION_HEIGHT/2, REGION_DEPTH/2));
+        babylonCamera.alpha = Math.PI / 4;
+        babylonCamera.beta = Math.PI / 4;
+        babylonCamera.radius = 600;
       });
       regionMapEl.appendChild(tile);
     }
@@ -1879,12 +1879,12 @@ enterBtn.addEventListener("click", ()=>{
   updateControlsState();
 
   // === Po wejściu do grupy, ustaw kamerę nad środkiem obszaru
-  camera.setTarget(new BABYLON.Vector3(REGION_WIDTH/2, REGION_HEIGHT/2, REGION_DEPTH/2));
-  camera.alpha = Math.PI / 4;
-  camera.beta = Math.PI / 4;
-  camera.radius = 600;
-  camera.minZ = 0.1;
-  camera.maxZ = 20000;
+  babylonCamera.setTarget(new BABYLON.Vector3(REGION_WIDTH/2, REGION_HEIGHT/2, REGION_DEPTH/2));
+  babylonCamera.alpha = Math.PI / 4;
+  babylonCamera.beta = Math.PI / 4;
+  babylonCamera.radius = 600;
+  babylonCamera.minZ = 0.1;
+  babylonCamera.maxZ = 20000;
 });
 
 exitBtn.addEventListener("click", ()=>{
@@ -2022,11 +2022,11 @@ function clearRenderedPoints(){
 }
 
 function createMeshForPointData(pd) {
-  const sphere = BABYLON.MeshBuilder.CreateSphere(`m_${pd.id}`, { diameter: 2 }, scene);
+  const sphere = BABYLON.MeshBuilder.CreateSphere(`m_${pd.id}`, { diameter: 2 }, babylonScene);
   sphere.position.set(pd.x, pd.y, pd.z);
   sphere.material = pointMat.clone();
   sphere.metadata = { id: pd.id, galactic: pd.galactic, name: pd.name || "" };
-  sphere.actionManager = new BABYLON.ActionManager(scene);
+  sphere.actionManager = new BABYLON.ActionManager(babylonScene);
   sphere.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger,()=>{
     if(selectedPoint) selectedPoint.material = pointMat.clone();
     selectedPoint = sphere; selectedPoint.material = selectedMat;
