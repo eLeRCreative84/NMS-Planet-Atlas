@@ -753,10 +753,8 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
   console.log("Babylon.js scene initialized");
 }
 
+// === WŁĄCZ / WYŁĄCZ BABYLON ===
 function showBabylonScene() {
-  if (window.globe) {
-    try { globe.pause(); } catch(e) {}
-  }
   document.getElementById("globeWrapper").style.display = "none";
   document.getElementById("babylonWrapper").style.display = "block";
 
@@ -766,14 +764,11 @@ function showBabylonScene() {
 }
 
 function hideBabylonScene() {
-  if (babylonScene) { babylonScene.dispose(); babylonScene = null; }
-  if (babylonEngine) { babylonEngine.dispose(); babylonEngine = null; }
-  babylonRenderLoopActive = false;
   document.getElementById("babylonWrapper").style.display = "none";
-
   document.getElementById("globeWrapper").style.display = "block";
-  if (window.globe && globe.resume) globe.resume();
+  babylonRenderLoopActive = false;
 }
+
 
 
 ///////////////////////////////////////////////////////// Tłumaczenie //////////////////////////////////////////
