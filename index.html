@@ -472,7 +472,14 @@
     <button id="editPointSolarSystem">Edytuj</button>
     <button id="deletePointSolarSystem">Usuń</button>
   </div>
-	
+ 
+<div style="height:0.5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div> 
+  <div>
+	<button id="movePointsMode">Przemieszczaj układy</button>
+<button id="confirmMove" style="display:none;">Zatwierdź zmiany</button>
+<button id="cancelMove" style="display:none;">Anuluj</button>
+  </div>
+  
 </div>  
 </div>
 	
@@ -622,7 +629,7 @@ function initBabylon() {
 
   babylonScene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
 
-  pointMat = new BABYLON.StandardMaterial("pointMat", babylonScene);
+    pointMat = new BABYLON.StandardMaterial("pointMat", babylonScene);
     pointMat.emissiveColor = new BABYLON.Color3(0,1,0); // zielony
 
     selectedMat = new BABYLON.StandardMaterial("selectedMat", babylonScene);
@@ -635,6 +642,74 @@ function initBabylon() {
       regions[key] = { pointsData: [], edges: [] };
     }
   }
+
+// === Interakcja myszką: przesuwanie istniejących punktów ===
+let pickedMesh = null;
+let dragPlane = null;
+let dragOffset = null;
+
+babylonScene.onPointerObservable.add((pointerInfo) => {
+	//Blokada – tylko w trybie przemieszczania
+  if (!moveModeActive) return;
+  switch (pointerInfo.type) {
+    case BABYLON.PointerEventTypes.POINTERDOWN: {
+      const pickInfo = pointerInfo.pickInfo;
+      if (pickInfo.hit && pickInfo.pickedMesh && renderedPoints.includes(pickInfo.pickedMesh)) {
+        pickedMesh = pickInfo.pickedMesh;
+
+        // 🔹 utwórz płaszczyznę prostopadłą do kierunku patrzenia kamery,
+        // przechodzącą przez pozycję punktu
+        const camForward = babylonCamera.getDirection(BABYLON.Axis.Z);
+        dragPlane = BABYLON.Plane.FromPositionAndNormal(pickedMesh.position, camForward);
+
+        // oblicz offset między punktem a miejscem kliknięcia na płaszczyźnie
+        const ray = babylonScene.createPickingRay(babylonScene.pointerX, babylonScene.pointerY, BABYLON.Matrix.Identity(), babylonCamera);
+        const distance = ray.intersectsPlane(dragPlane);
+        if (distance) {
+          const pickedPoint = ray.origin.add(ray.direction.scale(distance));
+          dragOffset = pickedPoint.subtract(pickedMesh.position);
+        }
+
+        babylonScene.activeCamera.detachControl(canvas);
+      }
+      break;
+    }
+
+    case BABYLON.PointerEventTypes.POINTERUP: {
+      if (pickedMesh) {
+        babylonScene.activeCamera.attachControl(canvas, true);
+        pickedMesh = null;
+        dragPlane = null;
+        dragOffset = null;
+      }
+      break;
+    }
+
+    case BABYLON.PointerEventTypes.POINTERMOVE: {
+      if (!pickedMesh || !dragPlane) return;
+
+      // twórz promień z pozycji myszy
+      const ray = babylonScene.createPickingRay(
+        babylonScene.pointerX,
+        babylonScene.pointerY,
+        BABYLON.Matrix.Identity(),
+        babylonCamera
+      );
+
+      // przecięcie promienia z dynamiczną płaszczyzną
+      const distance = ray.intersectsPlane(dragPlane);
+      if (distance) {
+        const pickedPoint = ray.origin.add(ray.direction.scale(distance));
+        const newPos = pickedPoint.subtract(dragOffset);
+        pickedMesh.position.copyFrom(newPos);
+		
+		//aktualizacja węzłów
+    updateEdgesForPoint(pickedMesh);
+      }
+      break;
+    }
+  }
+});
 
   // === Render loop (raz na zawsze) ===
   babylonEngine.runRenderLoop(() => {
@@ -1694,6 +1769,9 @@ function createEdgeBetweenPoints(pd1, pd2) {
   const line = BABYLON.MeshBuilder.CreateLines(`edge_${pd1.id}_${pd2.id}`, { points, updatable: true }, babylonScene);
   line.color = new BABYLON.Color3(1, 1, 0); // żółty
   line.isPickable = false; // żeby nie przeszkadzało przy kliku
+  
+  // zapisujemy referencje do punktów
+  line.metadata = { fromId: pd1.id, toId: pd2.id };
 
   renderedEdges.push(line); // dodaj do tablicy
   return line;              // zwróć dla logiki w addSolarSystemPoint
@@ -1750,6 +1828,7 @@ function addSolarSystemPoint(x, y, z, gal, targetRegionKey = null) {
   if (loadedRegionKey === key) {
     loadRegionByKey(key, { selectId: id });
   }
+  
   return id;
 }
 
@@ -2211,8 +2290,108 @@ document.getElementById("deletePointSolarSystem").addEventListener("click",()=>{
   if(level === 0) updateGalaxyTilesHasPoints();
 });
 
+////////////////////////////////////////////////////////////////////
+// ===== TRYB PRZEMIESZCZANIA UKŁADÓW =====
+////////////////////////////////////////////////////////////////////
 
+let moveModeActive = false;
+let originalPositions = new Map(); // zapamiętuje pozycje początkowe
 
+const moveBtn = document.getElementById("movePointsMode");
+const confirmBtn = document.getElementById("confirmMove");
+const cancelBtn = document.getElementById("cancelMove");
+
+// === Włączenie trybu edycji pozycji ===
+moveBtn.addEventListener("click", () => {
+  if (!loadedRegionKey || renderedPoints.length === 0) {
+    alert("Nie ma układów do przemieszczania!");
+    return;
+  }
+
+  moveModeActive = true;
+  moveBtn.style.display = "none";
+  confirmBtn.style.display = "inline-block";
+  cancelBtn.style.display = "inline-block";
+
+  // zapamiętaj oryginalne pozycje wszystkich meshów
+  originalPositions.clear();
+  renderedPoints.forEach(m => {
+    originalPositions.set(m.metadata.id, m.position.clone());
+  });
+
+  console.log("Tryb przemieszczania aktywny");
+});
+
+// === Zatwierdzenie zmian ===
+confirmBtn.addEventListener("click", () => {
+  if (!moveModeActive) return;
+
+  // zapisujemy nowe pozycje do regionu
+  const region = regions[loadedRegionKey];
+  if (region && region.pointsData) {
+    region.pointsData.forEach(pd => {
+      const mesh = renderedPoints.find(m => m.metadata.id === pd.id);
+      if (mesh) {
+        pd.x = mesh.position.x;
+        pd.y = mesh.position.y;
+        pd.z = mesh.position.z;
+      }
+    });
+  }
+
+  exitMoveMode();
+  console.log("Zmiany pozycji zapisane");
+});
+
+// === Anulowanie zmian ===
+cancelBtn.addEventListener("click", () => {
+  if (!moveModeActive) return;
+
+  // przywróć oryginalne pozycje
+  renderedPoints.forEach(m => {
+    const orig = originalPositions.get(m.metadata.id);
+    if (orig) m.position.copyFrom(orig);
+  });
+
+//przywróć krawędzie do pierwotnych pozycji
+renderedEdges.forEach(edge => {
+  const fromMesh = renderedPoints.find(m => m.metadata.id === edge.metadata.fromId);
+  const toMesh = renderedPoints.find(m => m.metadata.id === edge.metadata.toId);
+  if (fromMesh && toMesh) {
+    BABYLON.MeshBuilder.CreateLines(null, {
+      points: [fromMesh.position, toMesh.position],
+      instance: edge
+    });
+  }
+});
+
+  exitMoveMode();
+  console.log("Zmiany pozycji anulowane");
+});
+
+function exitMoveMode() {
+  moveModeActive = false;
+  moveBtn.style.display = "inline-block";
+  confirmBtn.style.display = "none";
+  cancelBtn.style.display = "none";
+  originalPositions.clear();
+}
+
+// === Aktualizuje linie (edges) dla konkretnego punktu ===
+function updateEdgesForPoint(mesh) {
+  renderedEdges.forEach(edge => {
+    if (edge.metadata.fromId === mesh.metadata.id || edge.metadata.toId === mesh.metadata.id) {
+      const fromMesh = renderedPoints.find(m => m.metadata.id === edge.metadata.fromId);
+      const toMesh = renderedPoints.find(m => m.metadata.id === edge.metadata.toId);
+      if (fromMesh && toMesh) {
+        BABYLON.MeshBuilder.CreateLines(null, {
+          points: [fromMesh.position, toMesh.position],
+          instance: edge
+        });
+      }
+    }
+  });
+}
 
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
