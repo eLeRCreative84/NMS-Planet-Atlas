@@ -479,7 +479,13 @@
 <button id="confirmMove" style="display:none;">Zatwierdź zmiany</button>
 <button id="cancelMove" style="display:none;">Anuluj</button>
   </div>
-  
+ 
+<!-- 🔹 Tooltip z podpowiedziami -->
+  <div id="moveTooltip" class="edit-tooltip" style="display:none;">
+    💡 <b>Ctrl</b> – przesuwanie tylko w osi <b>Y</b><br>
+    💡 <b>Shift</b> – przesuwanie tylko po płaszczyźnie <b>X/Z</b>
+  </div>
+
 </div>  
 </div>
 	
@@ -707,14 +713,22 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
       if (distance) {
         const pickedPoint = ray.origin.add(ray.direction.scale(distance));
         const newPos = pickedPoint.subtract(dragOffset);
-    
-	
-	//jeśli Ctrl wciśnięty → tylko Y, inaczej pełna swoboda
-    if (pointerInfo.event.ctrlKey) {
-      pickedMesh.position.y = newPos.y;  // tylko Y
-    } else {
-      pickedMesh.position.copyFrom(newPos);  // pełna swoboda
-    }
+
+        //tryby przesuwania:
+        const ctrl = pointerInfo.event.ctrlKey;
+        const shift = pointerInfo.event.shiftKey;
+
+        if (ctrl) {
+          // tylko Y
+          pickedMesh.position.y = newPos.y;
+        } else if (shift) {
+          // tylko X i Z
+          pickedMesh.position.x = newPos.x;
+          pickedMesh.position.z = newPos.z;
+        } else {
+          // pełna swoboda
+          pickedMesh.position.copyFrom(newPos);
+        }
 		
 		//aktualizacja węzłów
     updateEdgesForPoint(pickedMesh);
@@ -755,7 +769,34 @@ function hideBabylonScene() {
   babylonRenderLoopActive = false;
 }
 
-//////////////////// Tłumaczenie ///////////////////////
+/////////////////////////////// Tryb mobilny - przełączanie widoczności panelu bocznego ////////////////////////////
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.getElementById("sidebar");
+  const toggleButton = document.createElement("button");
+  toggleButton.textContent = "☰ Menu";
+  toggleButton.id = "menu-toggle";
+  toggleButton.style.cssText = `
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 16px;
+  `;
+  document.body.appendChild(toggleButton);
+
+  toggleButton.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+  });
+});
+
+///////////////////////////////////////////////////////// Tłumaczenie //////////////////////////////////////////
 let currentLang = "pl"; // domyślny język
 
 function setLanguage(lang) {
@@ -2367,6 +2408,9 @@ moveBtn.addEventListener("click", () => {
   confirmBtn.style.display = "inline-block";
   cancelBtn.style.display = "inline-block";
 
+  // pokaż tooltip z instrukcjami Ctrl / Shift
+  document.getElementById("moveTooltip").style.display = "block";
+
   // zapamiętaj oryginalne pozycje wszystkich meshów
   originalPositions.clear();
   renderedPoints.forEach(m => {
@@ -2428,6 +2472,10 @@ function exitMoveMode() {
   moveBtn.style.display = "inline-block";
   confirmBtn.style.display = "none";
   cancelBtn.style.display = "none";
+  
+  // [ukryj tooltip
+  document.getElementById("moveTooltip").style.display = "none";
+  
   originalPositions.clear();
 }
 
@@ -2446,6 +2494,7 @@ function updateEdgesForPoint(mesh) {
     }
   });
 }
+
 
 ////////////////////////////////////////////////////////////////////
 //------------------ Planety, lista, tworzenie -------------------//
