@@ -609,6 +609,12 @@ function initBabylon() {
   babylonCamera.maxZ = 20000;
   babylonCamera.lowerRadiusLimit = 50;
   babylonCamera.upperRadiusLimit = 8000;
+  
+	  //zwiększamy szybkość przesuwania sceny (prawy przycisk myszy)
+	babylonCamera.panningSensibility = 10;  // mniejsza liczba = szybsze przesuwanie
+	babylonCamera.panningInertia = 0.8;      // mniejsza = mniej bezwładności (bardziej responsywne)
+	babylonCamera.panningAxis = new BABYLON.Vector3(1, 1, 0); // standardowe przesuwanie w poziomie i pionie
+
 
   new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), babylonScene);
 
@@ -701,7 +707,14 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
       if (distance) {
         const pickedPoint = ray.origin.add(ray.direction.scale(distance));
         const newPos = pickedPoint.subtract(dragOffset);
-        pickedMesh.position.copyFrom(newPos);
+    
+	
+	//jeśli Ctrl wciśnięty → tylko Y, inaczej pełna swoboda
+    if (pointerInfo.event.ctrlKey) {
+      pickedMesh.position.y = newPos.y;  // tylko Y
+    } else {
+      pickedMesh.position.copyFrom(newPos);  // pełna swoboda
+    }
 		
 		//aktualizacja węzłów
     updateEdgesForPoint(pickedMesh);
@@ -1798,6 +1811,35 @@ function addSolarSystemPoint(x, y, z, gal, targetRegionKey = null) {
   // inicjalizacja regionu jeśli nie istnieje
   if (!regions[key]) regions[key] = { pointsData: [], edges: [] };
 
+  //sprawdzenie, czy w tym regionie już istnieje punkt o identycznych współrzędnych
+	const EPS = 0.01; // tolerancja błędu
+	const duplicate = regions[key].pointsData.find(
+	  p => Math.abs(p.x - x) < EPS &&
+		   Math.abs(p.y - y) < EPS &&
+		   Math.abs(p.z - z) < EPS
+	);
+
+  if (duplicate) {
+    //Alert i pytanie o losowe przesunięcie
+    const result = confirm(
+      "Układ o takich współrzędnych już istnieje.\n" +
+      "Czy chcesz utworzyć nowy układ w losowym położeniu?"
+    );
+
+    if (!result) {
+      alert("Tworzenie układu zostało anulowane.");
+      return null;
+    }
+
+    //Losujemy nowe współrzędne w promieniu 100 jednostek od miejsca kolizji
+    const offset = 100;
+    const randomOffset = () => (Math.random() * 2 - 1) * offset;
+    x = Math.min(Math.max(x + randomOffset(), 0), REGION_WIDTH);
+    y = Math.min(Math.max(y + randomOffset(), 0), REGION_HEIGHT);
+    z = Math.min(Math.max(z + randomOffset(), 0), REGION_DEPTH);
+  }
+
+  //tworzymy nowy punkt
   const id = `pt_${uniqueIdCounter++}`;
   const pd = { id, x, y, z, galactic: gal || "", name: nameInput.value.trim() || "" };
 
@@ -1805,18 +1847,28 @@ function addSolarSystemPoint(x, y, z, gal, targetRegionKey = null) {
 
   // rysujemy węzeł od zaznaczonego punktu, tylko jeśli istnieje zaznaczony w tym regionie
   if (selectedPoint && selectedPoint.metadata && selectedPoint.metadata.regionKey === key) {
-    const prevPd = {
-      x: selectedPoint.position.x,
-      y: selectedPoint.position.y,
-      z: selectedPoint.position.z,
-      id: selectedPoint.metadata.id
-    };
-    const edgeMesh = createEdgeBetweenPoints(prevPd, pd);
-   
-   regions[key].edges.push({ fromId: prevPd.id, toId: pd.id });
- 
-    renderedEdges.push(edgeMesh); // dodajemy do globalnej tablicy
-    pd.connectedToPrev = true;    // flaga, że jest połączony z poprzednim
+    // upewnij się, że nie tworzymy krawędzi do samego siebie (czyli duplikatu)
+    const isSamePos = (
+      selectedPoint.position.x === x &&
+      selectedPoint.position.y === y &&
+      selectedPoint.position.z === z
+    );
+
+    if (!isSamePos) {
+      const prevPd = {
+        x: selectedPoint.position.x,
+        y: selectedPoint.position.y,
+        z: selectedPoint.position.z,
+        id: selectedPoint.metadata.id
+      };
+      const edgeMesh = createEdgeBetweenPoints(prevPd, pd);
+
+      regions[key].edges.push({ fromId: prevPd.id, toId: pd.id });
+      renderedEdges.push(edgeMesh); // dodajemy do globalnej tablicy
+      pd.connectedToPrev = true;    // flaga, że jest połączony z poprzednim
+    } else {
+      pd.connectedToPrev = false;
+    }
   } else {
     pd.connectedToPrev = false;
   }
@@ -1828,7 +1880,7 @@ function addSolarSystemPoint(x, y, z, gal, targetRegionKey = null) {
   if (loadedRegionKey === key) {
     loadRegionByKey(key, { selectId: id });
   }
-  
+
   return id;
 }
 
@@ -2268,6 +2320,8 @@ document.getElementById("editPointSolarSystem").addEventListener("click",()=>{
   selectedPoint.position.set(entry.x, entry.y, entry.z);
   selectedPoint.metadata.galactic = entry.galactic;
   selectedPoint.metadata.name = entry.name;
+
+  updateEdgesForPoint(selectedPoint);
 
   // odśwież listę
   refreshSolarListForLoadedRegion();
