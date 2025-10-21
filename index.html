@@ -754,42 +754,27 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
 }
 
 function showBabylonScene() {
-  // Wyłącz GlobeGL
   if (window.globe) {
-    try {
-      globe.pause(); // jeśli biblioteka GlobeGL to obsługuje
-    } catch (e) {}
-    document.getElementById("globeWrapper").style.display = "none";
+    try { globe.pause(); } catch(e) {}
   }
-
+  document.getElementById("globeWrapper").style.display = "none";
   document.getElementById("babylonWrapper").style.display = "block";
 
-  if (!babylonEngine) {
-    initBabylon();
-  }
-
+  if (!babylonEngine) initBabylon();
   babylonRenderLoopActive = true;
   setTimeout(() => babylonEngine.resize(), 100);
 }
 
 function hideBabylonScene() {
-  // Zniszcz Babylon, żeby zwolnić GPU kontekst
-  if (babylonScene) {
-    babylonScene.dispose();
-    babylonScene = null;
-  }
-  if (babylonEngine) {
-    babylonEngine.dispose();
-    babylonEngine = null;
-  }
-
+  if (babylonScene) { babylonScene.dispose(); babylonScene = null; }
+  if (babylonEngine) { babylonEngine.dispose(); babylonEngine = null; }
   babylonRenderLoopActive = false;
   document.getElementById("babylonWrapper").style.display = "none";
 
-  // Dopiero teraz włącz GlobeGL
   document.getElementById("globeWrapper").style.display = "block";
   if (window.globe && globe.resume) globe.resume();
 }
+
 
 ///////////////////////////////////////////////////////// Tłumaczenie //////////////////////////////////////////
 let currentLang = "pl"; // domyślny język
