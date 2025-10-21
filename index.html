@@ -753,24 +753,42 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
   console.log("Babylon.js scene initialized");
 }
 
-// === WŁĄCZ / WYŁĄCZ BABYLON ===
 function showBabylonScene() {
-  document.getElementById("globeWrapper").style.display = "none";
+  // Wyłącz GlobeGL
+  if (window.globe) {
+    try {
+      globe.pause(); // jeśli biblioteka GlobeGL to obsługuje
+    } catch (e) {}
+    document.getElementById("globeWrapper").style.display = "none";
+  }
+
   document.getElementById("babylonWrapper").style.display = "block";
-if (window.globe) {
-  try { globe.pause(); } catch(e){}
-  try { globe.renderer.dispose(); } catch(e){}
-  try { globe = null; } catch(e){}
-}
-  if (!babylonEngine) initBabylon();
+
+  if (!babylonEngine) {
+    initBabylon();
+  }
+
   babylonRenderLoopActive = true;
   setTimeout(() => babylonEngine.resize(), 100);
 }
 
 function hideBabylonScene() {
-  document.getElementById("babylonWrapper").style.display = "none";
-  document.getElementById("globeWrapper").style.display = "block";
+  // Zniszcz Babylon, żeby zwolnić GPU kontekst
+  if (babylonScene) {
+    babylonScene.dispose();
+    babylonScene = null;
+  }
+  if (babylonEngine) {
+    babylonEngine.dispose();
+    babylonEngine = null;
+  }
+
   babylonRenderLoopActive = false;
+  document.getElementById("babylonWrapper").style.display = "none";
+
+  // Dopiero teraz włącz GlobeGL
+  document.getElementById("globeWrapper").style.display = "block";
+  if (window.globe && globe.resume) globe.resume();
 }
 
 ///////////////////////////////////////////////////////// Tłumaczenie //////////////////////////////////////////
