@@ -769,33 +769,6 @@ function hideBabylonScene() {
   babylonRenderLoopActive = false;
 }
 
-/////////////////////////////// Tryb mobilny - przełączanie widoczności panelu bocznego ////////////////////////////
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const sidebar = document.getElementById("sidebar");
-  const toggleButton = document.createElement("button");
-  toggleButton.textContent = "☰ Menu";
-  toggleButton.id = "menu-toggle";
-  toggleButton.style.cssText = `
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 20;
-    background: rgba(0,0,0,0.6);
-    color: white;
-    border: none;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 16px;
-  `;
-  document.body.appendChild(toggleButton);
-
-  toggleButton.addEventListener("click", () => {
-    sidebar.classList.toggle("active");
-  });
-});
-
 ///////////////////////////////////////////////////////// Tłumaczenie //////////////////////////////////////////
 let currentLang = "pl"; // domyślny język
 
