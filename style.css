@@ -594,3 +594,37 @@ button:disabled {
   position: absolute;
 }
 
+/* === Responsywność dla telefonów === */
+@media (max-width: 768px) {
+  #regionMap, #solarList {
+    width: 160px;
+    font-size: 11px;
+  }
+
+  #cameraControls {
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  #hud {
+    transform: scale(0.9);
+    transform-origin: bottom right;
+  }
+}
+
+/* Dla bardzo małych ekranów (np. telefon pionowo) */
+@media (max-width: 480px) {
+  #regionMap, #solarList {
+    display: none; /* chowamy boczne panele */
+  }
+
+  #cameraControls {
+    width: calc(100% - 20px);
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+  }
+}
