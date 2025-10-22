@@ -448,43 +448,44 @@
 <!-- Zakładka PODRÓŻ -->
 <div id="journey" class="tab-content">
 
- <div>X: <input type="number" id="xInput" value="0">
-      Y: <input type="number" id="yInput" value="0">
-      Z: <input type="number" id="zInput" value="0">
-  </div>
+<div id="coordRow" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+  X: <input type="number" id="xInput" value="0">
+  Y: <input type="number" id="yInput" value="0">
+  Z: <input type="number" id="zInput" value="0">
+</div>
   
   <div style="height:0.5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
   
 	<div class="field">
 	  <label for="coordInput">Koordynaty:</label>
-	  <input id="coordInput" type="text">
+	  <input id="coordInput" placeholder="AAAA:BBBB:CCCC:DDDD" type="text">
 	</div>
 
 	<div class="field">
 	  <label for="nameInput">Nazwa układu:</label>
-	  <input id="nameInput" type="text">
+	  <input id="nameInput" placeholder="Podaj nazwę nowego układu gwiezdnego" type="text">
 	</div>
   
   <div style="height:0.5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div>
   <div>
     <button id="addPointSolarSystem">Dodaj układ</button>
-    <button id="zoomToPointSolarSystem">Zoom</button>
     <button id="editPointSolarSystem">Edytuj</button>
     <button id="deletePointSolarSystem">Usuń</button>
   </div>
  
 <div style="height:0.5px; background:#102b56; margin:0.5rem 0; border-radius:4px;"></div> 
   <div>
+    <button id="zoomToPointSolarSystem">Zoom</button>
 	<button id="movePointsMode">Przemieszczaj układy</button>
 <button id="confirmMove" style="display:none;">Zatwierdź zmiany</button>
 <button id="cancelMove" style="display:none;">Anuluj</button>
+<select id="skyboxSelect" onchange="setSkybox(this.value)">
+  <option value="sky1">Skybox 1</option>
+  <option value="sky2">Skybox 2</option>
+  <option value="sky3">Skybox 3</option>
+  </select>
   </div>
  
-<!-- 🔹 Tooltip z podpowiedziami -->
-  <div id="moveTooltip" class="edit-tooltip" style="display:none;">
-    💡 <b>Ctrl</b> – przesuwanie tylko w osi <b>Y</b><br>
-    💡 <b>Shift</b> – przesuwanie tylko po płaszczyźnie <b>X/Z</b>
-  </div>
 
 </div>  
 </div>
@@ -496,8 +497,8 @@
     <!-- nagłówek moja lokalizacja -->
     <div id="myLocationBox" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6); color:white; padding:0.5rem; border-radius:8px; z-index:10;">
       <div style="font-weight:bold; margin-bottom:0.5rem;" data-i18n="header_My_loc">Moja lokalizacja</div>
-      <label>X: <input type="number" id="myLat" step="0.01" style="width:70px;"></label>
-      <label>Y: <input type="number" id="myLng" step="0.01" style="width:70px;"></label>
+      <label>X: <input type="number" id="myLat" step="1" style="width:70px;"></label>
+      <label>Y: <input type="number" id="myLng" step="1" style="width:70px;"></label>
     </div>
     <!-- glob -->
     <div id="globeViz"></div>
@@ -532,14 +533,27 @@
  <div id="babylonWrapper" style="position: relative; width:100%; height:100%; display:none;">
 
 	 <!-- Babylon.js (ukryty na start) -->
-<canvas id="babylonCanvas" style="width:100%; height:100%; display:none;"></canvas>  
-	    <div id="regionMap"></div>
+<canvas id="babylonCanvas" style="width:100%; height:100%; display:none;"></canvas> 
+	
+	<!-- Tooltip z podpowiedziami -->
+	  <div id="moveTooltip" class="floating-tooltip">
+		💡 <b>Ctrl</b> – przesuwanie tylko w osi <b>Y</b><br>
+		💡 <b>Shift</b> – przesuwanie tylko po płaszczyźnie <b>X/Z</b>
+	  </div>
+ 
+<!-- Sidebar Mapa galaktyki - nagłowek -->
+<div id="regionMapHeader">Mapa galaktyki</div>
+<div id="galaxyCenter">☀</div>
+<div id="regionMap"></div>
 <div id="regionControls">
   <button id="enterGroup">+</button>
   <button id="exitGroup">-</button>
 </div>
 <div id="groupNameLabel"></div>
- 
+ <!-- Sidebar lista układów - nagłowek -->
+<div id="solarListHeader">
+  Lista układów gwiezdnych
+</div>
   <!-- Sidebar lista układów -->
 <div id="solarList"></div>
 </div>
@@ -595,6 +609,33 @@ function regionIndexKey(ix, iz) {
 }
 
 // === INICJALIZACJA SCENY BABYLON ===
+
+// === Skybox ===
+let skybox = null;
+let skyboxMaterial = null;
+
+function setSkybox(name) {
+  // usuń stary skybox jeśli istnieje
+  if (skybox) skybox.dispose();
+
+  skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 10000 }, babylonScene);
+  skyboxMaterial = new BABYLON.StandardMaterial("skyBoxMat", babylonScene);
+  skyboxMaterial.backFaceCulling = false;
+  skyboxMaterial.disableLighting = true;
+  skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+  skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+
+  skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+    `https://raw.githubusercontent.com/eLeRCreative84/NMS-Planet-Atlas/main/textures/skybox/${name}`,
+    babylonScene
+  );
+  skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+  skybox.material = skyboxMaterial;
+  skybox.infiniteDistance = true;
+
+  babylonScene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+}
+
 function initBabylon() {
   const canvas = document.getElementById("babylonCanvas");
    canvas.style.display = "block";
@@ -623,24 +664,10 @@ function initBabylon() {
 
 
   new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), babylonScene);
+ 
+ setSkybox("sky1");
 
-  // === Skybox ===
-  const skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 10000 }, babylonScene);
-  const skyboxMaterial = new BABYLON.StandardMaterial("skyBoxMat", babylonScene);
-  skyboxMaterial.backFaceCulling = false;
-  skyboxMaterial.disableLighting = true;
-  skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-  skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-  skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
-    "https://raw.githubusercontent.com/eLeRCreative84/NMS-Planet-Atlas/main/textures/skybox/sky1",
-    babylonScene
-  );
-  skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-  skybox.material = skyboxMaterial;
-  skybox.infiniteDistance = true;
-
-  babylonScene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
-
+//Materiały
     pointMat = new BABYLON.StandardMaterial("pointMat", babylonScene);
     pointMat.emissiveColor = new BABYLON.Color3(0,1,0); // zielony
 
@@ -1909,6 +1936,9 @@ const enterBtn = document.getElementById("enterGroup");
 const exitBtn = document.getElementById("exitGroup");
 const groupNameLabel = document.getElementById("groupNameLabel");
 
+// ustaw tekst startowy
+groupNameLabel.textContent = "Wybierz regiony";
+
 function updateControlsState() {
   if (level === 0) {
     // na poziomie galaktyki: można wejść, ale nie można wyjść
@@ -2020,6 +2050,8 @@ enterBtn.addEventListener("click", ()=>{
   drawGroupGrid(currentGroupX, currentGroupZ);
   updateControlsState();
 
+  updateGalaxyCenterPosition(currentGroupX, currentGroupZ);
+
   // === Po wejściu do grupy, ustaw kamerę nad środkiem obszaru
   babylonCamera.setTarget(new BABYLON.Vector3(REGION_WIDTH/2, REGION_HEIGHT/2, REGION_DEPTH/2));
   babylonCamera.alpha = Math.PI / 4;
@@ -2034,15 +2066,16 @@ exitBtn.addEventListener("click", ()=>{
   level = 0;
   currentGroupX = 0; currentGroupZ = 0;
   drawGalaxyGrid();
-  groupNameLabel.textContent = "";
+  // wróć do napisu podpowiedzi
+  groupNameLabel.textContent = "Wybierz regiony";
   // czyścimy załadowany region ze sceny (jeśli chcesz, możesz zostawić)
   clearRenderedPoints();
   updateControlsState();
   loadedRegionKey = null;
+  updateGalaxyCenterPosition(145, 113);
 });
 
 drawGalaxyGrid();
-groupNameLabel.textContent = "";
 
 
 // Funkcja aktualizuje kafelki grup (poziom galaktyki) pod kątem obecności punktów w regionach
@@ -2072,6 +2105,60 @@ function updateGalaxyTilesHasPoints() {
     else tile.classList.remove("hasPoints");
   });
 }
+
+const galaxyCenter = document.getElementById("galaxyCenter");
+
+// funkcja do aktualizacji pozycji centrum galaktyki
+function updateGalaxyCenterPosition(groupX, groupZ) {
+  // domyślnie (w widoku całej galaktyki) środek
+  galaxyCenter.style.top = "146px";
+  galaxyCenter.style.right = "128px";
+
+  // jeśli jesteśmy w trybie grupy — dopasuj narożnik
+  if (level === 1) {
+    // G6 (gx=1, gz=1)
+    if (groupX === 1 && groupZ === 1) {
+      
+      galaxyCenter.style.top = "249px";
+      galaxyCenter.style.right = "25px";
+      
+    }
+
+    // G7 (gx=2, gz=1)
+    else if (groupX === 2 && groupZ === 1) {
+      
+      galaxyCenter.style.top = "249px";
+      galaxyCenter.style.right = "233px";
+      
+    }
+
+    // G10 (gx=1, gz=2)
+    else if (groupX === 1 && groupZ === 2) {
+      galaxyCenter.style.top = "42px";
+      galaxyCenter.style.right = "25px";
+      
+    }
+
+    // G11 (gx=2, gz=2)
+    else if (groupX === 2 && groupZ === 2) {
+      galaxyCenter.style.top = "42px";
+      galaxyCenter.style.right = "233px";
+      
+    }
+	
+    // inne grupy — ukryj centrum galaktyki
+    else {
+      galaxyCenter.style.display = "none";
+    }
+  }
+
+  // jeśli wyjdziemy z trybu grupy, przywróć widoczność w centrum
+  else {
+    galaxyCenter.style.display = "block";
+  }
+}
+
+
 
 /* ===============================
    SIDEBAR – lista układów
@@ -2384,7 +2471,7 @@ moveBtn.addEventListener("click", () => {
   cancelBtn.style.display = "inline-block";
 
   // pokaż tooltip z instrukcjami Ctrl / Shift
-  document.getElementById("moveTooltip").style.display = "block";
+  if (moveTooltip) moveTooltip.classList.add("visible");
 
   // zapamiętaj oryginalne pozycje wszystkich meshów
   originalPositions.clear();
@@ -2448,8 +2535,8 @@ function exitMoveMode() {
   confirmBtn.style.display = "none";
   cancelBtn.style.display = "none";
   
-  // [ukryj tooltip
-  document.getElementById("moveTooltip").style.display = "none";
+  // ukryj tooltip
+  if (moveTooltip) moveTooltip.classList.remove("visible");
   
   originalPositions.clear();
 }
