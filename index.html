@@ -615,42 +615,48 @@ let skybox = null;
 let skyboxMaterial = null;
 
 function setSkybox(name) {
-  // usuń stary skybox jeśli istnieje
-  if (skybox) skybox.dispose();
+  if (!babylonScene) return;
 
-  skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 10000 }, babylonScene);
-  skyboxMaterial = new BABYLON.StandardMaterial("skyBoxMat", babylonScene);
-  skyboxMaterial.backFaceCulling = false;
-  skyboxMaterial.disableLighting = true;
-  skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-  skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+  // === Utwórz nowy skybox (start: przezroczysty) ===
+  const newSkybox = BABYLON.MeshBuilder.CreateBox("skyBoxTmp", { size: 10000 }, babylonScene);
+  const newMaterial = new BABYLON.StandardMaterial("skyBoxMatTmp", babylonScene);
+  newMaterial.backFaceCulling = false;
+  newMaterial.disableLighting = true;
+  newMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+  newMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+  newMaterial.alpha = 0; // zaczynamy od pełnej przezroczystości
 
-  skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+  newMaterial.reflectionTexture = new BABYLON.CubeTexture(
     `https://raw.githubusercontent.com/eLeRCreative84/NMS-Planet-Atlas/main/textures/skybox/${name}`,
     babylonScene
   );
-  skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-  skybox.material = skyboxMaterial;
-  skybox.infiniteDistance = true;
+  newMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
 
-  // animacja fade in/out
-  const animTime = 30; // liczba klatek
+  newSkybox.material = newMaterial;
+  newSkybox.infiniteDistance = true;
+
+  // === Animacja fade (przenikanie) ===
+  const animTime = 30; // liczba klatek (ok. 0.5 sekundy)
   let frame = 0;
 
   const fadeInterval = setInterval(() => {
     frame++;
     const t = frame / animTime;
-    if (skyboxMaterial) skyboxMaterial.alpha = 1 - t;  // fade out stary
-    newMaterial.alpha = t;                              // fade in nowy
+
+    if (skyboxMaterial) skyboxMaterial.alpha = 1 - t; // stary znika
+    newMaterial.alpha = t;                            // nowy się pojawia
 
     if (frame >= animTime) {
       clearInterval(fadeInterval);
-      // usuń stary skybox
+
+      // usuń stary skybox po zakończeniu animacji
       if (skybox) skybox.dispose();
+
+      // ustaw nowy jako aktywny
       skybox = newSkybox;
       skyboxMaterial = newMaterial;
     }
-  }, 16); // ~60fps
+  }, 16); // ~60 FPS
 }
 
 function initBabylon() {
