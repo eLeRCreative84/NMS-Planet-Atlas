@@ -633,7 +633,24 @@ function setSkybox(name) {
   skybox.material = skyboxMaterial;
   skybox.infiniteDistance = true;
 
-  babylonScene.clearColor = new BABYLON.Color4(0, 0, 0, 1);
+  // animacja fade in/out
+  const animTime = 30; // liczba klatek
+  let frame = 0;
+
+  const fadeInterval = setInterval(() => {
+    frame++;
+    const t = frame / animTime;
+    if (skyboxMaterial) skyboxMaterial.alpha = 1 - t;  // fade out stary
+    newMaterial.alpha = t;                              // fade in nowy
+
+    if (frame >= animTime) {
+      clearInterval(fadeInterval);
+      // usuń stary skybox
+      if (skybox) skybox.dispose();
+      skybox = newSkybox;
+      skyboxMaterial = newMaterial;
+    }
+  }, 16); // ~60fps
 }
 
 function initBabylon() {
