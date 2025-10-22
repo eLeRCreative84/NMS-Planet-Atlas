@@ -520,6 +520,12 @@ button:disabled {
   box-shadow: 0 0 6px rgba(255, 230, 0, 0.5);
 }
 
+.regionTile.hasPointsGroup {
+  outline: 3px solid yellow;
+  outline-offset: -3px;
+}
+
+
 #groupNameLabel {
   position: absolute;
   top: 294px;
