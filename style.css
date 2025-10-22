@@ -494,13 +494,13 @@ button:disabled {
 
 /* regionMap: po prawej górze, 4x4 */
 #regionMap {
-  position:absolute; top:10px; right:10px; width:240px; height:240px;
+  position:absolute; top:40px; right:10px; width:240px; height:240px;
   background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
   display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(4,1fr);
   gap:4px; padding:6px; box-sizing:border-box;
 }
 .regionTile {
-  background:rgba(255,255,255,0.02);
+  background:rgba(25,25,25,0.5);
   border:1px solid rgba(255,255,255,0.06);
   cursor:pointer; user-select:none;
   display:flex; align-items:center; justify-content:center;
@@ -508,7 +508,7 @@ button:disabled {
 }
 .regionTile:hover { filter:brightness(1.2); }
 .regionTile.selected { outline:2px solid rgba(0,200,0,0.9); }
-#regionControls { position:absolute; top:260px; right:10px; display:flex; gap:6px; }
+#regionControls { position:absolute; top:290px; right:10px; display:flex; gap:6px; }
 #regionControls button { padding:6px 8px; }
 
   #regionControls button:disabled {
@@ -522,18 +522,25 @@ button:disabled {
 
 #groupNameLabel {
   position: absolute;
-  top: 267px;
-  right: 90px; /* po lewej od przycisków */
+  top: 294px;
+  right: 86px; 
+  width: 120px;
   color: #fff;
   font-size: 14px;
   opacity: 0.8;
   font-weight: 500;
+  border-radius: 8px;
+  background: rgba(25, 25, 25, 0.8);
+  padding: 8px 22px;
+  text-align: left;
+ 
+  
 }
   
 /* === LISTA UKŁADÓW (SIDEBAR) === */
 #solarList {
   position: absolute;
-  top: 320px;          /* poniżej regionControls (260px + trochę marginesu) */
+  top: 368px;          /* poniżej regionControls (260px + trochę marginesu) */
   right: 10px;
   width: 240px;        /* taka sama szerokość jak regionMap */
   max-height: calc(100vh - 320px); /* nie wychodzi poza ekran */
@@ -587,25 +594,93 @@ button:disabled {
 
 /* HUD Babylon (na wierzchu) */
 #regionMap,
+#regionMapHeader,
 #regionControls,
 #groupNameLabel,
+#solarListHeader,
 #solarList {
   z-index: 5; /* wyraźnie powyżej canvasa */
   position: absolute;
 }
 
-.edit-tooltip {
-  margin-top: 8px;
-  padding: 6px 10px;
-  font-size: 13px;
-  line-height: 1.4;
-  color: #ddd;
-  background: rgba(30, 30, 30, 0.85);
-  border-radius: 8px;
-  max-width: 300px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+#galaxyCenter {
+  z-index: 6; 
+  position: absolute;
 }
 
+.floating-tooltip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1000; /* nad sceną Babylon */
+  padding: 8px 12px;
+  background: rgba(25, 25, 25, 0.8);
+  color: #eee;
+  font-size: 13px;
+  line-height: 1.4;
+  border-radius: 8px;
+  pointer-events: none; /* nie blokuje kliknięć */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.25s ease;
+  opacity: 0;
+}
+.floating-tooltip.visible {
+  opacity: 1;
+}
+
+#solarListHeader {
+  position: absolute;
+  top: 340px;
+  right: 10px; 
+  width: 216px; 
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  opacity: 0.8;
+  font-weight: 500;
+  background: rgba(25, 25, 25, 0.8);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+#regionMapHeader {
+  position: absolute;
+  top: 10px;
+  right: 10px; 
+  width: 216px; 
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  opacity: 0.8;
+  font-weight: 500;
+  background: rgba(25, 25, 25, 0.8);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+#galaxyCenter {
+  position: absolute;
+  top: 146px;
+  right: 128px; 
+  width: 10px; 
+  font-size: 20px;
+  color: yellow;
+  text-align: center;
+  font-weight: 500;
+
+  text-shadow: /* efekt glow tylko na czcionkę */
+    0 0 5px #ffd700,
+    0 0 10px #ffd700,
+    0 0 20px #ffaa00;
+}
+
+#coordRow input {
+  width: 60px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
 
 /* --- Tryb mobilny --- */
 @media (max-width: 768px) {
