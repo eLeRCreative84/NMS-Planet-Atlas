@@ -781,8 +781,15 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
 }
 
 // === WŁĄCZ / WYŁĄCZ BABYLON ===
+const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
 function showBabylonScene() {
-  document.getElementById("globeWrapper").style.display = "none";
+  if (isMobile) {
+    // Na telefonie tylko jedna scena włączona
+    if (window.globe && typeof globe.pause === "function") globe.pause();
+    document.getElementById("globeWrapper").style.display = "none";
+  }
+
   document.getElementById("babylonWrapper").style.display = "block";
 
   if (!babylonEngine) initBabylon();
@@ -792,7 +799,13 @@ function showBabylonScene() {
 
 function hideBabylonScene() {
   document.getElementById("babylonWrapper").style.display = "none";
-  document.getElementById("globeWrapper").style.display = "block";
+  
+  if (isMobile) {
+    // Na telefonie wznawiamy tylko GlobeGL
+    document.getElementById("globeWrapper").style.display = "block";
+    if (window.globe && typeof globe.resume === "function") globe.resume();
+  }
+
   babylonRenderLoopActive = false;
 }
 	
