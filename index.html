@@ -782,18 +782,41 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
 
 // === WŁĄCZ / WYŁĄCZ BABYLON ===
 function showBabylonScene() {
-  document.getElementById("globeWrapper").style.display = "none";
+  // Wyłącz GlobeGL
+  if (window.globe) {
+    try {
+      globe.pause(); // jeśli biblioteka GlobeGL to obsługuje
+    } catch (e) {}
+    document.getElementById("globeWrapper").style.display = "none";
+  }
+
   document.getElementById("babylonWrapper").style.display = "block";
 
-  if (!babylonEngine) initBabylon();
+  if (!babylonEngine) {
+    initBabylon();
+  }
+
   babylonRenderLoopActive = true;
   setTimeout(() => babylonEngine.resize(), 100);
 }
 
 function hideBabylonScene() {
-  document.getElementById("babylonWrapper").style.display = "none";
-  document.getElementById("globeWrapper").style.display = "block";
+  // Zniszcz Babylon, żeby zwolnić GPU kontekst
+  if (babylonScene) {
+    babylonScene.dispose();
+    babylonScene = null;
+  }
+  if (babylonEngine) {
+    babylonEngine.dispose();
+    babylonEngine = null;
+  }
+
   babylonRenderLoopActive = false;
+  document.getElementById("babylonWrapper").style.display = "none";
+
+  // Dopiero teraz włącz GlobeGL
+  document.getElementById("globeWrapper").style.display = "block";
+  if (window.globe && globe.resume) globe.resume();
 }
 	
 ///////////////////////////////////////////////////////// Tłumaczenie //////////////////////////////////////////
@@ -2070,37 +2093,48 @@ exitBtn.addEventListener("click", ()=>{
   clearRenderedPoints();
   updateControlsState();
   loadedRegionKey = null;
+  updateGalaxyTilesHasPoints();
   updateGalaxyCenterPosition(145, 113);
 });
 
 drawGalaxyGrid();
+updateGalaxyTilesHasPoints();
 
 
 // Funkcja aktualizuje kafelki grup (poziom galaktyki) pod kątem obecności punktów w regionach
 function updateGalaxyTilesHasPoints() {
-  if(level !== 0) return; // tylko dla poziomu galaktyki
+  if (level !== 0) return; // tylko w widoku GALAKTYKI
+
   const tiles = regionMapEl.querySelectorAll(".regionTile");
+
   tiles.forEach(tile => {
     const gx = parseInt(tile.dataset.gx, 10);
     const gz = parseInt(tile.dataset.gz, 10);
+
     let hasPoints = false;
 
-    // sprawdzamy 4x4 regiony w tej grupie
-    for(let rz = 0; rz < REGIONS_PER_GROUP; rz++) {
-      for(let rx = 0; rx < REGIONS_PER_GROUP; rx++) {
+    // sprawdzamy wszystkie 4x4 regiony należące do tej grupy
+    for (let rz = 0; rz < REGIONS_PER_GROUP; rz++) {
+      for (let rx = 0; rx < REGIONS_PER_GROUP; rx++) {
         const regionX = gx * REGIONS_PER_GROUP + rx;
         const regionZ = gz * REGIONS_PER_GROUP + rz;
         const key = regionIndexKey(regionX, regionZ);
-        if(regions[key] && regions[key].pointsData && regions[key].pointsData.length > 0) {
+
+        if (
+          regions[key] &&
+          regions[key].pointsData &&
+          regions[key].pointsData.length > 0
+        ) {
           hasPoints = true;
           break;
         }
       }
-      if(hasPoints) break;
+      if (hasPoints) break;
     }
 
-    if(hasPoints) tile.classList.add("hasPoints");
-    else tile.classList.remove("hasPoints");
+    // dodaj lub usuń klasę (żółta obwódka)
+    if (hasPoints) tile.classList.add("hasPointsGroup");
+    else tile.classList.remove("hasPointsGroup");
   });
 }
 
