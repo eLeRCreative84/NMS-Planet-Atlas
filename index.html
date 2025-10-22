@@ -782,15 +782,26 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
 
 // === WŁĄCZ / WYŁĄCZ BABYLON ===
 function showBabylonScene() {
-  // Pauzujemy GlobeGL
-  if (window.globe && typeof globe.pause === "function") {
-    globe.pause();
+  // Jeśli Globe istnieje, dispose i pauza
+  if (window.globe) {
+    try {
+      if (typeof globe.pause === "function") globe.pause();
+      if (typeof globe.dispose === "function") globe.dispose();
+    } catch (e) { console.warn("Nie udało się dispose GlobeGL:", e); }
   }
 
   document.getElementById("globeWrapper").style.display = "none";
   document.getElementById("babylonWrapper").style.display = "block";
 
-  if (!babylonEngine) initBabylon();
+  // Tworzymy Babylon jeśli nie istnieje
+  if (!babylonEngine) {
+    initBabylon();
+  } else if (babylonScene) {
+    // upewniamy się, że scena nie jest zniszczona
+    babylonScene.dispose();
+    initBabylon();
+  }
+
   babylonRenderLoopActive = true;
   setTimeout(() => babylonEngine.resize(), 100);
 }
@@ -799,16 +810,24 @@ function hideBabylonScene() {
   document.getElementById("babylonWrapper").style.display = "none";
   document.getElementById("globeWrapper").style.display = "block";
 
-  // Wznawiamy GlobeGL
-  if (window.globe && typeof globe.resume === "function") {
-    globe.resume();
+  // Dispose Babylon
+  if (babylonScene) {
+    babylonScene.dispose();
+    babylonScene = null;
   }
-
+  if (babylonEngine) {
+    babylonEngine.dispose();
+    babylonEngine = null;
+  }
   babylonRenderLoopActive = false;
+
+  // Tworzymy lub wznawiamy GlobeGL
+  if (window.globe) {
+    try {
+      if (typeof globe.resume === "function") globe.resume();
+    } catch (e) { console.warn("Nie udało się wznowić GlobeGL:", e); }
+  }
 }
-
-
-
 ///////////////////////////////////////////////////////// Tłumaczenie //////////////////////////////////////////
 let currentLang = "pl"; // domyślny język
 
