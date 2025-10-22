@@ -696,7 +696,7 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
       if (pickInfo.hit && pickInfo.pickedMesh && renderedPoints.includes(pickInfo.pickedMesh)) {
         pickedMesh = pickInfo.pickedMesh;
 
-        // 🔹 utwórz płaszczyznę prostopadłą do kierunku patrzenia kamery,
+        // utwórz płaszczyznę prostopadłą do kierunku patrzenia kamery,
         // przechodzącą przez pozycję punktu
         const camForward = babylonCamera.getDirection(BABYLON.Axis.Z);
         dragPlane = BABYLON.Plane.FromPositionAndNormal(pickedMesh.position, camForward);
@@ -782,6 +782,11 @@ babylonScene.onPointerObservable.add((pointerInfo) => {
 
 // === WŁĄCZ / WYŁĄCZ BABYLON ===
 function showBabylonScene() {
+  // Pauzujemy GlobeGL
+  if (window.globe && typeof globe.pause === "function") {
+    globe.pause();
+  }
+
   document.getElementById("globeWrapper").style.display = "none";
   document.getElementById("babylonWrapper").style.display = "block";
 
@@ -793,6 +798,12 @@ function showBabylonScene() {
 function hideBabylonScene() {
   document.getElementById("babylonWrapper").style.display = "none";
   document.getElementById("globeWrapper").style.display = "block";
+
+  // Wznawiamy GlobeGL
+  if (window.globe && typeof globe.resume === "function") {
+    globe.resume();
+  }
+
   babylonRenderLoopActive = false;
 }
 
